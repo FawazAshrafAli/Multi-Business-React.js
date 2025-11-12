@@ -1,0 +1,106 @@
+import React, { useEffect, useState } from 'react'
+import useEnquiryForm from '../../../hooks/useServiceEnquiry';
+
+import location from '../../../lib/api/location';
+import service from '../../../lib/api/service';
+
+
+const DarkEnquiryForm = ({company, setMessage, setMessageClass}) => {
+    const [states, setStates] = useState([]);
+    const [statesLoading, setStatesLoading] = useState(false);
+
+    const [services, setServices] = useState([]);
+
+    
+
+    const {
+        formData,
+        handleChange,
+        handleSubmit,        
+    } = useEnquiryForm({}, company, setMessage, setMessageClass);
+
+
+    // States
+    useEffect(() => {
+        const fetchStates = async () => {
+            try {
+                const response = await location.getStates();
+                setStates(response.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setStatesLoading(false);
+            }
+        };
+
+        fetchStates();
+        
+    }, []);
+
+    // Services
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await service.getServices(company?.slug);
+                setServices(response.data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        fetchServices();
+        
+    }, [company]);
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+
+        
+
+        let success = false;
+
+        try {
+            success = await handleSubmit(e);
+        } catch (err) {
+            // Fallback for unexpected errors
+            console.error('Unexpected error:', err);
+            setMessage('An unexpected error occurred.');
+            setMessageClass('bg-danger');
+        }
+
+    };
+
+  return (
+    <>
+        <div className="faq-form-section" style={{background:"#00000059", padding: "30px", boxShadow: "none", borderRadius: "0", border: "0"}}>
+            <h2 style={{color:"#fff"}}>Get A Quote</h2>
+            <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
+            <form action="#" method="post" onSubmit={handleFormSubmit}>
+                <input type="text" name="name" placeholder="Your Name:" value={formData?.name || ''} onChange={handleChange} required/><br/>
+                <input type="tel" name="phone" placeholder="Phone Number:" value={formData?.phone || ''} onChange={handleChange} pattern="^[^A-Za-z]*$" title="Phone number must not contain letters." required /><br/>
+                <input type="email" name="email" placeholder="E-Mail Address:" value={formData?.email || ''} onChange={handleChange} required/><br/>
+                <select className="country" name="service" value={formData?.service || ''} onChange={handleChange} required>
+                    <option value="" disabled hidden>-- Select Service --</option>
+                    {services.map((service, index) => <option key={service.slug || index + 1} value={service.slug}>{service.name}</option>)}
+
+                </select><br/>
+                <select className="country" name="state" value={formData?.state || ''} onChange={handleChange} required>
+                    <option value="" disabled hidden>-- Select State --</option>
+                    {statesLoading? <option value="" disabled>Loading . . .</option> :
+                    states&&states.map((state) => <option key={state.slug} value={state.slug}>{state.name}</option>)
+                    }
+                
+                </select><br/>
+
+                <div className="frm-btn-sctn">
+                    <div>
+                        <button className="primary_button" role="button" type="submit">SUBMIT</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </>
+  )
+}
+
+export default DarkEnquiryForm

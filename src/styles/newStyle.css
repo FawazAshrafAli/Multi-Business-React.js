@@ -1,0 +1,534 @@
+ :root{
+    --bg:#f5f6f8; --card:#fff; --text:#1f2937; --muted:#6b7280;
+    --brand:#2563eb; --accent:#f59e0b; --line:#e5e7eb;
+    --radius:14px; --shadow:0 6px 18px rgba(16,24,40,.08);
+  }
+  *{box-sizing:border-box}
+ 
+ 
+  /* section wrapper */
+  #bznew_list_section{padding-block:40px; background:var(--bg); }
+  .bznew_list_card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
+  .bznew_list_muted{color:var(--muted)}
+
+.bznew_list_catBtn .bz_caret{ transition: transform .2s ease; }
+.bznew_list_catBtn[aria-expanded="true"] .bz_caret{ transform: rotate(180deg); }
+
+  /* toolbar */
+  .bznew_list_breadcrumb{font-size:12px; color:#6b7280}
+  .bznew_list_breadcrumb a{color:#6b7280; text-decoration:none}
+  .bznew_list_headline{font-size:22px; margin:6px 0 10px}
+  .bznew_list_headline small{font-weight:600; color:#6b7280; font-size:14px}
+
+  .bznew_list_searchRow{
+    display:flex; align-items:center; gap:.75rem;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    padding:.5rem .75rem; box-shadow:var(--shadow);
+    /* keep everything in one line by default */
+    flex-wrap:nowrap;
+  }
+  @media (max-width: 768px){ .bznew_list_searchRow{ flex-wrap:wrap } }
+  
+  
+  /* --- toolbar pieces get an order we can reshuffle on mobile --- */
+.bznew_list_searchRow { display:flex; flex-wrap:wrap; align-items:center; gap:.75rem; }
+
+/* default (desktop/tablet) order */
+.bznew_list_iconBtn{ order:0; }
+.bznew_list_search  { order:1; flex:1 1 260px; min-width:260px; }
+.bznew_list_nearme  { order:2; }
+.bznew_list_cityrail{ order:3; width:100%; }
+
+/* “Near Me” chip style */
+.bznew_list_nearme{
+  display:inline-flex; align-items:center; gap:.45rem;
+  padding:.55rem 1rem; border-radius:999px;
+  background:#fff; border:1px solid #d8dee6; color:#111; line-height:1;
+  box-shadow:0 1px 0 rgba(16,24,40,.02);
+  white-space:nowrap; font-weight:600; cursor:pointer;
+}
+.bznew_list_nearme .icon{ font-size:16px; opacity:.8 }
+
+/* ----- PHONE layout: put Near Me first, then Search, then city chips ----- */
+@media (max-width:576px){
+  .bznew_list_nearme { order:1; justify-content:center; }
+  .bznew_list_search  { order:2; flex:1 1 100%; min-width:0; }
+  .bznew_list_cityrail{ order:3; }
+  .bznew_list_iconBtn { order:0; }
+}
+
+
+  .bznew_list_iconBtn{border:none; background:#f3f4f6; border-radius:10px; padding:.6rem; display:grid; place-items:center; cursor:pointer}
+
+  .bznew_list_search{
+    flex:1 1 320px; display:flex; align-items:center; gap:.5rem;
+    background:#f3f4f6; padding:.55rem .85rem; border-radius:999px; min-width:220px
+  }
+  .bznew_list_search input{border:none; background:transparent; outline:none; width:100%; font-size:14px; padding:0; margin:0;}
+
+  /* Near Me pill */
+  .bznew_nearme{
+    flex:0 0 auto; display:inline-flex; align-items:center; gap:.4rem;
+    border:1px solid #d8dee6; border-radius:999px; padding:.5rem .9rem;
+    background:#fff; color:#111; white-space:nowrap; font-size:.95rem;
+  }
+  .bznew_nearme .dot{font-size:16px}
+
+  /* mobile categories dropdown (<lg) */
+  .bznew_list_catBtn{width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 1px 0 rgba(16,24,40,.02); cursor:pointer}
+  .bznew_list_catMenu{position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:999; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 16px 32px rgba(16,24,40,.1); max-height:280px; overflow:auto; padding:6px}
+  .bznew_list_catItem{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:var(--text)}
+  .bznew_list_catItem:hover{background:#fff1f2}
+  .bznew_list_catMenu.hidden{display:none}
+  
+  
+  /* ====== Sticky Sidebar (Desktop only) ====== */
+@media (min-width: 992px) {
+  .bz_sidebar_sticky {
+    position: sticky;
+    top: 0px; /* adjust if header height changes */
+    overflow-y: auto; /* allow sidebar content to scroll */
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  .bz_sidebar_sticky::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .bz_sidebar_sticky::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 6px;
+  }
+
+  .bz_sidebar_sticky::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+}
+
+  
+  
+  /* Category Headings */
+.bz_cat_heading {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 10px 0 6px;
+  border-bottom: 1px dashed #e5e7eb;
+  padding-bottom: 4px;
+}
+
+/* Dropdown menu items (mobile) */
+.bznew_list_catMenu .bznew_list_catItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.bznew_list_catMenu .bznew_list_catItem:hover {
+  background: #f3f4f6;
+  color: var(--brand);
+  transform: translateX(4px);
+}
+
+/* Scroll for mobile */
+@media (max-width: 768px) {
+  .bznew_list_catMenu {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+  .bz_cat_heading {
+    font-size: 14px;
+  }
+}
+
+
+  /* left sidebar list */
+  .bznew_list_side .bznew_list_section{padding:14px 14px 10px; border-bottom:1px dashed var(--line)}
+  .bznew_list_side h3{margin:0 0 10px; font-size:16px}
+  .bznew_list_list{display:flex; flex-direction:column; gap:.5rem}
+  .bznew_list_list a{display:flex; align-items:center; gap:.4rem; color:var(--text); font-size:14px}
+  .bznew_list_dot{width:5px; height:5px; border-radius:10px; background:#fbbf24}
+  .bznew_list_filterBtn{margin:12px 14px 14px; padding:10px 12px; width:calc(100% - 28px); border:none; border-radius:10px; background:#111827; color:#fff; cursor:pointer}
+  
+  /* === CITY CHIP SLIDER (one-line with arrows) === */
+  .bznew_list_cityrail{
+    position:relative; margin-top:.1rem; flex:1 1 420px; min-width:0; /* allow it to shrink and stay on one line */
+  }
+  .bznew_list_cityrail .bznew_list_city-viewport{
+    overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; width:100%;
+  }
+  .bznew_list_cityrail .bznew_list_city-viewport::-webkit-scrollbar{display:none}
+  .bznew_list_cityrail .bznew_list_city-track{
+    display:flex; gap:.5rem; padding:.25rem .75rem .5rem .75rem; width:max-content;
+    scroll-behavior:smooth;
+  }
+  .bznew_list_citychip{
+    padding:.5rem .9rem; border-radius:999px; font-size:.8rem;
+    background:#fff; color:#111; border:1px solid #d8dee6; white-space:nowrap;
+    line-height:1; display:inline-flex; align-items:center; gap:.35rem;
+  }
+  .bznew_list_citychip .pin{font-size:14px; opacity:.7}
+  .bznew_list_city-nav{
+    position:absolute; top:42%; transform:translateY(-50%);
+    width:32px; height:32px; border:none; border-radius:999px;
+    background:#fff; box-shadow:0 6px 18px rgba(16,24,40,.12);
+    display:grid; place-items:center; cursor:pointer; z-index:5;
+	
+  }
+  
+  .bznew_list_city-prev{ left:6px }
+  .bznew_list_city-next{ right:6px }
+  .bznew_list_city-nav.hidden{ display:none }
+  @media (max-width:576px){
+    .bznew_list_city-nav{ width:30px; height:30px }
+  }
+
+  /* ===== Full-width blue strip under toolbar ===== */
+  .bznew_list_strip{
+    background:#fff;
+    width:100vw;
+    position:relative; left:50%; margin-left:-50vw; right:50%; margin-right:-50vw;
+    padding:.75rem 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+	margin-top: 25px;
+  }
+  .bznew_list_strip .bznew_list_card{background:transparent; border:0; box-shadow:none}
+  @media (min-width:768px){ .bznew_list_strip{ padding:1rem 0 } 
+  }
+
+  /* product slider */
+  .bznew_list_slider{position:relative; overflow:hidden}
+  .bznew_list_slider-viewport{overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; width:100%}
+  .bznew_list_slider-viewport::-webkit-scrollbar{display:none}
+  .bznew_list_slider-track{display:flex; gap:12px; padding:0; width:max-content; scroll-behavior:smooth}
+  .bznew_list_slider-card{min-width:clamp(240px,82vw,300px); display:flex; gap:12px; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow)}
+  @media (min-width:992px){ .bznew_list_slider-card{min-width:280px} }
+
+  /* image thumb in slider */
+  .bznew_list_pic{
+    width:64px; height:64px; border-radius:12px; overflow:hidden; background:#f3f4f6; flex:0 0 64px;
+    display:grid; place-items:center;
+  }
+  .bznew_list_pic img{width:100%; height:100%; object-fit:cover; display:block}
+
+  .bznew_list_nav-btn{position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border:none; border-radius:999px; background:#fff; box-shadow:var(--shadow); display:grid; place-items:center; cursor:pointer; z-index:50}
+  @media (min-width:992px){ .bznew_list_nav-btn{width:40px; height:40px} }
+  .bznew_list_nav-prev{left:6px} .bznew_list_nav-next{right:6px}
+  .bznew_list_nav-btn.hidden{display:none}
+
+
+/* Autocomplete dropdown */
+.bznew_list_search { position: relative; }  /* anchor the panel */
+.bznew_list_suggest{
+  position:absolute; left:0; right:0; top:calc(100% + 6px);
+  background:#fff; border:1px solid #e5e7eb; border-radius:12px;
+  box-shadow:0 16px 32px rgba(16,24,40,.08);
+  max-height:260px; overflow:auto; padding:6px; z-index:100;
+  display:none;
+}
+.bznew_list_suggest.show{ display:block; }
+.bznew_list_suggest ul{ list-style:none; margin:0; padding:0; }
+.bznew_list_suggest li{
+  padding:10px 12px; border-radius:10px; cursor:pointer;
+  font-size:14px; color:#1f2937;
+}
+.bznew_list_suggest li:hover,
+.bznew_list_suggest li.active{ background:#f3f4f6; }
+.bznew_list_suggest .dim{ color:#6b7280; }
+
+
+  /* featured */
+  .bznew_list_featured{padding:0px 12px 12px 12px;}
+  .bznew_list_feature-row{display:grid; grid-template-columns:1fr; gap:0}
+  @media (min-width:768px){ .bznew_list_feature-row{grid-template-columns:200px minmax(0,1fr); gap:0px} }
+  .bznew_list_product-hero{background:#fff; border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:20px;}
+  
+  .bznew_list_product-hero .bznew_list_imgbox{display:grid; place-items:center; padding:18px; position:relative}
+  .bznew_list_product-hero img{
+	max-width: 100%;
+    height: 100%;
+    width: 100%;
+	object-fit: cover;
+	}
+  .bznew_list_badge{
+	  position: absolute;
+    top: 13px;
+    left: 13px;
+    background: #49aa00;
+    color: #fff;
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 999px;
+	  }
+  .bznew_list_product-body{padding:18px}
+  .bznew_list_title{margin:0 0 8px; font-size:18px; line-height:1.35}
+  .bznew_list_snippet{color:var(--muted); font-size:14px; margin:6px 0}
+  .bznew_list_cta{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
+  .bznew_list_btn{border:none; padding:5px 15px; border-radius:20px; cursor:pointer; font-weight:600}
+  .bznew_list_btn.primary{background:var(--brand); color:#fff; font-size:14px; }
+  .bznew_list_btn.ghost{background:#f3f4f6}
+
+  /* right rail cards */
+  .bznew_list_p-card{display:grid; grid-template-columns:90px 1fr; gap:10px; padding:10px; border:1px solid var(--line); border-radius:12px; background:#fff; align-items:center}
+  .bznew_list_p-card + .bznew_list_p-card{margin-top:10px}
+  .bznew_list_p-card .bznew_list_img{width:90px; height:76px; background:#f3f4f6; border-radius:10px; display:grid; place-items:center; font-size:12px}
+  @media (min-width:992px){ .bznew_list_p-card{grid-template-columns:110px 1fr; gap:12px; padding:12px} .bznew_list_p-card .bznew_list_img{width:110px; height:88px} }
+  .bznew_list_price{font-weight:800; margin-top:4px}
+  .bznew_list_buy{margin-top:8px; display:inline-block; padding:7px 10px; background:#0ea5e9; color:#fff; border-radius:8px; font-size:12px}
+  @media (min-width:992px){ .bznew_list_buy{padding:8px 10px; font-size:13px} }
+  
+.more-link{ 
+  display:block;            /* occupy full row */
+  text-align:right;         /* push text to the right */
+}
+
+.more_list_dets{ 
+  color:#1a0dab;
+  font-size:12px;
+  line-height:16px;
+}
+.more-link{ margin-left:auto; }     /* when parent is display:flex */
+
+
+
+/* ===== View Toggle (Grid / List) ===== */
+.bz_view_toggle{
+  order:2;                        /* sits after search, before Near Me on desktop */
+  display:inline-flex; gap:.5rem; align-items:center;
+}
+.bz_view_btn{
+  width:34px; height:34px; border-radius:8px;
+  display:grid; place-items:center; cursor:pointer;
+  border:1px solid #d8dee6; background:#fff;
+  transition:box-shadow .15s ease, border-color .15s ease;
+}
+.bz_view_btn svg{ width:20px; height:20px; stroke:#4b5563; fill:none; }
+.bz_view_btn.active{ border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.15); }
+.bz_view_btn.active svg{ stroke:#2563eb; }
+
+/* Mobile: Near Me first, then Search, then view toggle, then chips */
+@media (max-width:576px){
+  .bznew_list_nearme { order:1; }
+  .bznew_list_search { order:2; }
+  .bz_view_toggle    { order:3; }
+  .bznew_list_cityrail{order:4;}
+   
+}
+
+/* ===== Listing container view modes ===== */
+.bz_listing{ display:flex; flex-direction:column; gap:16px; }
+.bz_listing.grid{
+  display:grid; gap:16px;
+  grid-template-columns: 1fr;
+}
+@media (min-width:768px){
+.bz_listing.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  
+}
+
+}
+/* Make card look nice in grid too */
+.bz_listing.grid .bznew_list_feature-row{
+  grid-template-columns: 1fr;  /* image on top in grid */
+}
+@media (min-width:768px){
+  .bz_listing.grid .bznew_list_feature-row{ grid-template-columns: 1fr; }
+}
+.bz_listing.grid .bznew_list_imgbox{ padding:12px; }
+.bz_listing.grid .bznew_list_product-body{ padding:14px; }
+
+/* LIST mode (default) */
+.bz_listing.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* GRID mode */
+.bz_listing.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+
+/* Make grid cards consistent */
+.bz_listing.grid .bznew_list_product-hero {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.bz_listing.grid .bznew_list_feature-row {
+  grid-template-columns: 1fr; /* stack image & text vertically */
+}
+
+.bz_listing.grid .bznew_list_imgbox {
+  padding: 12px;
+}
+
+.bz_listing.grid .bznew_list_product-body {
+  padding: 14px;
+}
+
+/* ===== Mobile layout: Near Me + View toggle on the first row ===== */
+@media (max-width:576px){
+  .bznew_list_searchRow{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:.75rem;
+  }
+
+#bznew_list_section{padding-block:120px; }
+  /* 1st row */
+  .bznew_list_nearme{ 
+    order:1;                 /* left */
+  }
+  .bz_view_toggle{
+    order:1;                 /* same row as Near Me */
+    margin-left:auto;        /* push to the right side */
+    display:inline-flex;
+    gap:.5rem;
+  }
+
+  /* 2nd row */
+  .bznew_list_search{
+    order:2; 
+    flex:1 1 100%;           /* full width below */
+    min-width:0;
+  }
+
+  /* 3rd row */
+  .bznew_list_cityrail{ 
+    order:3; 
+    width:100%;
+  }
+}
+
+
+
+
+.bz_inline-bullet-list {
+  display: flex;
+  flex-wrap: wrap;              /* allows wrapping to next line if needed */
+  align-items: center;
+  gap: 0.5rem;                  /* spacing between items */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bz_inline-bullet-list li {
+  position: relative;
+  padding-left: 0.6rem;
+  font-size: 13px;
+  color: #333;
+}
+
+.bz_inline-bullet-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.30rem;
+  height: 0.30rem;
+  background-color: #f6b600;   /* yellow dot */
+  border-radius: 50%;
+}
+
+
+
+
+
+
+
+
+
+/* compact meta table */
+.bz_meta{
+  margin:10px 0 6px;
+  border-top:1px solid #eceff3;
+  border-bottom:1px solid #eceff3;
+  font-size: 13px;
+    font-weight: normal;
+}
+.bz_meta_row{
+  display:grid;
+  grid-template-columns: 150px 14px 1fr; /* label : value */
+  align-items:center;
+  gap:0;
+  padding:5px 0;
+  border-bottom:1px solid #eceff3;
+}
+.bz_meta_row:last-child{ border-bottom:0; }
+
+.bz_meta_label{
+  color:#6b7280;
+  font-weight:600;
+  letter-spacing:.02em;
+}
+.bz_meta_sep{ color:#9ca3af; }
+.bz_meta_value{
+  color:#111827;
+  font-weight:500;
+}
+
+/* a little wider on md+ */
+@media (min-width: 768px){
+  .bz_meta_row{ grid-template-columns: 150px 14px 1fr; }
+}
+.bz_rating {
+position: absolute;
+    left: 0;
+    bottom: 25px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 0px 15px 15px 0px;
+    background: rgb(0 0 0 / 81%);
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.bz_rating .score { font-weight: normal; }
+
+.bz_rating .stars { display:inline-flex; gap:2px; }
+
+.bz_star {
+    width: 13px;
+    height: 13px;
+    display: inline-block;
+    color: #f59e0b;                 /* filled color */
+}
+
+.bz_star svg { width:100%; height:100%; display:block; }
+
+/* empty (outline) star */
+.bz_star--empty { color:#9ca3af; }
+
+/* half star using two-layer trick */
+.bz_star--half { position: relative; }
+.bz_star--half svg { color:#9ca3af; }              /* base outline */
+.bz_star--half::after{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(90deg,#f59e0b 50%, transparent 50%);
+  -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/></svg>') center/contain no-repeat;
+          mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/></svg>') center/contain no-repeat;
+}
+

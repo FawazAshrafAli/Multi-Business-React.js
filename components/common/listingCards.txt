@@ -1,0 +1,311 @@
+{/* CSCs */}
+    
+    {/* Repeat product cards */}
+    {/* Product */}
+    <div className="bznew_list_product-hero">
+      <div className="bznew_list_feature-row">
+        <div className="bznew_list_imgbox">
+          <span className="bznew_list_badge">NEW</span>
+          <img alt="Course Image" src="https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"/>
+          
+          <div className="bz_rating" aria-label="Rated 4 out of 5">
+  <span className="score">4.0</span>
+  <span className="stars">
+    {/* 4 filled stars */}
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+
+    {/* last star (half or empty). Use ONE of these: */}
+    {/* half: */}
+    <span className="bz_star bz_star--empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+      </svg>
+    </span> 
+
+  </span>
+</div>
+
+          
+        </div>
+        <div className="bznew_list_product-body">
+          <h2 className="bznew_list_title">
+            Barbecue Chicken Drumstick 450g – Ready to Cook (Antibiotic Free)
+          </h2>
+  <div className="bz_meta">
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Price</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">₹50,000/-</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Stock</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Instock</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Product</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Sub Category</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Company</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Hiline Builders</span>
+  </div>
+</div>
+<div className="bznew_list_cta">
+            <a href="#" className="bznew_list_btn primary">Buy Now</a>
+            <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Course */}
+        <div className="bznew_list_product-hero">
+      <div className="bznew_list_feature-row">
+        <div className="bznew_list_imgbox">
+          <span className="bznew_list_badge">NEW</span>
+          <img alt="Course Image" src="https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"/>
+                <div className="bz_rating" aria-label="Rated 4 out of 5">
+  <span className="score">4.0</span>
+  <span className="stars">
+    {/* 4 filled stars */}
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+
+    {/* last star (half or empty). Use ONE of these: */}
+    {/* half: */}
+    <span className="bz_star bz_star--empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+      </svg>
+    </span> 
+
+  </span>
+</div>
+        </div>
+        <div className="bznew_list_product-body">
+          <h2 className="bznew_list_title">
+            Automation Course Training in Kozhikode - Courses, Certifications, Placements, Job Opportunities
+          </h2>
+
+<div className="bz_meta">
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Price</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">₹50,000/-</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Duration</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">30 Days</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Course Mode</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Offline</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Institution</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">IPCS Automation</span>
+  </div>
+</div>
+<div className="bznew_list_cta">
+            <a href="#" className="bznew_list_btn primary">Read More</a>
+            <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Service */}
+        <div className="bznew_list_product-hero">
+      <div className="bznew_list_feature-row">
+        <div className="bznew_list_imgbox">
+          <span className="bznew_list_badge">NEW</span>
+          <img alt="Course Image" src="https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"/>
+                <div className="bz_rating" aria-label="Rated 4 out of 5">
+  <span className="score">4.0</span>
+  <span className="stars">
+    {/* 4 filled stars */}
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+
+    {/* last star (half or empty). Use ONE of these: */}
+    {/* half: */}
+    <span className="bz_star bz_star--empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+      </svg>
+    </span> 
+
+  </span>
+</div>
+        </div>
+        <div className="bznew_list_product-body">
+          <h2 className="bznew_list_title">
+            AC Repair and Services in Kozhikode - Doorsterp AC Technician
+          </h2>
+       <div className="bz_meta">
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Price</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">₹50,000/-</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Duration</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">30 Days</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Service</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Sub Category</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Company</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Hiline Builders</span>
+  </div>
+</div>
+ <div className="bznew_list_cta">
+            <a href="#" className="bznew_list_btn primary">Read More</a>
+            <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Registration */}
+        <div className="bznew_list_product-hero">
+      <div className="bznew_list_feature-row">
+        <div className="bznew_list_imgbox">
+          <span className="bznew_list_badge">NEW</span>
+          <img alt="Course Image" src="https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"/>
+           <div className="bz_rating" aria-label="Rated 4 out of 5">
+  <span className="score">4.0</span>
+  <span className="stars">
+    {/* 4 filled stars */}
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+    <span className="bz_star">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+      </svg>
+    </span>
+
+    {/* last star (half or empty). Use ONE of these: */}
+    {/* half: */}
+    <span className="bz_star bz_star--empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+      </svg>
+    </span> 
+
+  </span>
+</div>
+        </div>
+        <div className="bznew_list_product-body">
+          <h2 className="bznew_list_title">
+            Startup Company Registration
+
+          </h2>
+       <div className="bz_meta">
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Price</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">₹50,000/-</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Time Required</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">30 Days</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Service</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">Sub Category</span>
+  </div>
+  <div className="bz_meta_row">
+    <span className="bz_meta_label">Company</span>
+    <span className="bz_meta_sep">:</span>
+    <span className="bz_meta_value">LegalGuides</span>
+  </div>
+</div>
+          <div className="bznew_list_cta">
+            <a href="#" className="bznew_list_btn primary">Read More</a>
+            <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+          </div>
+        </div>
+      </div>
+    </div>

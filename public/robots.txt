@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Block build/output folders (not needed for SEO crawlers)
+Disallow: /_next/
+Disallow: /api/
+
+# Point to sitemap index instead of single sitemap
+Sitemap: https://bzindia.in/sitemap_index.xml

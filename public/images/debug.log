@@ -1,0 +1,71 @@
+[0226/002805.550:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0226/002806.841:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0226/160353.115:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0226/193145.295:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0226/193145.438:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0226/232738.059:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0227/130755.314:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0227/143648.649:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0301/190017.495:INFO:CONSOLE(1)] "Long rAF frame-time", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-rich-tooltips/build/external.js (1)
+[0301/190017.717:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 1612
+[0301/190017.717:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 842
+[0301/190017.739:WARNING:angle_platform_impl.cc(52)] compileToBinary(230): 
+C:\fakepath(69,8-58): warning X3571: pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+C:\fakepath(77,9-43): warning X3571: pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them
+
+[0301/190017.907:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 1612
+[0301/190017.907:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 842
+[0301/190018.223:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 1612
+[0301/190018.223:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 842
+[0301/190018.539:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 1612
+[0301/190018.539:ERROR:mf_helpers.cc(14)] Error in dxva_video_decode_accelerator_win.cc on line 842
+[0302/125916.623:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0302/135422.660:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0302/235147.492:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0302/235148.572:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/114149.796:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/114149.996:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133059.708:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133059.724:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133104.728:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133104.736:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133109.754:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133501.740:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133506.759:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133511.774:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133516.780:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133521.787:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133526.794:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/133528.160:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155021.538:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155026.552:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155031.559:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155036.578:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155041.593:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155046.619:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155051.641:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155056.663:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155101.684:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155106.696:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155111.708:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155116.729:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155121.747:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155126.763:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155131.779:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155136.802:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155141.817:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155146.838:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155151.851:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155156.866:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155201.878:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155206.890:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155211.911:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155216.934:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155221.952:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155226.960:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155231.981:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0303/155237.003:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0304/140840.985:WARNING:dns_config_service_win.cc(668)] Failed to read DnsConfig.
+[0304/141304.303:WARNING:ipc_message_attachment_set.cc(49)] MessageAttachmentSet destroyed with unconsumed attachments: 0/1
+[0304/141304.311:ERROR:browser_gpu_channel_host_factory.cc(139)] Failed to launch GPU process.
+[0305/111923.990:INFO:CONSOLE(1)] "Long rAF frame-time", source: file:///C:/Program%20Files/Adobe/Adobe%20Photoshop%202020/Required/www-rich-tooltips/build/external.js (1)
