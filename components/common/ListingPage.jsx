@@ -18,6 +18,7 @@ import useFetchRegistrationDetails from '../../hooks/useFetchRegistrationDetails
 import createDOMPurify from 'dompurify';
 import useFetchProdSubCategories from '../../hooks/useFetchProdSubCategories';
 import useFetchProductDetails from '../../hooks/useFetchProductDetails';
+import useFetchCourseSpecializations from '../../hooks/useFetchCourseSpecializations';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -65,7 +66,7 @@ const ListingPage = ({
     const {prodSubCategories, prodSubCategoriesLoading, nextProdParams, fetchProdSubCategories} = useFetchProdSubCategories();
     const {registrationDetails, registrationDetailsLoading, nextRegistrationDetailsParams, fetchRegistrationDetails} = useFetchRegistrationDetails(); 
     const {productDetails, productDetailsLoading, nextProductDetailsParams, fetchProductDetails} = useFetchProductDetails(); 
-    const {eduSpecializations, eduSpecializationsLoading, nextCourseParams, fetchCourseSubCategories} = useFetchProdSubCategories();
+    const {eduSpecializations, eduSpecializationsLoading, fetchEduSpecializations} = useFetchCourseSpecializations();
 
     const [sanitizedSubTypeContent, setSanitizedSubTypeContent] = useState([]);  
 
@@ -355,8 +356,8 @@ const ListingPage = ({
                   fetchProductDetails("all", subCategory?.slug, nextProductDetailsParams);
                 }
               } else if (itemsType === "CourseSpecialization") {
-                if (nextCourseParams && !courseSpecializationsLoading) {
-                  fetchCourseSpecializations("all", null, nextCourseParams);
+                if (!eduSpecializationsLoading) {
+                  fetchEduSpecializations();
                 }
               }
           },
@@ -370,7 +371,8 @@ const ListingPage = ({
       itemsType, nextParams, subTypesLoading, 
       nextRegistrationDetailsParams, registrationDetailsLoading,
       nextProdParams, prodSubCategoriesLoading,
-      nextProductDetailsParams, productDetailsLoading, subCategory?.slug
+      nextProductDetailsParams, productDetailsLoading, subCategory?.slug,
+      eduSpecializationsLoading
     ]);
 
     useEffect(() => {
@@ -879,7 +881,7 @@ const ListingPage = ({
     <div className="bz_meta_row">
       <span className="bz_meta_label">Price</span>
       <span className="bz_meta_sep">:</span>
-      <span className="bz_meta_value">{subType?.price? `₹${subType?.price}/-` : "Unavailable"}</span>
+      <span className="bz_meta_value">{subType?.price? `INR ${subType?.price}/-` : "Unavailable"}</span>
     </div>
     <div className="bz_meta_row">
       <span className="bz_meta_label">Time Required</span>
@@ -963,7 +965,7 @@ const ListingPage = ({
     <div className="bz_meta_row">
       <span className="bz_meta_label">Price</span>
       <span className="bz_meta_sep">:</span>
-      <span className="bz_meta_value">{detail.price? `₹${detail.price}/-` : "Unavailable"}</span>
+      <span className="bz_meta_value">{detail.price? `INR ${detail.price}/-` : "Unavailable"}</span>
     </div>
     <div className="bz_meta_row">
       <span className="bz_meta_label">Time Required</span>
@@ -1042,7 +1044,7 @@ const ListingPage = ({
     <div className="bz_meta_row">
       <span className="bz_meta_label">Price</span>
       <span className="bz_meta_sep">:</span>
-      <span className="bz_meta_value">{firstMultipage.price? `₹${firstMultipage.price}/-` : "Unavailable"}</span>
+      <span className="bz_meta_value">{firstMultipage.price? `INR ${firstMultipage.price}/-` : "Unavailable"}</span>
     </div>
     <div className="bz_meta_row">
       <span className="bz_meta_label">Time Required</span>
@@ -1248,7 +1250,7 @@ const ListingPage = ({
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Price</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{subCategory?.price? `₹${subCategory?.price}/-` : "Unavailable"}</span>
+                  <span className="bz_meta_value">{subCategory?.price? `INR ${subCategory?.price}/-` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Stock</span>
@@ -1334,7 +1336,7 @@ const ListingPage = ({
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Price</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{detail?.product?.price? `₹${detail?.product?.price}/-` : "Unavailable"}</span>
+                  <span className="bz_meta_value">{detail?.product?.price? `INR ${detail?.product?.price}/-` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Stock</span>
@@ -1366,8 +1368,8 @@ const ListingPage = ({
       
     : (itemsType === "CourseSpecialization") ? 
       <>
-        {courseSpecializationsLoading && courseSpecializations.length === 0 && <Loading />}
-        {courseSpecializations?.map((specialization, index) => (
+        {eduSpecializationsLoading && eduSpecializations.length === 0 && <Loading />}
+        {eduSpecializations?.map((specialization, index) => (
           <div className="bznew_list_product-hero" key={`${specialization?.slug} - ${index + 1}`}>
             <div className="bznew_list_feature-row">
               <div className="bznew_list_imgbox">
@@ -1416,24 +1418,25 @@ const ListingPage = ({
                 <h2 className="bznew_list_title">
                   {specialization.name}
                 </h2>
+
                 <div className="bz_meta">
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Price</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{specialization?.price? `₹${specialization?.price}/-` : "Unavailable"}</span>
+                  <span className="bz_meta_value">{specialization?.price? `INR ${specialization?.price}/-` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
-                  <span className="bz_meta_label">Stock</span>
+                  <span className="bz_meta_label">Duration</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{specialization?.stock || "Unavailable"}</span>
+                  <span className="bz_meta_value">{specialization?.duration || "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
-                  <span className="bz_meta_label">Product</span>
+                  <span className="bz_meta_label">Course Mode</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{specialization?.category_name}</span>
+                  <span className="bz_meta_value">{specialization?.mode || "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
-                  <span className="bz_meta_label">Company</span>
+                  <span className="bz_meta_label">Institution</span>
                   <span className="bz_meta_sep">:</span>
                   <span className="bz_meta_value">{specialization?.company_name}</span>
                 </div>
@@ -1446,7 +1449,7 @@ const ListingPage = ({
             </div>
           </div>
         ))}
-        {courseSpecializationsLoading && courseSpecializations.length > 0 && <Loading />}
+        {eduSpecializationsLoading && eduSpecializations.length > 0 && <Loading />}
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>
 

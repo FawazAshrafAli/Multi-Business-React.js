@@ -38,7 +38,7 @@ const ListCourseSpecializations = ({locationData, blogs}) => {
      }, [nearestPlace]);
  
      useEffect(() => {
-       setTitle(`Course Specializations`);
+       setTitle(`Courses`);
  
        return () => {
          resetTitle();
