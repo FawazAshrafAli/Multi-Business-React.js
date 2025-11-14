@@ -20,6 +20,7 @@ import useFetchProdSubCategories from '../../hooks/useFetchProdSubCategories';
 import useFetchProductDetails from '../../hooks/useFetchProductDetails';
 import useFetchCourseSpecializations from '../../hooks/useFetchCourseSpecializations';
 import useFetchCourseDetails from '../../hooks/useFetchCourseDetails';
+import useFetchServSubCategories from '../../hooks/useFetchServSubCategories';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -69,6 +70,7 @@ const ListingPage = ({
     const {productDetails, productDetailsLoading, nextProductDetailsParams, fetchProductDetails} = useFetchProductDetails(); 
     const {eduSpecializations, eduSpecializationsLoading, fetchEduSpecializations} = useFetchCourseSpecializations();
     const {courseDetails, courseDetailsLoading, nextCourseDetailUrl, fetchCourseDetails} = useFetchCourseDetails(); 
+    const {servSubCategories, servSubCategoriesLoading, nextServParams, fetchServSubCategories} = useFetchServSubCategories();
 
     const [sanitizedContent, setSanitizedContent] = useState([]);  
 
@@ -330,7 +332,7 @@ const ListingPage = ({
 
     // *********************************************** */
     // *********************************************** */
-    // Registrations
+    // Registrations              
 
     // ***********************************************
     useEffect(() => {
@@ -338,7 +340,6 @@ const ListingPage = ({
       const observer = new IntersectionObserver(
           entries => {
               if (!entries[0].isIntersecting) return;
-
 
               if (itemsType === "RegistrationSubType") {
                 if (nextParams && !subTypesLoading) {
@@ -365,6 +366,11 @@ const ListingPage = ({
                 if (nextCourseDetailUrl && !courseDetailsLoading) {
                   fetchCourseDetails("all", specialization?.slug);
                 }
+              } else if (itemsType === "ServiceSubCategory") {
+
+                if (nextServParams && !servSubCategoriesLoading) {
+                  fetchServSubCategories("all", null, nextServParams);
+                }
               }
           },
           { threshold: 1 }
@@ -379,7 +385,7 @@ const ListingPage = ({
       nextProdParams, prodSubCategoriesLoading,
       nextProductDetailsParams, productDetailsLoading, subCategory?.slug,
       eduSpecializationsLoading, specialization?.slug, nextCourseDetailUrl,
-      courseDetailsLoading
+      courseDetailsLoading, nextServParams, servSubCategoriesLoading
     ]);
 
     useEffect(() => {
@@ -399,7 +405,6 @@ const ListingPage = ({
         fetchCourseDetails("all", specialization?.slug, true);
       }
     }, [itemsType, specialization?.slug]);
-    
     
     //******************************* */
 
@@ -512,6 +517,12 @@ const ListingPage = ({
               <span>{specialization?.starting_title} {specialization?.name} {specialization?.ending_title} {locationData?.name}</span>
             </>
 
+          : itemsType === "ServiceSubCategory" ?
+            <>
+              <Link href={`/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <span>Services</span>              
+            </>
+
           : itemsType === "State" ?
             <>
               <span>{state?.name}</span>              
@@ -546,6 +557,9 @@ const ListingPage = ({
 
             : itemsType === "CourseDetail" ?
             <>{specialization?.starting_title} {specialization?.name} {specialization?.ending_title} {locationData?.name} </>
+
+            : itemsType === "ServiceSubCategory" ?
+            <>Services {locationData?.name || ""} </> 
 
             : itemsType === "State" ?
             <>{state?.name || ""} </> 
@@ -650,6 +664,9 @@ const ListingPage = ({
 
           : itemsType === "CourseDetail" ?
           `/${district.state_slug}/courses/${specialization?.location_slug || specialization?.slug}-${district.slug}`
+
+          : itemsType === "ServiceSubCategory" ?
+          `/${district.slug}/services`
 
           : itemsType === "State" || itemsType === "District" ?
           `/${district.slug}/`
@@ -1563,6 +1580,92 @@ const ListingPage = ({
           </div>
         ))}
         {courseDetailsLoading && courseDetails.length > 0 && <Loading />}
+        <div ref={loaderRef} style={{ height: '1px' }} />
+      </>
+
+    : (itemsType === "ServiceSubCategory") ? 
+      <>
+        {servSubCategoriesLoading && servSubCategories.length === 0 && <Loading />}
+        {servSubCategories?.map((subCategory, index) => (
+          <div className="bznew_list_product-hero" key={`${subCategory?.slug} - ${index + 1}`}>
+            <div className="bznew_list_feature-row">
+              <div className="bznew_list_imgbox">
+                {/* <span className="bznew_list_badge">NEW</span> */}
+                <img alt={subCategory?.name || ""} src={subCategory?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"} />
+                
+                <div className="bz_rating" aria-label="Rated 4 out of 5">
+                  <span className="score">4.0</span>
+                  <span className="stars">
+                    {/* 4 filled stars */}
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+
+                    {/* last star (half or empty). Use ONE of these: */}
+                    {/* half: */}
+                    <span className="bz_star bz_star--empty">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+                      </svg>
+                    </span> 
+
+                  </span>
+                </div>
+
+                
+              </div>
+              <div className="bznew_list_product-body">
+                <h2 className="bznew_list_title">
+                  {subCategory.name}
+                </h2>
+                <div className="bz_meta">
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Price</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{subCategory?.price? `INR ${subCategory?.price}/-` : "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Duration</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{subCategory?.duration || "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Service</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{subCategory?.category_name || "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Company</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{subCategory?.company_name}</span>
+              </div>
+              </div>
+              <div className="bznew_list_cta">
+                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/services/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {servSubCategoriesLoading && servSubCategories.length > 0 && <Loading />}
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>
 

@@ -511,16 +511,16 @@ const Footer = () => {
     <>
       {/* top move button  */}
       <div className="whthspp-btn">
-        <a href="https://wa.me/9645850158" >
+        <a href="https://wa.me/0000000000" >
           <i className="fa fa-whatsapp"></i><span>WhatsApp
-            <br/><small>+91 9645850158</small></span>
+            <br/><small>+91 0000000000</small></span>
         </a>
       </div>
 
       <div className="adjust-call">
-        <a href="tel:9645850158">
+        <a href="tel:0000000000">
           <i className="fa fa-phone"></i><span>PhoneNumber
-            <br/><small>+91 9645850158</small></span>
+            <br/><small>+91 0000000000</small></span>
         </a>
       </div>
 

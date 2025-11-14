@@ -1,13 +1,12 @@
 import { useRouter } from 'next/router';
 import React, { useContext, useEffect } from 'react'
-import BlogContext from '../context/BlogContext';
 import TitleContext from '../context/TitleContext';
-import ListingPage from '../common/ListingPage';
+import BlogContext from '../context/BlogContext';
 import useNearestPlace from '../../hooks/useNearestPlace';
+import ListingPage from '../common/ListingPage';
 
-const ListProductSubCategories = ({locationData, blogs}) => {
-
-    const router = useRouter();
+const ListServiceSubCategories = ({locationData, blogs}) => {
+  const router = useRouter();
 
     const {setTitle, resetTitle} = useContext(TitleContext);                        
 
@@ -15,13 +14,13 @@ const ListProductSubCategories = ({locationData, blogs}) => {
 
     const {nearestPlace, fetchNearestPlace} = useNearestPlace()
     
-        useEffect(() => {
-            if (blogs) setBlogs(blogs);      
-        
-            return () => {      
-              resetBlogs();
-            };
-        }, [blogs]);
+    useEffect(() => {
+        if (blogs) setBlogs(blogs);      
+    
+        return () => {      
+            resetBlogs();
+        };
+    }, [blogs]);
           
     const handleNearby = async () => {
       try {
@@ -34,12 +33,12 @@ const ListProductSubCategories = ({locationData, blogs}) => {
     useEffect(() => {
       if (!nearestPlace) return;
 
-      router.push(`/${nearestPlace?.district?.slug}/products`);      
+      router.push(`/${nearestPlace?.district?.slug}/services`);      
 
     }, [nearestPlace]);
 
     useEffect(() => {
-      setTitle(`Product Sub Categories`);
+      setTitle(`Service Sub Categories`);
 
       return () => {
         resetTitle();
@@ -50,7 +49,7 @@ const ListProductSubCategories = ({locationData, blogs}) => {
   return (
     <>
         <ListingPage
-        itemsType="ProductSubCategory"        
+        itemsType="ServiceSubCategory"        
         handleNearby={handleNearby}
         locationData={locationData}        
         />        
@@ -59,4 +58,4 @@ const ListProductSubCategories = ({locationData, blogs}) => {
   )
 }
 
-export default ListProductSubCategories
+export default ListServiceSubCategories
