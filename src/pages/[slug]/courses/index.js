@@ -15,8 +15,8 @@ export default function ListSpecializationPage({
       {isSpecializationListingPage &&
         <>
         <SeoHead
-        meta_description={`Get online courses in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Courses ${locationData?.name}`}
+        meta_description={`Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`}
+        meta_title={`Specification Courses in ${address}`}
         blogs={blogs || []}
 
 

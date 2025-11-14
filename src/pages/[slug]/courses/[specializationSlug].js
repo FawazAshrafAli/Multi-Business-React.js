@@ -15,12 +15,12 @@ export default function ListSpecializationPage({
       {isListCourseDetailsPage &&
         <>
         <SeoHead
-        meta_description={`Get online courses in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Filing ${locationData?.name}`}
+        meta_description={`Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`}
+        meta_title={`Specification Courses in ${address}`}
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/filings/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
+        url = {`https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -72,8 +72,21 @@ export async function getServerSideProps(context) {
     let specialization, specializationRes;
 
     
-    specializationRes = await course.getSpecializations(`/course_api/companies/all/specializations/?location_slug=${passingSpecializationSlug}`);    
-    specialization = specializationRes.data?.results?.[0];    
+    specializationRes = await course.getSpecializations(`/course_api/companies/all/specializations/?location_slug=${passingSpecializationSlug}`);        
+    specialization = specializationRes.data?.results?.[0];
+    
+    let title_list = [];
+
+    if (specialization) {
+      [specialization?.starting_title, specialization?.name, specialization?.ending_title].forEach(title => {
+        if (title) {
+          title_list.push(title);
+        }
+      });      
+    }
+
+    specialization = {...specialization, "full_title": title_list.join(" ")};
+
   
     if (!specialization) {            
       specializationRes = await course.getSpecialization("all", passingSpecializationSlug);
@@ -199,19 +212,19 @@ export async function getServerSideProps(context) {
           details?.map(detail => ({
             "@type": "Course",
             "@id": `https://${detail.url}#course`,
-            "name": detail?.name || "",
-            "description": detail?.description || ` ${detail?.name}`,
+            "name": detail?.course?.name || "",
+            "description": detail?.description || ` ${detail?.course?.name}`,
             "url": `https://${detail.url}`,
-            "image": detail?.image_url || "",
+            "image": detail?.course?.image_url || "",
             "provider": { "@id": `https://bzindia.in/${specialization?.company_slug}/#org` },
-            "aggregateRating": (detail?.testimonials?.length > 0) ? {
+            "aggregateRating": (detail?.course?.testimonials?.length > 0) ? {
               "@type": "AggregateRating",
-              "ratingValue": Number(detail.rating),
-              "reviewCount": Number(detail?.testimonials?.length),
+              "ratingValue": Number(detail.course?.rating),
+              "reviewCount": Number(detail?.course?.testimonials?.length),
               "bestRating": "5",
               "worstRating": "1"
             } : undefined,
-            "review": detail?.testimonials?.length > 0 ? detail?.testimonials?.map(testimonial => ({
+            "review": detail?.course?.testimonials?.length > 0 ? detail?.course?.testimonials?.map(testimonial => ({
                 "@type": "Review",
                 "author": { "@type": "Person", "name": testimonial.name || testimonial.review_by || "" },
                 "datePublished": testimonial.created || "",
@@ -227,8 +240,8 @@ export async function getServerSideProps(context) {
                 "@type": "CourseInstance",
                 "name": `${locationData?.name} In-Person Batch`,
                 "courseMode": "InPerson",
-                "startDate": detail?.starting_date ? detail?.starting_date.split('T')[0] : "",
-                "endDate": detail?.ending_date ? detail?.ending_date.split('T')[0] : "",
+                "startDate": detail?.course?.starting_date ? detail?.course?.starting_date.split('T')[0] : "",
+                "endDate": detail?.course?.ending_date ? detail?.course?.ending_date.split('T')[0] : "",
                 "location": {
                   "@type": "Place",
                   "name": `${detail.company_name} — ${locationData?.name}`,
@@ -245,21 +258,21 @@ export async function getServerSideProps(context) {
                 "offers": {
                   "@type": "Offer",
                   "priceCurrency": "INR",
-                  "price": detail?.price || "",
+                  "price": detail?.course?.price || "",
                   "availability": "https://schema.org/InStock",
                   "url": `https://${detail.url}#apply`
                 }
               },
               {
                 "@type": "CourseInstance",
-                "name": `${detail?.mode} Weekday Batch`,
-                "courseMode": detail?.mode || "",
-                "startDate": detail?.starting_date ? detail?.starting_date.split('T')[0] : "",
-                "endDate": detail?.ending_date ? detail?.ending_date.split('T')[0] : "",
+                "name": `${detail?.course?.mode} Weekday Batch`,
+                "courseMode": detail?.course?.mode || "",
+                "startDate": detail?.course?.starting_date ? detail?.course?.starting_date.split('T')[0] : "",
+                "endDate": detail?.course?.ending_date ? detail?.course?.ending_date.split('T')[0] : "",
                 "offers": {
                   "@type": "Offer",
                   "priceCurrency": "INR",
-                  "price": detail?.price || "",
+                  "price": detail?.course?.price || "",
                   "availability": "https://schema.org/InStock",
                   "url": `https://${detail.url}#apply`
                 }
