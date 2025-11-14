@@ -666,7 +666,7 @@ const ListingPage = ({
           `/${district.state_slug}/courses/${specialization?.location_slug || specialization?.slug}-${district.slug}`
 
           : itemsType === "ServiceSubCategory" ?
-          `/${district.slug}/services`
+          `/${district.slug}/more-services`
 
           : itemsType === "State" || itemsType === "District" ?
           `/${district.slug}/`
@@ -1195,11 +1195,11 @@ const ListingPage = ({
             </h2>
             <div className="bz_meta">    
               <ul className="bz_inline-bullet-list">
-                {serviceSubCategories?.map((subCategory, index) => <li key={subCategory?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/services/${subCategory?.location_slug || subCategory?.slug}-${state?.slug || district?.slug}`}>{subCategory?.name}</Link></li>)}      
+                {serviceSubCategories?.map((subCategory, index) => <li key={subCategory?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${state?.slug || district?.slug}`}>{subCategory?.name}</Link></li>)}      
               </ul>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${state?.slug || district?.slug}/services/`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${state?.slug || district?.slug}/more-services/`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1658,7 +1658,7 @@ const ListingPage = ({
               </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/services/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
                   <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>

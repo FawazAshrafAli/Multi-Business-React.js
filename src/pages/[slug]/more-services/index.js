@@ -20,7 +20,7 @@ export default function ListSubCategoriePage({
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/services`}
+        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services`}
         />
 
         <Head>

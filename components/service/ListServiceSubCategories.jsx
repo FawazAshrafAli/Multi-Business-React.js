@@ -33,7 +33,7 @@ const ListServiceSubCategories = ({locationData, blogs}) => {
     useEffect(() => {
       if (!nearestPlace) return;
 
-      router.push(`/${nearestPlace?.district?.slug}/services`);      
+      router.push(`/${nearestPlace?.district?.slug}/more-services`);      
 
     }, [nearestPlace]);
 
