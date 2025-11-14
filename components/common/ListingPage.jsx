@@ -21,6 +21,7 @@ import useFetchProductDetails from '../../hooks/useFetchProductDetails';
 import useFetchCourseSpecializations from '../../hooks/useFetchCourseSpecializations';
 import useFetchCourseDetails from '../../hooks/useFetchCourseDetails';
 import useFetchServSubCategories from '../../hooks/useFetchServSubCategories';
+import useFetchServiceDetails from '../../hooks/useFetchServiceDetails';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -71,10 +72,11 @@ const ListingPage = ({
     const {eduSpecializations, eduSpecializationsLoading, fetchEduSpecializations} = useFetchCourseSpecializations();
     const {courseDetails, courseDetailsLoading, nextCourseDetailUrl, fetchCourseDetails} = useFetchCourseDetails(); 
     const {servSubCategories, servSubCategoriesLoading, nextServParams, fetchServSubCategories} = useFetchServSubCategories();
+    const {serviceDetails, serviceDetailsLoading, nextServiceDetailsParams, fetchServiceDetails} = useFetchServiceDetails(); 
 
     const [sanitizedContent, setSanitizedContent] = useState([]);  
 
-    const [firstMultipage, setFirstMultipage] = useState();
+    const [firstMultipage, setFirstMultipage] = useState(null);
 
     useEffect(() => {
       if (itemsType != "State" && itemsType != "District") return;
@@ -126,11 +128,13 @@ const ListingPage = ({
             modifiedUrl = `${companySlug}/${updatedMultipageSlug}`;      
           }
 
-          setFirstMultipage({
-            ...multipage,
-            url: modifiedUrl,
-            title: multipage?.title?.replace("place_name", locationData?.name || "India")
-          })          
+          if (multipage) {
+            setFirstMultipage({
+              ...multipage,
+              url: modifiedUrl,
+              title: multipage?.title?.replace("place_name", locationData?.name || "India")
+            })          
+          }
 
         } catch (err) {
           console.error(err);
@@ -328,6 +332,10 @@ const ListingPage = ({
     
     } else if (itemsType === "CourseDetail") {
       faqs = specialization?.faqs?.map(faq => ({...faq, "question": faq.question?.replace("place_name", locationData?.name), "answer": faq.answer?.replace("place_name", locationData?.name)}));
+    
+    } else if (itemsType === "ServiceDetail") {
+      faqs = subCategory?.faqs?.map(faq => ({...faq, "question": faq.question?.replace("place_name", locationData?.name), "answer": faq.answer?.replace("place_name", locationData?.name)}));
+    
     }
 
     // *********************************************** */
@@ -371,6 +379,10 @@ const ListingPage = ({
                 if (nextServParams && !servSubCategoriesLoading) {
                   fetchServSubCategories("all", null, nextServParams);
                 }
+              } else if (itemsType === "ServiceDetail") {
+                if (nextServiceDetailsParams && !serviceDetailsLoading) {
+                  fetchServiceDetails("all", subCategory?.slug, nextServiceDetailsParams);
+                }
               }
           },
           { threshold: 1 }
@@ -405,6 +417,12 @@ const ListingPage = ({
         fetchCourseDetails("all", specialization?.slug, true);
       }
     }, [itemsType, specialization?.slug]);
+
+    useEffect(() => {
+      if (itemsType === "ServiceDetail") {
+        fetchServiceDetails("all", subCategory?.slug, null, true);
+      }
+    }, [itemsType, subCategory?.slug]);
     
     //******************************* */
 
@@ -523,6 +541,13 @@ const ListingPage = ({
               <span>Services</span>              
             </>
 
+          : itemsType === "ServiceDetail" ?
+            <>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/more-services`}>Services</Link> <span>›</span>
+              <span>{subCategory?.starting_title} {subCategory?.name} {subCategory?.ending_title} {locationData?.name}</span>
+            </>
+
           : itemsType === "State" ?
             <>
               <span>{state?.name}</span>              
@@ -560,6 +585,9 @@ const ListingPage = ({
 
             : itemsType === "ServiceSubCategory" ?
             <>Services {locationData?.name || ""} </> 
+
+            : itemsType === "ServiceDetail" ?
+            <>{subCategory?.starting_title} {subCategory?.name} {subCategory?.ending_title} {locationData?.name} </>
 
             : itemsType === "State" ?
             <>{state?.name || ""} </> 
@@ -667,6 +695,9 @@ const ListingPage = ({
 
           : itemsType === "ServiceSubCategory" ?
           `/${district.slug}/more-services`
+
+          : itemsType === "ServiceDetail" ?
+          `/${district.state_slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${district.slug}`
 
           : itemsType === "State" || itemsType === "District" ?
           `/${district.slug}/`
@@ -943,7 +974,7 @@ const ListingPage = ({
     </div>
   </div>
             <div className="bznew_list_cta">
-              <a href={`/${locationData?.district_slug}/filings/${subType?.location_slug || subType?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/filings/${subType?.location_slug || subType?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1666,6 +1697,92 @@ const ListingPage = ({
           </div>
         ))}
         {servSubCategoriesLoading && servSubCategories.length > 0 && <Loading />}
+        <div ref={loaderRef} style={{ height: '1px' }} />
+      </>
+
+    : (itemsType === "ServiceDetail") ? 
+      <>
+        {serviceDetailsLoading && serviceDetails.length === 0 && <Loading />}
+        {serviceDetails?.map((detail, index) => (
+          <div className="bznew_list_product-hero" key={`${detail?.slug} - ${index + 1}`}>
+            <div className="bznew_list_feature-row">
+              <div className="bznew_list_imgbox">
+                {/* <span className="bznew_list_badge">NEW</span> */}
+                <img alt={detail?.service?.name || ""} src={detail?.service?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"} />
+                
+                <div className="bz_rating" aria-label="Rated 4 out of 5">
+                  <span className="score">4.0</span>
+                  <span className="stars">
+                    {/* 4 filled stars */}
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+
+                    {/* last star (half or empty). Use ONE of these: */}
+                    {/* half: */}
+                    <span className="bz_star bz_star--empty">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+                      </svg>
+                    </span> 
+
+                  </span>
+                </div>
+
+                
+              </div>
+              <div className="bznew_list_product-body">
+                <h2 className="bznew_list_title">
+                  {detail.service?.name}
+                </h2>
+                <div className="bz_meta">
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Price</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{detail?.service?.price? `INR ${detail?.service?.price}/-` : "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Duration</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{detail?.service?.duration || "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Service</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{detail?.service?.category_name || "Unavailable"}</span>
+              </div>
+              <div className="bz_meta_row">
+                <span className="bz_meta_label">Company</span>
+                <span className="bz_meta_sep">:</span>
+                <span className="bz_meta_value">{detail?.company_name}</span>
+              </div>
+              </div>
+              <div className="bznew_list_cta">
+                  <a href={`/${detail?.url}`} className="bznew_list_btn primary">Read More</a>
+                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {serviceDetailsLoading && serviceDetails.length > 0 && <Loading />}
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>
 
