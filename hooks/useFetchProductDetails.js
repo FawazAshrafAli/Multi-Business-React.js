@@ -10,7 +10,6 @@ export default function useFetchProductDetails() {
 
     const fetchProductDetails = useCallback(async (slug, subCategorySlug = null, params = null, reset = false) => {
 
-        console.log("called")
         if (fetchingRef.current) return;
         
             fetchingRef.current = true;
