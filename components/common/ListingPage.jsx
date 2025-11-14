@@ -19,12 +19,13 @@ import createDOMPurify from 'dompurify';
 import useFetchProdSubCategories from '../../hooks/useFetchProdSubCategories';
 import useFetchProductDetails from '../../hooks/useFetchProductDetails';
 import useFetchCourseSpecializations from '../../hooks/useFetchCourseSpecializations';
+import useFetchCourseDetails from '../../hooks/useFetchCourseDetails';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
   handleNearby, faqs, locationData, subType,
   
-  subCategory,
+  subCategory, specialization,
 
   state, district
 }) => {
@@ -67,8 +68,9 @@ const ListingPage = ({
     const {registrationDetails, registrationDetailsLoading, nextRegistrationDetailsParams, fetchRegistrationDetails} = useFetchRegistrationDetails(); 
     const {productDetails, productDetailsLoading, nextProductDetailsParams, fetchProductDetails} = useFetchProductDetails(); 
     const {eduSpecializations, eduSpecializationsLoading, fetchEduSpecializations} = useFetchCourseSpecializations();
+    const {courseDetails, courseDetailsLoading, nextCourseDetailUrl, fetchCourseDetails} = useFetchCourseDetails(); 
 
-    const [sanitizedSubTypeContent, setSanitizedSubTypeContent] = useState([]);  
+    const [sanitizedContent, setSanitizedContent] = useState([]);  
 
     const [firstMultipage, setFirstMultipage] = useState();
 
@@ -157,15 +159,15 @@ const ListingPage = ({
     }
 
     useEffect(() => {
-      if (typeof window === 'undefined' || !subType?.content) return;
+      if (typeof window === 'undefined' || (!subType?.content && subCategory?.content && specialization?.content)) return;
   
-        const subTypeContent = subType?.content || "";
+        const infoContent = subType?.content || subCategory?.content || specialization?.content || "";
   
         const DOMPurify = createDOMPurify(window);
-        const sanitized = DOMPurify.sanitize( subTypeContent || '');         
+        const sanitized = DOMPurify.sanitize( infoContent || '');         
   
-        setSanitizedSubTypeContent(sanitized);
-      }, [subType?.content]);
+        setSanitizedContent(sanitized);
+      }, [subType?.content, subCategory?.content, specialization?.content]);
 
     useEffect(() => {
         if (message) {
@@ -234,14 +236,11 @@ const ListingPage = ({
             try {
                 const response = await registration.getRegistrationSubTypes("all");
                 
-                setRegistrationSubTypes(response.data?.results?.map(subType => (
-                    {
+                setRegistrationSubTypes(response.data?.results?.map(subType => ({
                       "name": subType?.name, "category_name": subType?.type_name, 
                       "slug": subType?.slug, "image_url": subType?.image_url,
                       "url": subType?.url
-                    },
-                      
-                ))?.slice(0,4))
+                    }))?.slice(0,4))
             } catch (err) {
                 console.error(`Error fetching registration sub types:`, err);
             }
@@ -324,6 +323,9 @@ const ListingPage = ({
 
     } else if (itemsType === "ProductDetail") {
       faqs = subCategory?.faqs?.map(faq => ({...faq, "question": faq.question?.replace("place_name", locationData?.name), "answer": faq.answer?.replace("place_name", locationData?.name)}));
+    
+    } else if (itemsType === "CourseDetail") {
+      faqs = specialization?.faqs?.map(faq => ({...faq, "question": faq.question?.replace("place_name", locationData?.name), "answer": faq.answer?.replace("place_name", locationData?.name)}));
     }
 
     // *********************************************** */
@@ -359,6 +361,10 @@ const ListingPage = ({
                 if (!eduSpecializationsLoading) {
                   fetchEduSpecializations();
                 }
+              } else if (itemsType === "CourseDetail") {
+                if (nextCourseDetailUrl && !courseDetailsLoading) {
+                  fetchCourseDetails("all", specialization?.slug);
+                }
               }
           },
           { threshold: 1 }
@@ -372,7 +378,8 @@ const ListingPage = ({
       nextRegistrationDetailsParams, registrationDetailsLoading,
       nextProdParams, prodSubCategoriesLoading,
       nextProductDetailsParams, productDetailsLoading, subCategory?.slug,
-      eduSpecializationsLoading
+      eduSpecializationsLoading, specialization?.slug, nextCourseDetailUrl,
+      courseDetailsLoading
     ]);
 
     useEffect(() => {
@@ -385,7 +392,13 @@ const ListingPage = ({
       if (itemsType === "ProductDetail") {
         fetchProductDetails("all", subCategory?.slug, null, true);
       }
-    }, [itemsType, subCategory?.slug]);   
+    }, [itemsType, subCategory?.slug]);
+
+    useEffect(() => {
+      if (itemsType === "CourseDetail") {
+        fetchCourseDetails("all", specialization?.slug, true);
+      }
+    }, [itemsType, specialization?.slug]);
     
     
     //******************************* */
@@ -492,6 +505,13 @@ const ListingPage = ({
               <span>Courses</span>              
             </>
 
+          : itemsType === "CourseDetail" ?
+            <>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/courses`}>Courses</Link> <span>›</span>
+              <span>{specialization?.starting_title} {specialization?.name} {specialization?.ending_title} {locationData?.name}</span>
+            </>
+
           : itemsType === "State" ?
             <>
               <span>{state?.name}</span>              
@@ -523,6 +543,9 @@ const ListingPage = ({
             
             : itemsType === "CourseSpecialization" ?
             <>Courses {locationData?.name || ""} </> 
+
+            : itemsType === "CourseDetail" ?
+            <>{specialization?.starting_title} {specialization?.name} {specialization?.ending_title} {locationData?.name} </>
 
             : itemsType === "State" ?
             <>{state?.name || ""} </> 
@@ -624,6 +647,9 @@ const ListingPage = ({
 
           : itemsType === "CourseSpecialization" ?
           `/${district.slug}/courses`
+
+          : itemsType === "CourseDetail" ?
+          `/${district.state_slug}/courses/${specialization?.location_slug || specialization?.slug}-${district.slug}`
 
           : itemsType === "State" || itemsType === "District" ?
           `/${district.slug}/`
@@ -1232,7 +1258,7 @@ const ListingPage = ({
                     {/* last star (half or empty). Use ONE of these: */}
                     {/* half: */}
                     <span className="bz_star bz_star--empty">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                       </svg>
                     </span> 
@@ -1318,7 +1344,7 @@ const ListingPage = ({
                     {/* last star (half or empty). Use ONE of these: */}
                     {/* half: */}
                     <span className="bz_star bz_star--empty">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                       </svg>
                     </span> 
@@ -1404,7 +1430,7 @@ const ListingPage = ({
                     {/* last star (half or empty). Use ONE of these: */}
                     {/* half: */}
                     <span className="bz_star bz_star--empty">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                       </svg>
                     </span> 
@@ -1442,7 +1468,7 @@ const ListingPage = ({
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${specialization?.location_slug || specialization?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
+                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization?.location_slug || specialization?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
                   <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
@@ -1450,6 +1476,93 @@ const ListingPage = ({
           </div>
         ))}
         {eduSpecializationsLoading && eduSpecializations.length > 0 && <Loading />}
+        <div ref={loaderRef} style={{ height: '1px' }} />
+      </>
+
+    : (itemsType === "CourseDetail") ? 
+      <>
+        {courseDetailsLoading && courseDetails.length === 0 && <Loading />}
+        {courseDetails?.map((detail, index) => (
+          <div className="bznew_list_product-hero" key={`${detail?.slug} - ${index + 1}`}>
+            <div className="bznew_list_feature-row">
+              <div className="bznew_list_imgbox">
+                {/* <span className="bznew_list_badge">NEW</span> */}
+                <img alt={detail?.course?.name || ""} src={detail?.course?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"} />
+                
+                <div className="bz_rating" aria-label="Rated 4 out of 5">
+                  <span className="score">4.0</span>
+                  <span className="stars">
+                    {/* 4 filled stars */}
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+                    <span className="bz_star">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                      </svg>
+                    </span>
+
+                    {/* last star (half or empty). Use ONE of these: */}
+                    {/* half: */}
+                    <span className="bz_star bz_star--empty">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+                      </svg>
+                    </span> 
+
+                  </span>
+                </div>
+
+                
+              </div>
+              <div className="bznew_list_product-body">
+                <h2 className="bznew_list_title">
+                  {detail.course?.name}
+                </h2>
+
+                <div className="bz_meta">
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Price</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{detail?.course?.price? `INR ${detail?.course?.price}/-` : "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Duration</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{detail?.course?.duration || "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Course Mode</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{detail?.course?.mode || "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Institution</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{detail?.company_name}</span>
+                </div>
+              </div>
+              <div className="bznew_list_cta">
+                  <a href={`/${detail?.url}`} className="bznew_list_btn primary">Read More</a>
+                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {courseDetailsLoading && courseDetails.length > 0 && <Loading />}
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>
 
@@ -1496,17 +1609,27 @@ const ListingPage = ({
 
 
 
-{itemsType === "CSC" || itemsType === "RegistrationDetail" && 
+{(
+  itemsType === "CSC" 
+  || itemsType === "RegistrationDetail"
+  || itemsType === "ProductDetail"
+  || itemsType === "CourseDetail"
+) && 
   <section className="cleints-listing-secion py-5 h2_second">
       <div className="container">
 
-          <h2>{itemsType === "RegistrationDetail" ? subType?.name : "Common Service Center (CSC) in India"}</h2>
+          <h2>{
+          itemsType === "RegistrationDetail" ? subType?.name 
+          : itemsType === "ProductDetail" ? subCategory?.name 
+          : itemsType === "CourseDetail" ? specialization?.name 
+          : "Common Service Center (CSC) in India"
+          }</h2>
           <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
           <div className="row" data-aos="fade-up">
             <div className="col-md-12">
-              {itemsType === "RegistrationDetail"?
-               <div style={{textAlign: "left"}} dangerouslySetInnerHTML={{__html:sanitizedSubTypeContent}} />
+              {(itemsType === "RegistrationDetail" || itemsType === "ProductDetail" || itemsType === "CourseDetail")?
+               <div style={{textAlign: "left"}} dangerouslySetInnerHTML={{__html:sanitizedContent}} />
               :
                 <p>
 
@@ -1527,8 +1650,12 @@ Through CSCs, citizens gain access to affordable and high-quality services in ar
   </section>
 }
 
-{itemsType === "CSC" 
-|| (itemsType === "RegistrationDetail" && !subType?.hide_faqs) && 
+{(
+  itemsType === "CSC" 
+  || (itemsType === "RegistrationDetail" && !subType?.hide_faqs)
+  || (itemsType === "ProductDetail" && !subCategory?.hide_faqs)
+  || (itemsType === "CourseDetail" && !specialization?.hide_faqs)
+  ) && 
 <div className="container">
   <div className="row">
     <div className="col-md-12" data-aos="fade-up">
