@@ -20,7 +20,7 @@ export default function ListSubCategoriePage({
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/products`}
+        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products`}
         />
 
         <Head>
@@ -122,9 +122,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products#page`,
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products#page`,
             "name": `Sub Categories Wholesale Supplier in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/products`,
+            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products`,
             "description": `Find Sub Categories wholesale suppliers in ${address}.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" }
@@ -133,11 +133,11 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products#breadcrumbs`,
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://${locationData?.district_slug || locationData?.state_slug}/products` },
+              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products` },
             ]
           },
 
@@ -190,11 +190,11 @@ export async function getServerSideProps(context) {
 
           subCategories?.map(subCategory => ({
             "@type": "Product",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#product`,
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#product`,
             "name": `${subCategory.company_name || index + 1} - ${subCategory.name}`,
             "description": subCategory?.description || "",
             "image":[subCategory?.image_url || "https://bzindia.in/images/logo.svg"],
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
+            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
             "sku": subCategory.sku || "",
             "brand": { "@type": "Brand", "name": subCategory.brand || "" },
             "aggregateRating": (subCategory?.testimonials?.length > 0) ? {
@@ -204,7 +204,7 @@ export async function getServerSideProps(context) {
               "bestRating": "5",
               "worstRating": "1"
             } : undefined,
-            "review": subCategory?.testimonials.length > 0 ? subCategory?.testimonials?.map(testimonial => ({
+            "review": subCategory?.testimonials?.length > 0 ? subCategory?.testimonials?.map(testimonial => ({
                 "@type": "Review",
                 "author": { "@type": "Person", "name": testimonial.name || testimonial.review_by || "" },
                 "datePublished": testimonial.created || "",
@@ -221,7 +221,7 @@ export async function getServerSideProps(context) {
               "price": subCategory?.price || "",
               "priceValidUntil": priceValidUntil,
               "availability": "https://schema.org/InStock",
-              "url": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
+              "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
               "seller": { "@id": "https://bzindia.in/#org" },
               "shippingDetails": [{
                 "@type": "OfferShippingDetails",

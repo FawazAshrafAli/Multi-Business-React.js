@@ -1,26 +1,26 @@
 import Head from 'next/head';
 import SeoHead from '../../../../components/SeoHead';
-import ListCourseSpecializations from '../../../../components/education/ListCourseSpecializations';
+import course from '../../../../lib/api/course';
 import location from '../../../../lib/api/location';
 import blog from '../../../../lib/api/blog';
-import course from '../../../../lib/api/course';
+import ListCourseDetails from '../../../../components/education/ListCourseDetails';
 
 export default function ListSpecializationPage({
-  isSpecializationListingPage, blogs,
-  structuredData, address,
-  locationData
-}) {
+  details, isListCourseDetailsPage,
+  structuredData, specialization, blogs,
+  locationData, address
+}) {  
   return (
     <>
-      {isSpecializationListingPage &&
+      {isListCourseDetailsPage &&
         <>
         <SeoHead
         meta_description={`Get online courses in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Courses ${locationData?.name}`}
+        meta_title={`Filing ${locationData?.name}`}
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses`}
+        url = {`https://${locationData?.district_slug || locationData?.state_slug}/filings/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -32,13 +32,14 @@ export default function ListSpecializationPage({
             />
           ))}    
         </Head>
-
-      <ListCourseSpecializations
-       
-       blogs={blogs}
-       locationData={locationData}
-       />
-       </>
+        
+        <ListCourseDetails
+         
+        details={details}
+        locationData={locationData}
+        specialization={specialization}
+        />
+      </>
       }
 
     </>
@@ -47,43 +48,47 @@ export default function ListSpecializationPage({
 
 export async function getServerSideProps(context) {
   try {
-    const {slug} = context.params;
-    let isSpecializationListingPage = false;
-    let locationData = {};
-               
-    try {
+    const {slug, specializationSlug} = context.params;
+    let isListCourseDetailsPage = false;
+    
+    let urlLocationRes;
+    
+    urlLocationRes = await location.getUrlLocation("state", specializationSlug);
 
-      const districtRes = await location.getMinimalDistrict(slug);
-      const district = districtRes.data;
+    if (!urlLocationRes?.data?.data) {
+      urlLocationRes = await location.getUrlLocation("district", specializationSlug);
+    }
 
-      isSpecializationListingPage = true;
+    if (!urlLocationRes?.data?.data) {
+      urlLocationRes = await location.getUrlLocation("place", specializationSlug);
+    }
 
-      const districtCenterRes = await location.getDistrictCenter(slug);
-      const districtCenter = districtCenterRes.data;
+    const urlLocation = urlLocationRes.data;
 
-      locationData = {
-          ...district, 
-          "latitude": districtCenter?.latitude, "longitude": districtCenter?.longitude
-      }
-    } catch (err) {
-      const stateRes = await location.getMinimalState(slug);
-      const state = stateRes.data;          
-      
-      isSpecializationListingPage = true;
-      
-      const stateCenterRes = await location.getStateCenter(slug);
-      const stateCenter = stateCenterRes.data;
+    const locationData = urlLocation?.data;
 
-      locationData = {
-          ...state, 
-          "latitude": stateCenter?.latitude, "longitude": stateCenter?.longitude
-      }
-    }            
+    const passingSpecializationSlug = specializationSlug?.replace(`-${locationData?.slug}`, "");
 
-    if (!isSpecializationListingPage) throw new Error("Not a course specialization listing page");
+    let specialization, specializationRes;
 
-    const specializationRes = await course.getSpecializations("/course_api/companies/all/specializations/");    
-    const specializations = specializationRes.data?.results;
+    
+    specializationRes = await course.getSpecializations(`/course_api/companies/all/specializations/?location_slug=${passingSpecializationSlug}`);    
+    specialization = specializationRes.data?.results?.[0];    
+  
+    if (!specialization) {            
+      specializationRes = await course.getSpecialization("all", passingSpecializationSlug);
+      specialization = specializationRes.data;
+
+    }
+
+    if (specialization && (locationData?.district_slug == slug || locationData?.state_slug == slug || locationData?.slug == slug)) {
+      isListCourseDetailsPage = true;
+    }    
+
+    if (!isListCourseDetailsPage) throw new Error("Not a course detail listing page");
+
+    const detailRes = await course.getDetailList("all");
+    const details = detailRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
     const blogs = (blogsRes.data.results || [])
@@ -101,7 +106,6 @@ export async function getServerSideProps(context) {
         meta_tags: b.meta_tags,
         })); 
 
-      
     const address_list = [];
 
     if (locationData?.name) address_list.push(locationData?.name);
@@ -118,9 +122,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses#page`,
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses#page`,
             "name": `Specification Courses in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses`,
+            "url": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses`,
             "description": `Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
@@ -139,36 +143,25 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs (eligible rich result) */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses#breadcrumbs`,
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses` },
+              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://${locationData?.district_slug || locationData?.state_slug}/courses` },
+              { "@type": "ListItem", "position": 4, "name": `${specialization?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}` },
             ]
           },
 
           /* C) FAQ (eligible rich result) */
-          // {
-          //   "@type": "FAQPage",
-          //   "@id": "https://bzindia.in/kerala/courses/CompanySubType/specification-courses-in-malappuram#faq",
-          //   "mainEntity": [
-          //     {
-          //       "@type": "Question",
-          //       "name": "Do you offer both online and classroom Specification Courses in Malappuram?",
-          //       "acceptedAnswer": { "@type": "Answer", "text": "Yes. Most programs are available in both online and in-person modes with flexible schedules." }
-          //     },
-          //     {
-          //       "@type": "Question",
-          //       "name": "Will I get a certificate after completion?",
-          //       "acceptedAnswer": { "@type": "Answer", "text": "Yes, all programs include course completion certificates. Some include vendor/industry credentials." }
-          //     },
-          //     {
-          //       "@type": "Question",
-          //       "name": "Is placement assistance available?",
-          //       "acceptedAnswer": { "@type": "Answer", "text": "We provide interview prep, resume support, and referrals through partner employers." }
-          //     }
-          //   ]
-          // },
+          {
+            "@type": "FAQPage",
+            "@id": "https://bzindia.in/kerala/courses/CompanySubType/specification-courses-in-malappuram#faq",
+            "mainEntity": specialization?.faqs?.map(faq => ({
+                "@type": "Question",
+                "name": faq.question || "",
+                "acceptedAnswer": { "@type": "Answer", "text": faq.answer || "" }
+              }))            
+          },
 
           /* D) Provider (with reviews & rating) */
           {
@@ -203,22 +196,22 @@ export async function getServerSideProps(context) {
             ]
           },
 
-          specializations?.map(specialization => ({
+          details?.map(detail => ({
             "@type": "Course",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#course`,
-            "name": specialization?.name || "",
-            "description": specialization?.description || `Specification courses of ${specialization?.name}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}`,
-            "image": specialization?.image_url || "",
+            "@id": `https://${detail.url}#course`,
+            "name": detail?.name || "",
+            "description": detail?.description || ` ${detail?.name}`,
+            "url": `https://${detail.url}`,
+            "image": detail?.image_url || "",
             "provider": { "@id": `https://bzindia.in/${specialization?.company_slug}/#org` },
-            "aggregateRating": (specialization?.testimonials?.length > 0) ? {
+            "aggregateRating": (detail?.testimonials?.length > 0) ? {
               "@type": "AggregateRating",
-              "ratingValue": Number(specialization.rating),
-              "reviewCount": Number(specialization?.testimonials?.length),
+              "ratingValue": Number(detail.rating),
+              "reviewCount": Number(detail?.testimonials?.length),
               "bestRating": "5",
               "worstRating": "1"
             } : undefined,
-            "review": specialization?.testimonials?.length > 0 ? specialization?.testimonials?.map(testimonial => ({
+            "review": detail?.testimonials?.length > 0 ? detail?.testimonials?.map(testimonial => ({
                 "@type": "Review",
                 "author": { "@type": "Person", "name": testimonial.name || testimonial.review_by || "" },
                 "datePublished": testimonial.created || "",
@@ -234,11 +227,11 @@ export async function getServerSideProps(context) {
                 "@type": "CourseInstance",
                 "name": `${locationData?.name} In-Person Batch`,
                 "courseMode": "InPerson",
-                "startDate": specialization?.starting_date ? specialization?.starting_date.split('T')[0] : "",
-                "endDate": specialization?.ending_date ? specialization?.ending_date.split('T')[0] : "",
+                "startDate": detail?.starting_date ? detail?.starting_date.split('T')[0] : "",
+                "endDate": detail?.ending_date ? detail?.ending_date.split('T')[0] : "",
                 "location": {
                   "@type": "Place",
-                  "name": `${specialization.company_name} — ${locationData?.name}`,
+                  "name": `${detail.company_name} — ${locationData?.name}`,
                   "geo": { "@type": "GeoCoordinates", "latitude": 11.0730, "longitude": 76.0740 },
                   "address": {
                     "@type": "PostalAddress",
@@ -252,23 +245,23 @@ export async function getServerSideProps(context) {
                 "offers": {
                   "@type": "Offer",
                   "priceCurrency": "INR",
-                  "price": specialization?.price || "",
+                  "price": detail?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
+                  "url": `https://${detail.url}#apply`
                 }
               },
               {
                 "@type": "CourseInstance",
-                "name": `${specialization?.mode} Weekday Batch`,
-                "courseMode": specialization?.mode || "",
-                "startDate": specialization?.starting_date ? specialization?.starting_date.split('T')[0] : "",
-                "endDate": specialization?.ending_date ? specialization?.ending_date.split('T')[0] : "",
+                "name": `${detail?.mode} Weekday Batch`,
+                "courseMode": detail?.mode || "",
+                "startDate": detail?.starting_date ? detail?.starting_date.split('T')[0] : "",
+                "endDate": detail?.ending_date ? detail?.ending_date.split('T')[0] : "",
                 "offers": {
                   "@type": "Offer",
                   "priceCurrency": "INR",
-                  "price": specialization?.price || "",
+                  "price": detail?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
+                  "url": `https://${detail.url}#apply`
                 }
               }
             ]
@@ -281,11 +274,12 @@ export async function getServerSideProps(context) {
     return {
       props: {
         structuredData,
-        specializations: specializations || [],
-        isSpecializationListingPage: isSpecializationListingPage || false,
+        details: details || [],
+        isListCourseDetailsPage: isListCourseDetailsPage || false,
         locationData: locationData || {},
+        specialization: specialization || null,
         blogs: blogs || [],
-        address: address || null
+        address: address || [],
       },
     };
 
@@ -294,13 +288,14 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        specializations: [],
+        details: [],
         structuredData: [],
-        isSpecializationListingPage: false,
+        isListCourseDetailsPage: false,
         locationData: {},
+        specialization: null,
         blogs: [],
-        address: null
-      }
+        address: null,
+      }      
     }
   }
 

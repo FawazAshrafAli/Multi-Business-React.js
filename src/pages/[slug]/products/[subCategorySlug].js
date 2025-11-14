@@ -140,7 +140,7 @@ export async function getServerSideProps(context) {
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Filings", "item": `https://${locationData?.district_slug || locationData?.state_slug}/products` },
+              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://${locationData?.district_slug || locationData?.state_slug}/products` },
               { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
             ]
           },
