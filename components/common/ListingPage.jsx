@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import company from '../../lib/api/company';
 import Loading from '../Loading';
 import Link from 'next/link';
@@ -22,6 +22,8 @@ import useFetchCourseSpecializations from '../../hooks/useFetchCourseSpecializat
 import useFetchCourseDetails from '../../hooks/useFetchCourseDetails';
 import useFetchServSubCategories from '../../hooks/useFetchServSubCategories';
 import useFetchServiceDetails from '../../hooks/useFetchServiceDetails';
+import AutoPopUp from './AutoPopUp';
+import LogoContext from '../context/LogoContext';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -65,6 +67,8 @@ const ListingPage = ({
     const [message, setMessage] = useState();
     const [messageClass, setMessageClass] = useState();  
 
+    const [currentCompany, setCurrentCompany] = useState();
+
     const {subTypes, subTypesLoading, nextParams, fetchSubTypes} = useFetchSubTypes();
     const {prodSubCategories, prodSubCategoriesLoading, nextProdParams, fetchProdSubCategories} = useFetchProdSubCategories();
     const {registrationDetails, registrationDetailsLoading, nextRegistrationDetailsParams, fetchRegistrationDetails} = useFetchRegistrationDetails(); 
@@ -80,6 +84,8 @@ const ListingPage = ({
     const [firstServiceMultipage, setFirstServiceMultipage] = useState(null);
     const [firstCourseMultipage, setFirstCourseMultipage] = useState(null);
     const [firstProductMultipage, setFirstProductMultipage] = useState(null);
+
+    const {setLogo, resetLogo} = useContext(LogoContext);
 
     useEffect(() => {
       if (itemsType != "State" && itemsType != "District") return;
@@ -596,12 +602,47 @@ const ListingPage = ({
     //******************************* */
 
 
+useEffect(() => {
+  if (!subCategory && !subType && !specialization) return;
+
+  const companySlug = subCategory?.company_slug || subType?.company_slug || specialization?.company_slug;
+
+  const fetchCurrentCompany = async () => {
+    try {
+      const response = await company.getInnerPageCompany(companySlug);
+      setCurrentCompany(response.data);
+    } catch (err) {
+      console.error(err);
+    }
+
+  }
+
+  fetchCurrentCompany()
+
+}, [subCategory, subType, specialization]);
+
+useEffect(() => {
+  if (!currentCompany?.logo_url) return
+
+  setLogo(currentCompany?.logo_url);
+
+  return () => {
+    resetLogo();
+  }
+
+}, [currentCompany]);
+
 
   return (
     <>
       {message&&
         <Message message={message} messageClass={messageClass} />
-      }      
+      }
+
+      {currentCompany &&
+        
+        <AutoPopUp currentCompany={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>  
+      }
         <section id="bznew_list_section">
   <div className="container">
     {/* Top: mobile dropdown, breadcrumb, headline, search + near me + cities */}
@@ -1080,7 +1121,7 @@ const ListingPage = ({
                   {/* <span className="bznew_list_badge">NEW</span> */}
                   <img alt={subType?.name} src={subType?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"}/>
                   <div className="bz_rating" aria-label="Rated 4 out of 5">
-          <span className="score">4.0</span>
+          <span className="score">{subType.rating}</span>
           <span className="stars">
             {/* 4 filled stars */}
             <span className="bz_star">
@@ -2233,6 +2274,7 @@ const ListingPage = ({
   itemsType === "CSC" 
   || itemsType === "RegistrationDetail"
   || itemsType === "ProductDetail"
+  || itemsType === "ServiceDetail"
   || itemsType === "CourseDetail"
 ) && 
   <section className="cleints-listing-secion py-5 h2_second">
@@ -2240,8 +2282,8 @@ const ListingPage = ({
 
           <h2>{
           itemsType === "RegistrationDetail" ? subType?.name 
-          : itemsType === "ProductDetail" ? subCategory?.name 
-          : itemsType === "CourseDetail" ? specialization?.name 
+          : (itemsType === "ProductDetail" || itemsType === "ServiceDetail") ? subCategory?.name 
+          : itemsType === "CourseDetail" ? specialization?.name
           : "Common Service Center (CSC) in India"
           }</h2>
           <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
@@ -2273,7 +2315,7 @@ Through CSCs, citizens gain access to affordable and high-quality services in ar
 {(
   itemsType === "CSC" 
   || (itemsType === "RegistrationDetail" && !subType?.hide_faqs)
-  || (itemsType === "ProductDetail" && !subCategory?.hide_faqs)
+  || ((itemsType === "ProductDetail" || itemsType === "ServiceDetail") && !subCategory?.hide_faqs)
   || (itemsType === "CourseDetail" && !specialization?.hide_faqs)
   ) && 
 <div className="container">
