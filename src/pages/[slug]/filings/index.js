@@ -143,18 +143,18 @@ export async function getServerSideProps(context) {
             },
             "mainEntity": {
               "@type": "ItemList",
-              "name": `Registration Sub Types in ${locationData?.name || ""}`,
+              "name": `Registrations in ${locationData?.name || ""}`,
               "itemListOrder": "http://schema.org/ItemListOrderAscending",
               "itemListElement": subTypes?.map((subType, index) => ({
                   "@type": "ListItem",
                   "position": index + 1,
                   "item": {
                     "@type": "Service",
-                    "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug}-${locationData?.slug}#government-service`,
+                    "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}#government-service`,
                     "name": subType?.full_title || "",
                     "description": subType?.description || "",
                     "image": subType?.image_url || "",
-                    "url": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug}-${locationData?.slug}`
+                    "url": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}`
                   }
               }))
             }

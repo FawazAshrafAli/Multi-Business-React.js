@@ -73,6 +73,18 @@ export async function getServerSideProps(context) {
 
     subCategoryRes = await service.getSubCategories("all", undefined, `location_slug=${passingSubCategorySlug}`);
     subCategory = subCategoryRes.data?.results?.[0];
+
+    let title_list = [];
+
+    if (subCategory) {
+      [subCategory?.starting_title, subCategory?.name, subCategory?.ending_title].forEach(title => {
+        if (title) {
+          title_list.push(title);
+        }
+      });      
+    }
+
+    subCategory = {...subCategory, "full_title": title_list.join(" ")};
     
     if (!subCategory) {
 
@@ -87,7 +99,7 @@ export async function getServerSideProps(context) {
 
     if (!isListServiceDetailsPage) throw new Error("Not a service sub type listing page");
 
-    const detailRes = await service.getSubCategories("all");
+    const detailRes = await service.getDetailList("all");
     const details = detailRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
@@ -118,7 +130,120 @@ export async function getServerSideProps(context) {
     sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
     const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];      
 
-    const structuredData = [];
+    const structuredData = [
+      JSON.stringify({
+        "@context": "https://schema.org",
+        "@graph": [
+
+          /* A) Listing page */
+          {
+            "@type": ["WebPage","CollectionPage"],
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#page`,
+            "name": `Sub category Services in ${address}`,
+            "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}/`,
+            "description": `Get online services in ${address} with expert consultants and quick approvals.`,
+            "image": "https://bzindia.in/images/logo.svg",
+            "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
+            "spatialCoverage": {
+              "@type": "AdministrativeArea",
+              "name": locationData?.name || "",
+              "containedInPlace": {
+                "@type": "AdministrativeArea",
+                "name": locationData?.state_name || locationData?.district_name || "",
+                "containedInPlace": {
+                  "@type": "Country", "name": "IN"
+                }
+              },
+              "geo": { "@type": "GeoCoordinates", "latitude": locationData?.latitude || "", "longitude": locationData?.longitude || "" }
+            },
+            "mainEntity": {
+              "@type": "ItemList",
+              "name": `Services in ${locationData?.name || ""}`,
+              "itemListOrder": "http://schema.org/ItemListOrderAscending",
+              "itemListElement": details?.map((detail, index) => ({
+                  "@type": "ListItem",
+                  "position": index + 1,
+                  "item": {
+                    "@type": "Service",
+                    "@id": `https://${detail?.url}#service`,
+                    "name": detail?.service?.name || "",
+                    "description": detail?.description || detail?.service?.description || "",
+                    "image": detail?.service?.image_url || "",
+                    "url": `https://${detail?.url}`
+                  }
+              }))
+            }
+          },
+
+          /* B) Breadcrumbs */
+          {
+            "@type": "BreadcrumbList",
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#breadcrumbs`,
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
+              { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
+              { "@type": "ListItem", "position": 3, "name": "Services", "item": `https://${locationData?.district_slug || locationData?.state_slug}/more-services` },
+              { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
+            ]
+          },
+
+          /* C) FAQ */
+          {
+            "@type": "FAQPage",
+            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#faq`,
+            "mainEntity": subCategory?.faqs?.map(faq => ({
+                "@type": "Question",
+                "name": faq?.question || "",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq?.answer || ""
+                }
+              }))          
+          },
+
+          /* D) Provider with ratings */
+          details?.map((detail, index) => ({
+            "@type": "ProfessionalService",
+            "@id": `https://${detail.url}#service`,
+            "name": `${detail.company_name || index + 1} - ${detail.service?.name}`, 
+            "image": detail.company_logo_url || "",
+            "url": `https://${detail.url}`,
+            "telephone": detail?.company_contact? `+91-${detail?.company_contact}`: "",
+            "priceRange": detail?.service?.price? `₹${detail?.service?.price}` : "",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": locationData?.name || "",
+              "addressRegion": locationData?.state_name || locationData?.district_name || "",
+              "postalCode": locationData?.pincode || "",
+              "addressCountry": "IN"
+            },
+            "geo": { "@type": "GeoCoordinates", "latitude": locationData?.latitude || "", "longitude": locationData?.longitude || "" },
+            "areaServed": [ address, "IN" ],
+            "openingHoursSpecification": [
+              { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:30", "closes": "18:30" }
+            ],
+            "aggregateRating": (detail?.service?.testimonials?.length > 0) && {
+              "@type": "AggregateRating",
+              "ratingValue": Number(detail.service?.rating),
+              "reviewCount": Number(detail?.service?.testimonials?.length),
+              "bestRating": "5",
+              "worstRating": "1"
+            } || undefined,
+            "review": detail?.service?.testimonials?.map(testimonial => ({
+                "@type": "Review",
+                "author": { "@type": "Person", "name": testimonial.name || "" },
+                "datePublished": testimonial.created || "",
+                "reviewRating": {
+                  "@type": "Rating", 
+                  "ratingValue": Number(testimonial.rating), 
+                  "bestRating": "5" 
+                },
+                "reviewBody": testimonial.text || ""
+              }))
+          })),
+        ]
+      })
+    ];
 
     return {
       props: {
