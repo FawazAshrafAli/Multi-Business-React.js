@@ -125,7 +125,17 @@ const ListingPage = ({
 
           if (urlType === "location_filtered") {
             updatedMultipageSlug = updatedMultipageSlug.replace("-place_name", "");
-            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationData?.state_slug}/${locationData?.district_slug}/${locationData?.slug}`;
+            
+            let locationSlugList = [];
+            [locationData?.state_slug, locationData?.district_slug, locationData?.slug].forEach(slugItem => {
+              if (slugItem) {
+                locationSlugList.push(slugItem);
+              }
+            })
+
+            const locationSlugString = locationSlugList.join("/");
+
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationSlugString}`;
           } else {
             updatedMultipageSlug = updatedMultipageSlug.replace("place_name", locationData?.slug || "india");
             modifiedUrl = `${companySlug}/${updatedMultipageSlug}`;      
@@ -167,7 +177,17 @@ const ListingPage = ({
 
           if (urlType === "location_filtered") {
             updatedMultipageSlug = updatedMultipageSlug.replace("-place_name", "");
-            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationData?.state_slug}/${locationData?.district_slug}/${locationData?.slug}`;
+            
+            let locationSlugList = [];
+            [locationData?.state_slug, locationData?.district_slug, locationData?.slug].forEach(slugItem => {
+              if (slugItem) {
+                locationSlugList.push(slugItem);
+              }
+            })
+
+            const locationSlugString = locationSlugList.join("/");
+
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationSlugString}`;
           } else {
             updatedMultipageSlug = updatedMultipageSlug.replace("place_name", locationData?.slug || "india");
             modifiedUrl = `${companySlug}/${updatedMultipageSlug}`;      
@@ -191,8 +211,112 @@ const ListingPage = ({
       fetchFirstServiceMultipage();
       
     }, [subCategory?.slug, locationData?.state_slug, itemsType]);
-    
-    
+
+    useEffect(() => {
+      if (!specialization?.slug || !locationData?.state_slug || itemsType != "CourseDetail") return;
+
+      const fetchFirstCourseMultipage = async () => {
+        try {
+
+          const response = await course.getCourseMultipages(locationData?.state_slug, `specialization=${specialization?.slug}`);
+          const multipage = response.data?.results?.[0];
+
+          const slug = multipage?.slug || "";
+          const companySlug = multipage?.company_slug || "";
+          const urlType = multipage?.url_type;
+
+          let updatedMultipageSlug = slug;
+          let modifiedUrl = "";
+
+          if (urlType === "location_filtered") {
+            updatedMultipageSlug = updatedMultipageSlug.replace("-place_name", "");
+            
+            let locationSlugList = [];
+            [locationData?.state_slug, locationData?.district_slug, locationData?.slug].forEach(slugItem => {
+              if (slugItem) {
+                locationSlugList.push(slugItem);
+              }
+            })
+
+            const locationSlugString = locationSlugList.join("/");
+
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationSlugString}`;
+          } else {
+            updatedMultipageSlug = updatedMultipageSlug.replace("place_name", locationData?.slug || "india");
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}`;      
+          }
+
+          if (multipage) {
+            setFirstCourseMultipage({
+              ...multipage,
+              url: modifiedUrl,
+              title: multipage?.title?.replace("place_name", locationData?.name || "India")
+            })          
+          }
+
+        } catch (err) {
+          console.error(err);
+        }
+        
+      }
+      
+      
+      fetchFirstCourseMultipage();
+      
+    }, [specialization?.slug, locationData?.state_slug, itemsType]);
+
+    useEffect(() => {
+      if (!subCategory?.slug || !locationData?.state_slug || itemsType != "ProductDetail") return;
+
+      const fetchFirstProductMultipage = async () => {
+        try {
+          const response = await product.getProductMultipages(locationData?.state_slug, `sub_category=${subCategory?.slug}`);
+          const multipage = response.data?.results?.[0];
+
+          const slug = multipage?.slug || "";
+          const companySlug = multipage?.company_slug || "";
+          const urlType = multipage?.url_type;
+
+          let updatedMultipageSlug = slug;
+          let modifiedUrl = "";
+
+          if (urlType === "location_filtered") {
+            updatedMultipageSlug = updatedMultipageSlug.replace("-place_name", "");
+
+            let locationSlugList = [];
+            [locationData?.state_slug, locationData?.district_slug, locationData?.slug].forEach(slugItem => {
+              if (slugItem) {
+                locationSlugList.push(slugItem);
+              }
+            })
+
+            const locationSlugString = locationSlugList.join("/");
+
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}/${locationSlugString}`;
+          } else {
+            updatedMultipageSlug = updatedMultipageSlug.replace("place_name", locationData?.slug || "india");
+            modifiedUrl = `${companySlug}/${updatedMultipageSlug}`;      
+          }
+
+          if (multipage) {
+            setFirstProductMultipage({
+              ...multipage,
+              url: modifiedUrl,
+              title: multipage?.title?.replace("place_name", locationData?.name || "India")
+            })          
+          }
+
+        } catch (err) {
+          console.error(err);
+        }
+        
+      }
+      
+      
+      fetchFirstProductMultipage();
+      
+    }, [subCategory?.slug, locationData?.state_slug, itemsType]);
+
     let districtSlug;
 
     let possibleStateSlug = locationData?.state?.slug || locationData?.state_slug || locationData?.slug;
@@ -1482,6 +1606,83 @@ const ListingPage = ({
           </div>
         ))}
         {productDetailsLoading && productDetails.length > 0 && <Loading />}
+        {(!productDetailsLoading && firstProductMultipage) &&
+          <div className="bznew_list_product-hero">
+                  <div className="bznew_list_feature-row">
+                    <div className="bznew_list_imgbox">
+                      {/* <span className="bznew_list_badge">NEW</span> */}
+                      <img alt={firstProductMultipage?.title?.replace("place_name", locationData?.name)} src={firstProductMultipage?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"}/>
+                      <div className="bz_rating" aria-label="Rated 4 out of 5">
+              <span className="score">4.0</span>
+              <span className="stars">
+                {/* 4 filled stars */}
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+
+                {/* last star (half or empty). Use ONE of these: */}
+                {/* half: */}
+                <span className="bz_star bz_star--empty">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+                  </svg>
+                </span> 
+
+              </span>
+            </div>
+              </div>
+              <div className="bznew_list_product-body">
+                <h2 className="bznew_list_title">
+                  {firstProductMultipage?.title}
+
+                </h2>
+            <div className="bz_meta">
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Price</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstProductMultipage.products?.[0]?.price? `INR ${firstProductMultipage.products?.[0]?.price}/-` : "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Stock</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstProductMultipage.products?.[0]?.stock || "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Product</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstProductMultipage.products?.[0]?.category_name}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Company</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstProductMultipage.products?.[0]?.company_name}</span>
+                </div>
+              </div>
+                <div className="bznew_list_cta">
+                  <a href={`/${firstProductMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
+                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>   
       
@@ -1656,6 +1857,83 @@ const ListingPage = ({
           </div>
         ))}
         {courseDetailsLoading && courseDetails.length > 0 && <Loading />}
+        {(!courseDetailsLoading && firstCourseMultipage) &&
+          <div className="bznew_list_product-hero">
+                  <div className="bznew_list_feature-row">
+                    <div className="bznew_list_imgbox">
+                      {/* <span className="bznew_list_badge">NEW</span> */}
+                      <img alt={firstCourseMultipage?.title?.replace("place_name", locationData?.name)} src={firstCourseMultipage?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"}/>
+                      <div className="bz_rating" aria-label="Rated 4 out of 5">
+              <span className="score">4.0</span>
+              <span className="stars">
+                {/* 4 filled stars */}
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+                <span className="bz_star">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 .587l3.668 7.431 8.207 1.193-5.938 5.79 1.403 8.168L12 18.896 4.66 23.17l1.403-8.168L.125 9.211l8.207-1.193z"/>
+                  </svg>
+                </span>
+
+                {/* last star (half or empty). Use ONE of these: */}
+                {/* half: */}
+                <span className="bz_star bz_star--empty">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
+                  </svg>
+                </span> 
+
+              </span>
+            </div>
+              </div>
+              <div className="bznew_list_product-body">
+                <h2 className="bznew_list_title">
+                  {firstCourseMultipage?.title}
+
+                </h2>
+            <div className="bz_meta">
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Price</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstCourseMultipage.price? `INR ${firstCourseMultipage.price}/-` : "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Duration</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstCourseMultipage.duration || "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Course Mode</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstCourseMultipage.mode || "Unavailable"}</span>
+                </div>
+                <div className="bz_meta_row">
+                  <span className="bz_meta_label">Institution</span>
+                  <span className="bz_meta_sep">:</span>
+                  <span className="bz_meta_value">{firstCourseMultipage?.company_name}</span>
+                </div>
+              </div>
+                <div className="bznew_list_cta">
+                  <a href={`/${firstCourseMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
+                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
         <div ref={loaderRef} style={{ height: '1px' }} />
       </>
 
@@ -1833,7 +2111,7 @@ const ListingPage = ({
                   <div className="bznew_list_feature-row">
                     <div className="bznew_list_imgbox">
                       {/* <span className="bznew_list_badge">NEW</span> */}
-                      <img alt={firstServiceMultipage.title?.replace("place_name", locationData?.name)} src={firstServiceMultipage.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"}/>
+                      <img alt={firstServiceMultipage?.title?.replace("place_name", locationData?.name)} src={firstServiceMultipage?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"}/>
                       <div className="bz_rating" aria-label="Rated 4 out of 5">
               <span className="score">4.0</span>
               <span className="stars">
@@ -1872,7 +2150,7 @@ const ListingPage = ({
               </div>
               <div className="bznew_list_product-body">
                 <h2 className="bznew_list_title">
-                  {firstServiceMultipage.title}
+                  {firstServiceMultipage?.title}
 
                 </h2>
             <div className="bz_meta">
@@ -1898,7 +2176,7 @@ const ListingPage = ({
               </div>
               </div>
                 <div className="bznew_list_cta">
-                  <a href={`/${firstServiceMultipage.url}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`/${firstServiceMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
                   <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
