@@ -8,16 +8,17 @@ import product from '../../../../lib/api/product';
 export default function ListSubCategoryPage({
   isListProductDetailsPage,
   structuredData, subCategory, blogs,
-  locationData, address
+  locationData, address, metaKeywords
 }) {  
   return (
     <>
       {isListProductDetailsPage &&
         <>
         <SeoHead
-        meta_description={`${subCategory.name}, bulk pricing, reliable shipping across ${locationData?.name}."`}
-        meta_title={`Sub Categories Wholesale Supplier in ${address}`}
+        meta_description={subCategory?.meta_description?.replace("place_name", locationData?.name) || ""}
+        meta_title={`${subCategory?.full_title} ${locationData?.name || ""}`}
         blogs={blogs || []}
+        metaKeywords={metaKeywords}
 
 
         url = {`https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
@@ -115,7 +116,12 @@ export async function getServerSideProps(context) {
 
     const sixMonthsLater = new Date();
     sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
-    const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];      
+    const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];
+    
+    const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.name);
+    const metaKeywords = [
+      `${subCategory?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
+    ].filter(Boolean);
 
     const structuredData = [
       JSON.stringify({
@@ -250,6 +256,7 @@ export async function getServerSideProps(context) {
         subCategory: subCategory || null,
         blogs: blogs || [],
         address: address || [],
+        metaKeywords: metaKeywords || [],
       },
     };
 
@@ -264,6 +271,7 @@ export async function getServerSideProps(context) {
         subCategory: null,
         blogs: [],
         address: null,
+        metaKeywords: []
       }      
     }
   }

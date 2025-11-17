@@ -8,16 +8,17 @@ import service from '../../../../lib/api/service';
 export default function ListSubCategoryPage({
   isListServiceDetailsPage,
   structuredData, subCategory, blogs,
-  locationData, address
+  locationData, address, metaKeywords
 }) {  
   return (
     <>
       {isListServiceDetailsPage &&
         <>
         <SeoHead
-        meta_description={`${subCategory.name}, bulk pricing, reliable shipping across ${locationData?.name}."`}
-        meta_title={`Sub Categories Wholesale Supplier in ${address}`}
+        meta_description={subCategory?.meta_description?.replace("place_name", locationData?.name) || ""}
+        meta_title={`${subCategory?.full_title} ${locationData?.name || ""}`}
         blogs={blogs || []}
+        metaKeywords={metaKeywords}
 
 
         url = {`https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
@@ -124,11 +125,12 @@ export async function getServerSideProps(context) {
     if (locationData?.district_name) address_list.push(locationData?.district_name);
     if (locationData?.state_name) address_list.push(locationData?.state_name);
 
-    const address = address_list.join(", ");
-
-    const sixMonthsLater = new Date();
-    sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
-    const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];      
+    const address = address_list.join(", ");    
+    
+    const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.service?.name);
+    const metaKeywords = [
+      `${subCategory?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
+    ].filter(Boolean);
 
     const structuredData = [
       JSON.stringify({
@@ -253,6 +255,7 @@ export async function getServerSideProps(context) {
         subCategory: subCategory || null,
         blogs: blogs || [],
         address: address || [],
+        metaKeywords: metaKeywords || [],
       },
     };
 
@@ -267,6 +270,7 @@ export async function getServerSideProps(context) {
         subCategory: null,
         blogs: [],
         address: null,
+        metaKeywords: []
       }      
     }
   }

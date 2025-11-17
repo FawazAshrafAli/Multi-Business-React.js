@@ -8,16 +8,18 @@ import blog from '../../../../lib/api/blog';
 export default function ListSubTypePage({
   details, isListRegistrationDetailsPage,
   structuredData, subType, blogs,
-  locationData, address
+  locationData, address, metaKeywords
 }) {  
+
   return (
     <>
       {isListRegistrationDetailsPage &&
         <>
         <SeoHead
-        meta_description={`Get online registrations in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Filing ${locationData?.name}`}
+        meta_description={subType?.meta_description?.replace("place_name", locationData?.name) || ""}
+        meta_title={`${subType?.full_title} ${locationData?.name || ""}`}
         blogs={blogs || []}
+        metaKeywords={metaKeywords}
 
 
         url = {`https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType?.locationSlug || subType?.slug}-${locationData?.slug}`}
@@ -112,6 +114,11 @@ export async function getServerSideProps(context) {
     if (locationData?.state_name) address_list.push(locationData?.state_name);
 
     const address = address_list.join(", ");
+
+    const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.name);
+    const metaKeywords = [
+      `${subType?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
+    ].filter(bool);
 
     const structuredData = [
       JSON.stringify({
@@ -243,6 +250,7 @@ export async function getServerSideProps(context) {
         subType: subType || null,
         blogs: blogs || [],
         address: address || [],
+        metaKeywords: metaKeywords || [],
       },
     };
 
@@ -258,6 +266,7 @@ export async function getServerSideProps(context) {
         subType: null,
         blogs: [],
         address: null,
+        metaKeywords: []
       }      
     }
   }

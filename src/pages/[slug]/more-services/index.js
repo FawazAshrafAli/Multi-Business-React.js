@@ -110,10 +110,6 @@ export async function getServerSideProps(context) {
 
     const address = address_list.join(", ");
 
-    const sixMonthsLater = new Date();
-    sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
-    const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];      
-
     const structuredData = [
       JSON.stringify({
         "@context": "https://schema.org",
@@ -151,7 +147,7 @@ export async function getServerSideProps(context) {
                     "@type": "Service",
                     "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#service`,
                     "name": subCategory?.full_title || "",
-                    "description": subCategory?.description || "",
+                    "description": subCategory?.meta_description || "",
                     "image": subCategory?.image_url || "",
                     "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`
                   }

@@ -8,16 +8,17 @@ import ListCourseDetails from '../../../../components/education/ListCourseDetail
 export default function ListSpecializationPage({
   details, isListCourseDetailsPage,
   structuredData, specialization, blogs,
-  locationData, address
+  locationData, address, metaKeywords
 }) {  
   return (
     <>
       {isListCourseDetailsPage &&
         <>
         <SeoHead
-        meta_description={`Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`}
-        meta_title={`Specification Courses in ${address}`}
+        meta_description={specialization?.meta_description?.replace("place_name", locationData?.name) || ""}
+        meta_title={`${specialization?.full_title} ${locationData?.name || ""}`}
         blogs={blogs || []}
+        metaKeywords={metaKeywords}
 
 
         url = {`https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
@@ -126,6 +127,11 @@ export async function getServerSideProps(context) {
     if (locationData?.state_name) address_list.push(locationData?.state_name);
 
     const address = address_list.join(", ");
+
+    const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.course?.name);
+    const metaKeywords = [
+      `${specialization?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
+    ].filter(Boolean);
 
     const structuredData = [
       JSON.stringify({
@@ -293,6 +299,7 @@ export async function getServerSideProps(context) {
         specialization: specialization || null,
         blogs: blogs || [],
         address: address || [],
+        metaKeywords: metaKeywords || [],
       },
     };
 
@@ -308,6 +315,7 @@ export async function getServerSideProps(context) {
         specialization: null,
         blogs: [],
         address: null,
+        metaKeywords: []
       }      
     }
   }
