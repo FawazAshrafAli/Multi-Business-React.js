@@ -210,14 +210,14 @@ export async function getServerSideProps(context) {
             "openingHoursSpecification": [
               { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "09:30", "closes": "18:30" }
             ],
-            "aggregateRating": (detail?.testimonials?.length > 0) && {
+            "aggregateRating": (subType?.testimonials?.length > 0) && {
               "@type": "AggregateRating",
-              "ratingValue": Number(detail.rating),
-              "reviewCount": Number(detail?.testimonials?.length),
+              "ratingValue": Number(subType.rating),
+              "reviewCount": Number(subType?.testimonials?.length),
               "bestRating": "5",
               "worstRating": "1"
             },
-            "review": detail?.testimonials?.map(testimonial => ({
+            "review": subType?.testimonials?.map(testimonial => ({
                 "@type": "Review",
                 "author": { "@type": "Person", "name": testimonial.name || "" },
                 "datePublished": testimonial.created || "",
