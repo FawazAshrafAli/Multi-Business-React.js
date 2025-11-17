@@ -4,7 +4,7 @@ import Head from 'next/head'
 const SeoHead = ({
     meta_description, meta_title, metaTags,
     url, blogs = [], currentCompany, pageImage,
-    isBlogPage = false, cscTags
+    isBlogPage = false, cscTags, metaKeywords
 }) => {    
 
     const publishedTime = new Date().toISOString();
@@ -26,8 +26,10 @@ const SeoHead = ({
         <link rel="shortcut icon" href={currentCompany? currentCompany?.favicon_url: 'https://bzindia.in/images/Favicon.png'} />
             
         <meta name="description" content={meta_description || ""} />
-        {cscTags || metaTags && 
-        <meta name="keywords" content={cscTags || metaTags?.map(metaTag => metaTag?.name).join(", ") || ""} />
+        {(cscTags || metaKeywords || metaTags) && 
+        <meta name="keywords" content={
+            (cscTags || metaTags)?.map(metaTag => metaTag?.name).join(", ") || metaKeywords?.join(", ") ||  ""
+        } />
         }
     
         <link rel="canonical" href={url || ""} />
