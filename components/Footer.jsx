@@ -310,6 +310,7 @@ const Footer = () => {
 <div className="row">
     <h1 className="foot_head"><a href="#"><i className="fa fa-crosshairs" aria-hidden="true"></i></a> Explore State-Wise, District-Wise Locations</h1>
     <div className="footer_directory">      
+      <Link className="anchor" href="/state-list-in-india" >State List In India</Link>
       {statesLoading ? <Loading/>
       :  
       states?.map((state, index) => <Link key={state?.slug || index + 1} className="anchor" href={`/${state?.slug || ""}`} >District List of {state?.name}</Link>)
