@@ -314,7 +314,9 @@ const ListMetaTag = ({
         {message&&
         <Message message={message} messageClass={messageClass} />
         }
+        {mostMatchingCompany &&
         <AutoPopUp currentCompany={mostMatchingCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+        }
 
 <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
     <div className="bg-overlay"></div>
