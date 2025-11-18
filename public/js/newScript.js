@@ -246,83 +246,83 @@
 
 
 
-(function(){
-  // Example dataset: add/replace with your actual list
-  const CITY_DATA = [
-    "Agra, Uttar Pradesh","Ahmedabad, Gujarat","Ajmer, Rajasthan","Alappuzha, Kerala",
-    "All India","Amritsar, Punjab","Aurangabad, Maharashtra","Bengaluru, Karnataka",
-    "Bhopal, Madhya Pradesh","Bhubaneswar, Odisha","Chandigarh","Chennai, Tamil Nadu",
-    "Coimbatore, Tamil Nadu","Cuttack, Odisha","Dehradun, Uttarakhand","Delhi",
-    "Depalpur, Madhya Pradesh","Dhanbad, Jharkhand","Faridabad, Haryana",
-    "Faridkot, Punjab","Farrukhabad, Uttar Pradesh","Fatehabad, Haryana",
-    "Fatehpur, Rajasthan","Ferozepur, Punjab","Firozabad, Uttar Pradesh","Feroke, Kerala",
-    "Gandhinagar, Gujarat","Ghaziabad, Uttar Pradesh","Gurugram, Haryana",
-    "Guwahati, Assam","Gwalior, Madhya Pradesh","Hyderabad, Telangana","Indore, Madhya Pradesh",
-    "Jaipur, Rajasthan","Jodhpur, Rajasthan","Kanpur, Uttar Pradesh",
-    "Kochi, Kerala","Kolkata, West Bengal","Kozhikode, Kerala",
-    "Lucknow, Uttar Pradesh","Madurai, Tamil Nadu","Mumbai, Maharashtra",
-    "Mysuru, Karnataka","Nagpur, Maharashtra","Noida, Uttar Pradesh",
-    "Patna, Bihar","Pune, Maharashtra","Raipur, Chhattisgarh",
-    "Rajkot, Gujarat","Ranchi, Jharkhand","Sonipat, Haryana","Surat, Gujarat",
-    "Thiruvananthapuram, Kerala","Vadodara, Gujarat","Varanasi, Uttar Pradesh"
-  ];
+// (function(){
+//   // Example dataset: add/replace with your actual list
+//   const CITY_DATA = [
+//     "Agra, Uttar Pradesh","Ahmedabad, Gujarat","Ajmer, Rajasthan","Alappuzha, Kerala",
+//     "All India","Amritsar, Punjab","Aurangabad, Maharashtra","Bengaluru, Karnataka",
+//     "Bhopal, Madhya Pradesh","Bhubaneswar, Odisha","Chandigarh","Chennai, Tamil Nadu",
+//     "Coimbatore, Tamil Nadu","Cuttack, Odisha","Dehradun, Uttarakhand","Delhi",
+//     "Depalpur, Madhya Pradesh","Dhanbad, Jharkhand","Faridabad, Haryana",
+//     "Faridkot, Punjab","Farrukhabad, Uttar Pradesh","Fatehabad, Haryana",
+//     "Fatehpur, Rajasthan","Ferozepur, Punjab","Firozabad, Uttar Pradesh","Feroke, Kerala",
+//     "Gandhinagar, Gujarat","Ghaziabad, Uttar Pradesh","Gurugram, Haryana",
+//     "Guwahati, Assam","Gwalior, Madhya Pradesh","Hyderabad, Telangana","Indore, Madhya Pradesh",
+//     "Jaipur, Rajasthan","Jodhpur, Rajasthan","Kanpur, Uttar Pradesh",
+//     "Kochi, Kerala","Kolkata, West Bengal","Kozhikode, Kerala",
+//     "Lucknow, Uttar Pradesh","Madurai, Tamil Nadu","Mumbai, Maharashtra",
+//     "Mysuru, Karnataka","Nagpur, Maharashtra","Noida, Uttar Pradesh",
+//     "Patna, Bihar","Pune, Maharashtra","Raipur, Chhattisgarh",
+//     "Rajkot, Gujarat","Ranchi, Jharkhand","Sonipat, Haryana","Surat, Gujarat",
+//     "Thiruvananthapuram, Kerala","Vadodara, Gujarat","Varanasi, Uttar Pradesh"
+//   ];
 
-  const input   = document.getElementById('cityInput');
-  const panel   = document.getElementById('citySuggest');
-  let activeIdx = -1;  // keyboard highlight index
+//   const input   = document.getElementById('cityInput');
+//   const panel   = document.getElementById('citySuggest');
+//   let activeIdx = -1;  // keyboard highlight index
 
-  function render(list){
-    if(!list.length){ panel.classList.remove('show'); panel.innerHTML=''; return; }
-    const items = list.slice(0,10).map((name,i)=>{
-      // split "City, State" into parts for nicer look
-      const [city, state=''] = name.split(/\s*,\s*/);
-      return `<li role="option" data-value="${name.replace(/"/g,'&quot;')}"
-                  class="${i===activeIdx?'active':''}">
-                <strong>${city}</strong>${state?`, <span class="dim">${state}</span>`:''}
-              </li>`;
-    }).join('');
-    panel.innerHTML = `<ul>${items}</ul>`;
-    panel.classList.add('show');
-  }
+//   function render(list){
+//     if(!list.length){ panel.classList.remove('show'); panel.innerHTML=''; return; }
+//     const items = list.slice(0,10).map((name,i)=>{
+//       // split "City, State" into parts for nicer look
+//       const [city, state=''] = name.split(/\s*,\s*/);
+//       return `<li role="option" data-value="${name.replace(/"/g,'&quot;')}"
+//                   class="${i===activeIdx?'active':''}">
+//                 <strong>${city}</strong>${state?`, <span class="dim">${state}</span>`:''}
+//               </li>`;
+//     }).join('');
+//     panel.innerHTML = `<ul>${items}</ul>`;
+//     panel.classList.add('show');
+//   }
 
-  function filter(q){
-    if(!q){ activeIdx=-1; render([]); return; }
-    q = q.trim().toLowerCase();
-    const matches = CITY_DATA.filter(n => n.toLowerCase().startsWith(q));
-    activeIdx = -1;
-    render(matches);
-  }
+//   function filter(q){
+//     if(!q){ activeIdx=-1; render([]); return; }
+//     q = q.trim().toLowerCase();
+//     const matches = CITY_DATA.filter(n => n.toLowerCase().startsWith(q));
+//     activeIdx = -1;
+//     render(matches);
+//   }
 
-  input.addEventListener('input', e => filter(e.target.value));
+//   input.addEventListener('input', e => filter(e.target.value));
 
-  // Keyboard navigation
-  input.addEventListener('keydown', e=>{
-    const items = [...panel.querySelectorAll('li')];
-    if(!panel.classList.contains('show') || !items.length) return;
+//   // Keyboard navigation
+//   input.addEventListener('keydown', e=>{
+//     const items = [...panel.querySelectorAll('li')];
+//     if(!panel.classList.contains('show') || !items.length) return;
 
-    if(e.key==='ArrowDown'){ e.preventDefault(); activeIdx = (activeIdx+1) % items.length; items.forEach(li=>li.classList.remove('active')); items[activeIdx].classList.add('active'); }
-    else if(e.key==='ArrowUp'){ e.preventDefault(); activeIdx = (activeIdx-1+items.length) % items.length; items.forEach(li=>li.classList.remove('active')); items[activeIdx].classList.add('active'); }
-    else if(e.key==='Enter'){ e.preventDefault(); if(activeIdx>=0){ choose(items[activeIdx].dataset.value); } }
-    else if(e.key==='Escape'){ panel.classList.remove('show'); }
-  });
+//     if(e.key==='ArrowDown'){ e.preventDefault(); activeIdx = (activeIdx+1) % items.length; items.forEach(li=>li.classList.remove('active')); items[activeIdx].classList.add('active'); }
+//     else if(e.key==='ArrowUp'){ e.preventDefault(); activeIdx = (activeIdx-1+items.length) % items.length; items.forEach(li=>li.classList.remove('active')); items[activeIdx].classList.add('active'); }
+//     else if(e.key==='Enter'){ e.preventDefault(); if(activeIdx>=0){ choose(items[activeIdx].dataset.value); } }
+//     else if(e.key==='Escape'){ panel.classList.remove('show'); }
+//   });
 
-  // Click selection
-  panel.addEventListener('click', e=>{
-    const li = e.target.closest('li[data-value]');
-    if(li) choose(li.dataset.value);
-  });
+//   // Click selection
+//   panel.addEventListener('click', e=>{
+//     const li = e.target.closest('li[data-value]');
+//     if(li) choose(li.dataset.value);
+//   });
 
-  function choose(value){
-    input.value = value;
-    panel.classList.remove('show');
-    panel.innerHTML = '';
-    input.dispatchEvent(new Event('change')); // optional hook
-  }
+//   function choose(value){
+//     input.value = value;
+//     panel.classList.remove('show');
+//     panel.innerHTML = '';
+//     input.dispatchEvent(new Event('change')); // optional hook
+//   }
 
-  // Close when clicking outside
-  document.addEventListener('click', e=>{
-    if(!panel.contains(e.target) && e.target !== input){
-      panel.classList.remove('show');
-    }
-  });
-})();
+//   // Close when clicking outside
+//   document.addEventListener('click', e=>{
+//     if(!panel.contains(e.target) && e.target !== input){
+//       panel.classList.remove('show');
+//     }
+//   });
+// })();

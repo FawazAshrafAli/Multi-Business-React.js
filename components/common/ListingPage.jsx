@@ -24,6 +24,7 @@ import useFetchServSubCategories from '../../hooks/useFetchServSubCategories';
 import useFetchServiceDetails from '../../hooks/useFetchServiceDetails';
 import AutoPopUp from './AutoPopUp';
 import LogoContext from '../context/LogoContext';
+import { useCitySearch } from '../../hooks/useCitySearch';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -632,6 +633,43 @@ useEffect(() => {
 
 }, [currentCompany]);
 
+  // const ITEMS = [
+  //   "Agra, Uttar Pradesh","Ahmedabad, Gujarat","Ajmer, Rajasthan","Alappuzha, Kerala",
+  //   "All India","Amritsar, Punjab","Aurangabad, Maharashtra","Bengaluru, Karnataka",
+  //   "Bhopal, Madhya Pradesh","Bhubaneswar, Odisha","Chandigarh","Chennai, Tamil Nadu",
+  //   "Coimbatore, Tamil Nadu","Cuttack, Odisha","Dehradun, Uttarakhand","Delhi",
+  //   "Depalpur, Madhya Pradesh","Dhanbad, Jharkhand","Faridabad, Haryana",
+  //   "Faridkot, Punjab","Farrukhabad, Uttar Pradesh","Fatehabad, Haryana",
+  //   "Fatehpur, Rajasthan","Ferozepur, Punjab","Firozabad, Uttar Pradesh","Feroke, Kerala",
+  //   "Gandhinagar, Gujarat","Ghaziabad, Uttar Pradesh","Gurugram, Haryana",
+  //   "Guwahati, Assam","Gwalior, Madhya Pradesh","Hyderabad, Telangana","Indore, Madhya Pradesh",
+  //   "Jaipur, Rajasthan","Jodhpur, Rajasthan","Kanpur, Uttar Pradesh",
+  //   "Kochi, Kerala","Kolkata, West Bengal","Kozhikode, Kerala",
+  //   "Lucknow, Uttar Pradesh","Madurai, Tamil Nadu","Mumbai, Maharashtra",
+  //   "Mysuru, Karnataka","Nagpur, Maharashtra","Noida, Uttar Pradesh",
+  //   "Patna, Bihar","Pune, Maharashtra","Raipur, Chhattisgarh",
+  //   "Rajkot, Gujarat","Ranchi, Jharkhand","Sonipat, Haryana","Surat, Gujarat",
+  //   "Thiruvananthapuram, Kerala","Vadodara, Gujarat","Varanasi, Uttar Pradesh"
+  // ];
+
+  const ITEMS = [
+    {"name": "Filings", "ending_url": "filings"}, 
+    {"name": "Products", "ending_url": "products"}, 
+    {"name": "Services", "ending_url": "services"}, 
+    {"name": "Courses", "ending_url": "courses"}, 
+    {"name": "Common Service Centers", "ending_url": `csc/common-service-centers-${state?.slug || district?.slug || locationData?.slug}`},     
+  ];
+
+  const {
+    query,
+    setQuery,
+    filtered,
+    activeIdx,
+    isPanelOpen,
+    filterItems,
+    handleKeyDown,
+    chooseCity,
+  } = useCitySearch(ITEMS);
 
   return (
     <>
@@ -827,14 +865,38 @@ useEffect(() => {
 
   {/* search (unchanged) */}
   <div className="bznew_list_search" role="search">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-         strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-    <input id="cityInput" placeholder="Please Enter Your City Name" />
-    <div id="citySuggest" className="bznew_list_suggest" role="listbox" aria-label="City suggestions"></div>
-  </div>
+      <input
+        id="cityInput"
+        placeholder="Search"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          filterItems(e.target.value);
+        }}
+        onKeyDown={handleKeyDown}
+        aria-autocomplete="list"
+      />
+      {isPanelOpen && (
+        <div id="citySuggest" className="bznew_list_suggest" role="listbox" style={{display: "block"}}>
+          <ul>
+            {filtered.map((item, i) => {
+              // const [city, state = ""] = item.name?.split(/\s*,\s*/);
+              return (
+                <li
+                  key={item.name}
+                  role="option"
+                  data-value={item}
+                  className={i === activeIdx ? "active" : ""}
+                  onMouseDown={() => chooseCity(item)}
+                >
+                  <strong>{item.name}</strong>                  
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
 
   {/* NEW: view toggle */}
   <div className="bz_view_toggle" aria-label="Change view">
@@ -879,7 +941,7 @@ useEffect(() => {
     <button className="bznew_list_city-nav bznew_list_city-prev" id="cityPrev" aria-label="Previous city">‹</button>
     <div className="bznew_list_city-viewport" id="cityViewport">
       <div className="bznew_list_city-track" id="cityTrack">
-        <Link className="bznew_list_citychip" href="#"><span className="pin">📍</span>All India</Link>
+        {/* <Link className="bznew_list_citychip" href="#"><span className="pin">📍</span>All India</Link> */}
         {stateDistrictsLoading ? <Loading/> :
           stateDistricts?.map((district, index) => (
           <Link className="bznew_list_citychip" href={itemsType === "CSC" ?
