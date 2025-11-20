@@ -118,7 +118,7 @@ export async function getServerSideProps(context) {
     const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.name);
     const metaKeywords = [
       `${subType?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
-    ].filter(bool);
+    ].filter(Boolean);
 
     const structuredData = [
       JSON.stringify({
