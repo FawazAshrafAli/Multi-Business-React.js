@@ -7,6 +7,8 @@ import '@/styles/newStyle.css';
 
 import '@/styles/w3/footerCompanies.css';
 
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
 import AppLayout from '../../components/layout/AppLayout';
 import Script from 'next/script';
 import { useEffect } from 'react';
@@ -83,11 +85,11 @@ export default function App({ Component, pageProps }) {
       />
 
         {/* Font Awesome */}
-      <Script
+      {/* <Script
         src="https://kit.fontawesome.com/ef28b1feab.js"
         crossOrigin="anonymous"
         strategy="afterInteractive"
-      />      
+      />       */}
       
 
       {/* <AppLayout>
