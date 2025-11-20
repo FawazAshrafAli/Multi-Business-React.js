@@ -28,7 +28,9 @@ const SeoHead = ({
         <meta name="description" content={meta_description || ""} />
         {(cscTags || metaKeywords || metaTags) && 
         <meta name="keywords" content={
-            (cscTags || metaTags)?.map(metaTag => metaTag?.name).join(", ") || metaKeywords?.join(", ") ||  ""
+            Array.isArray(cscTags || metaTags) ?
+            (cscTags || metaTags || [])?.map(metaTag => metaTag?.name).join(", ") 
+            : metaKeywords?.join(", ") ||  ""
         } />
         }
     
