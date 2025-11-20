@@ -41,19 +41,6 @@ const MultipageEducation = ({
 
       return sanitized || "";
     }    
-    
-    // useEffect(() => {
-    //   const fetchFallBackTestimonials = async () => {
-    //     try {
-    //       const response = await course.getTestimonials(slug);
-    //       setFallBackTestimonials(response.data);
-    //     } catch (err) {
-    //       console.error(err);
-    //     }
-    //   };
-  
-    //   fetchFallBackTestimonials();
-    // }, [slug]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !replacedMultipage) return;
