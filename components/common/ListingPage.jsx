@@ -1418,7 +1418,7 @@ useEffect(() => {
           </div>
           <div className="bznew_list_product-body">
             <h2 className="bznew_list_title">
-              Filings
+              StartUp Services
             </h2>
             <div className="bz_meta">    
               <ul className="bz_inline-bullet-list">
@@ -1503,26 +1503,27 @@ useEffect(() => {
       <div className="bznew_list_feature-row">
         <div className="bznew_list_imgbox">
           {/* <span className="bznew_list_badge">NEW</span> */}
-          <img alt="Common Service Centers" src="/images/csc_logo.jpg"/>                    
+          <img alt="Useful Directories" src="https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"/>                    
 
           
         </div>
         <div className="bznew_list_product-body">
           <h2 className="bznew_list_title">
-            Common Service Centers
+            Useful Directories
           </h2>
   <div className="bz_meta">  
   <ul className="bz_inline-bullet-list">
-    {
-      nearbyCscCentersLoading? <Loading/> :
-    nearbyCscCenters?.map((center, index) => <li key={center?.slug || index + 1}><Link href={`/${district?.slug || state?.slug}/csc/${center.slug}`}>{center?.name}</Link></li>)
-    }      
+    <li><Link href={`/${district?.state?.slug || state?.slug}/csc/${district?.slug ? `common-service-center-${district?.slug}` : ""}`}>Common Service Centers</Link></li>
+    <li><Link href="#">Post Offices</Link></li>
+    <li><Link href="#">Police Stations</Link></li>
+    <li><Link href="#">Banks</Link></li>
+    <li><Link href="#">Courts</Link></li>
   </ul>
 </div>
 <div className="bznew_list_cta">
             {/* <Link href={`${stateSlug ? `/${stateSlug}`: ""}/${parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link> */}
-            <Link href={`/${district?.state?.slug || state?.slug}/csc/${district?.slug ? `common-service-center-${district?.slug}` : ""}`} className="bznew_list_btn primary">Read More</Link>
-             <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+            {/* <Link href={`/${district?.state?.slug || state?.slug}/csc/${district?.slug ? `common-service-center-${district?.slug}` : ""}`} className="bznew_list_btn primary">Read More</Link> */}
+             {/* <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a> */}
           </div>
         </div>
       </div>
