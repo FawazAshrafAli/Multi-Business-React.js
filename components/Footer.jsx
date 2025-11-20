@@ -13,9 +13,13 @@ import company from '../lib/api/company';
 import BlogContext from './context/BlogContext';
 import LocationContext from './context/LocationContext';
 import { useRouter } from 'next/router';
+import customPage from '../lib/api/customPage';
+import NearestLocationContext from './context/NearesLocationContext';
 
 const Footer = () => {    
   const {blogs} = useContext(BlogContext);
+
+  const [bzindiaContacts, setBzindiaContacts] = useState();
 
   const router = useRouter();
 
@@ -28,6 +32,8 @@ const Footer = () => {
   const {slug} = router.query;
   const {multipageParams} = router.query;
   const {placeLocation} = useContext(LocationContext);  
+
+  const [isLocationSlug, setIsLocationSlug] = useState(true);
 
   const [passingSlug, setPassingSlug] = useState();
 
@@ -51,6 +57,8 @@ const Footer = () => {
   const [nearestPlace, setNearestPlace] = useState([]);
   const [nearestPlaceLoading, setNearestPlaceLoading] = useState([]);
 
+  const {setNearestLocation, resetNearestLocation} = useContext(NearestLocationContext);
+
   let cscUrlParentSlug = nearestPlace?.district?.slug || nearestPlace?.state?.slug || "maharashtra";
   let cscUrlChildSlug = `common-service-center-${ nearestPlace?.slug || "thane"}`
 
@@ -63,6 +71,40 @@ const Footer = () => {
       cscUrlChildSlug = "";
     }
   }
+
+  useEffect(() => {
+    const fetchBzindiaContacts = async () => {
+      try {
+        const response = await customPage.getBzindiaContacts();
+        setBzindiaContacts(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchBzindiaContacts();
+
+  }, [])
+
+  useEffect(() => {
+    if (!slug) return;
+
+    const fetchLocation = async () => {
+      try {
+        const response = await location.getUrlLocation(undefined, slug);
+        const locationData = response.data;
+        if (!locationData?.match_type) {
+          setIsLocationSlug(false);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+    }
+
+    fetchLocation();
+
+  }, [slug]);
   
   useEffect(() => {
     if (slug) {
@@ -77,20 +119,20 @@ const Footer = () => {
   }, [slug, multipageParams]);  
 
   useEffect(() => {
-    if (!passingSlug) return;
+    if (!passingSlug || isLocationSlug) return;
 
     const fetchCurrentCompany = async () => {
       try {
         const response = await company.getCompany(passingSlug);
         setCurrentCompany(response.data);
       } catch (err) {
-        console.error(err);
+        
       }
     };
 
     fetchCurrentCompany();
 
-  }, [passingSlug]);
+  }, [passingSlug, isLocationSlug]);
 
   // Destinations  
   useEffect(() => {    
@@ -182,12 +224,22 @@ const Footer = () => {
         } catch (err) {
           console.error("Geolocation error:", err);
         } finally {
-          setNearestPlaceLoading(false);
+          setNearestPlaceLoading(false);          
         }
       }
   
     fetchNearestPlace();
   }, []);
+
+  useEffect(() => {
+    if (!nearestPlace) return;
+
+    setNearestLocation(nearestPlace);
+
+    return () => {
+      resetNearestLocation();
+    }
+  }, [nearestPlace]);
 
   const updatedMultipage = (multipage, city) => {    
     const title = multipage?.title?.replace("place_name", placeLocation?.name || city?.name || "India");
@@ -512,16 +564,16 @@ const Footer = () => {
     <>
       {/* top move button  */}
       <div className="whthspp-btn">
-        <a href="https://wa.me/0000000000" >
+        <a href={`https://wa.me/${bzindiaContacts?.[0]?.mobile}`} >
           <i className="fa fa-whatsapp"></i><span>WhatsApp
-            <br/><small>+91 0000000000</small></span>
+            <br/><small>{bzindiaContacts?.[0]?.mobile}</small></span>
         </a>
       </div>
 
       <div className="adjust-call">
-        <a href="tel:0000000000">
+        <a href={`tel:${bzindiaContacts?.[0]?.tel}`}>
           <i className="fa fa-phone"></i><span>PhoneNumber
-            <br/><small>+91 0000000000</small></span>
+            <br/><small>{bzindiaContacts?.[0]?.tel}</small></span>
         </a>
       </div>
 

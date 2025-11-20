@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import LogoContext from './context/LogoContext';
 import { useAuth } from "../hooks/useAuth";
 import location from '../lib/api/location';
+import NearestLocationContext from './context/NearesLocationContext';
 
 const Navbar = () => {
   const router = useRouter();
@@ -13,9 +14,9 @@ const Navbar = () => {
   const [openedLink, setOpenedLink] = useState(null);
 
   const [passingSlug, setPassingSlug] = useState();
+  const [isLocationSlug, setIsLocationSlug] = useState(true);  
 
-  const [nearestPlace, setNearestPlace] = useState([]);
-  const [nearestPlaceLoading, setNearestPlaceLoading] = useState([]);
+  const {nearestLocation} = useContext(NearestLocationContext)
 
   const {slug} = router.query;
   const {multipageParams} = router.query;
@@ -51,21 +52,41 @@ const Navbar = () => {
   const { user, loading, refresh, logout } = useAuth();  
 
   useEffect(() => {
-    if (!passingSlug) return;
+    if (!slug) return;
+
+    const fetchLocation = async () => {
+      try {
+        const response = await location.getUrlLocation(undefined, slug);
+        const locationData = response.data;
+        if (!locationData?.match_type) {
+          setIsLocationSlug(false);
+        }
+      } catch (err) {
+        console.error(err)
+      }
+
+    }
+
+    fetchLocation();
+
+  }, [slug]);
+
+  useEffect(() => {
+    if (!passingSlug || isLocationSlug) return;
 
     const fetchCurrentCompany = async () => {
       try {
         const response = await company.getCompany(passingSlug);
         setCurrentCompany(response.data);
       } catch (err) {
-        console.error(err);
+        
       } finally {
         setCurrentCompanyLoading(false);
       }
     };
 
     fetchCurrentCompany();
-  }, [passingSlug]);
+  }, [passingSlug, isLocationSlug]);
 
     useEffect(() => {
       const fetchCompanyTypes = async () => {
@@ -95,24 +116,7 @@ const Navbar = () => {
       await logout();
       refresh();
       router(0);
-    }
-
-    // Nearest Place  
-    useEffect(() => {
-      const fetchNearestPlace = async () => {
-        try {            
-          const response = await location.getNearestPlace();
-
-          setNearestPlace(response.data);
-        } catch (err) {
-          console.error("Geolocation error:", err);
-        } finally {
-          setNearestPlaceLoading(false);
-        }        
-      };
-    
-      fetchNearestPlace();
-    }, []);
+    }    
 
     if (companyTypeError) {
       console.error(companyTypeError);
@@ -185,7 +189,9 @@ const Navbar = () => {
                                       <li itemProp="name" key={subCategory.slug || subCategoryIndex + 1}><Link itemProp="url" href={subCategory.url}  title={subCategory.title}>{subCategory.title}</Link></li>
                                     )) || []}
                                     {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestPlace?.district?.slug || nearestPlace?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    {nearestLocation && 
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    }
                                   </>
                                   : 
                                   <>
@@ -204,7 +210,9 @@ const Navbar = () => {
                                       <li itemProp="name" key={subCategory.slug || subCategoryIndex + 1}><Link itemProp="url" href={subCategory.url}  title={subCategory.title}>{subCategory.title}</Link></li>
                                     )) || []}
                                     {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestPlace?.district?.slug || nearestPlace?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    {nearestLocation && 
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    }
                                   </>
                                   : 
                                   <>
@@ -223,7 +231,9 @@ const Navbar = () => {
                                         <li itemProp="name" key={subCategory.slug || subCategoryIndex + 1}><Link itemProp="url" href={subCategory.url}  title={subCategory.title}>{subCategory.title}</Link></li>
                                       )) || []}
                                       {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
-                                      <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestPlace?.district?.slug || nearestPlace?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                      {nearestLocation && 
+                                      <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                      }
                                     </>
                                     : 
                                     <>
@@ -241,7 +251,9 @@ const Navbar = () => {
                                   )) || []}                            
                                   {company?.sub_categories?.length > 24 ?
                                     // <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestPlace?.district?.slug || nearestPlace?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    nearestLocation && 
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    
                                     : ""
                                   }
                                 </ul>                               
@@ -255,7 +267,9 @@ const Navbar = () => {
                                 <li itemProp="name" key={subCategory.slug || subCategoryIndex + 1}><Link itemProp="url" href={subCategory.url}  title={subCategory.title}>{subCategory.title}</Link></li>
                               )) || []}
                               {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>                               */}
-                              <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestPlace?.district?.slug || nearestPlace?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                              {nearestLocation && 
+                              <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                              }
                             </ul> 
                           </div>
                         
