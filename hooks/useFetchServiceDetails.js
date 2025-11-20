@@ -9,7 +9,6 @@ export default function useFetchServiceDetails() {
     const [nextServiceDetailsParams, setNextServiceDetailsParams] = useState(null);
 
     const fetchServiceDetails = useCallback(async (slug, subCategorySlug = null, params = null, reset = false) => {
-        console.log(subCategorySlug)
         if (fetchingRef.current) return;
         
             fetchingRef.current = true;
