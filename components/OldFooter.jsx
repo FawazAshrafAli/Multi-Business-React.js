@@ -312,14 +312,14 @@ const Footer = ({
     </footer>
 
   <div className="whthspp-btn">
-    <Link href="https://wa.me/9645850158" >
-      <i className="fa fa-whatsapp"></i><span>WhatsApp<br/><small>+91 9645850158</small></span>
+    <Link href="https://wa.me/0000000000" >
+      <i className="fa fa-whatsapp"></i><span>WhatsApp<br/><small>+91 0000000000</small></span>
     </Link>
   </div>
 
   <div className="adjust-call">
-    <Link href="tel:9645850158">
-      <i className="fa fa-phone"></i><span>PhoneNumber<br/><small>+91 9645850158</small></span>
+    <Link href="tel:0000000000">
+      <i className="fa fa-phone"></i><span>PhoneNumber<br/><small>+91 0000000000</small></span>
     </Link>
   </div>
 
