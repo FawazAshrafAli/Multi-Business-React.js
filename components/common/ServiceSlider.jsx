@@ -6,7 +6,7 @@ import Slider from "react-slick";
 import { offeredServiceSettings } from '/public/w3/js/slider';
 import Link from 'next/link';
 
-const ServiceSlider = ({detailPages}) => {
+const ServiceSlider = ({detailPages, nearestLocation}) => {
     
     return (
         <>  
@@ -41,7 +41,9 @@ const ServiceSlider = ({detailPages}) => {
                         </Slider>
 
                     </div>
-                    <Link href="/services"  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+                    {nearestLocation &&
+                    <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/more-services`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+                    }
                 </div>
             </div>
             

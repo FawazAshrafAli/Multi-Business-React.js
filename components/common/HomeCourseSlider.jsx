@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -7,7 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { offeredServiceSettings } from '/public/w3/js/slider';
 import Link from 'next/link.js';
 
-const HomeCourseSlider = ({detailPages}) => {    
+const HomeCourseSlider = ({detailPages, nearestLocation}) => {    
   return (
     <>
         <div className="container">
@@ -39,7 +39,10 @@ const HomeCourseSlider = ({detailPages}) => {
               </Slider>       
     
           </div>
-          <Link href="/courses"  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+          {nearestLocation && 
+          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/courses`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+          }
+
       </div>
   </div> 
     </>
