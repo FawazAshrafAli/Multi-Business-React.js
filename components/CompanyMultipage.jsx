@@ -55,6 +55,37 @@ const CompanyMultipage = ({slug, currentCompany, replacedMultipage}) => {
       }
   
     }, [placeSlug, stateSlug, districtSlug, replacedMultipage?.url_type])
+
+    useEffect(() => {
+      if (!multipageParams?.[1]) return;
+
+      if (!place && !district && !state) {
+        const passingSlug = multipageParams?.[1]
+
+        const fetchLocation = async () => {
+          try {
+            const response = await location.getUrlLocation(undefined, passingSlug);
+            const locationData = response.data;
+            const matchType = locationData?.match_type;
+
+            if (matchType === "place") {
+              setPlace(locationData.data);
+            } else if (matchType === "district") {
+              setDistrict(locationData.data);
+            } else if (matchType === "state") {
+              setState(locationData.data);
+            }
+
+          } catch (err) {
+            console.error(err);
+          }
+        }
+
+        fetchLocation();
+      }
+    }, [
+      place, district, state, multipageParams?.[1],
+    ]);
   
     useEffect(() => {
       if (!stateSlug) {
