@@ -13,6 +13,7 @@ import { useSearchParams } from 'next/navigation.js';
 
 import BlogContext from './context/BlogContext.jsx';
 import TitleContext from './context/TitleContext.jsx';
+import NearestLocationContext from './context/NearesLocationContext.jsx';
 
 const VentureSlider = lazy(() => import('./home/VentureSlider.jsx'));
 const RegistrationSlider = lazy(() => import('./home/RegistrationSlider.jsx'));
@@ -35,7 +36,8 @@ const Home = ({
   const [formData, setFormData] = useState({});
 
   const { setBlogs, resetBlogs } = useContext(BlogContext);
-  const { setTitle, resetTitle } = useContext(TitleContext);    
+  const { setTitle, resetTitle } = useContext(TitleContext);  
+  const { nearestLocation } = useContext(NearestLocationContext);
 
   useEffect(() => {
       if (blogs) setBlogs(blogs);      
@@ -138,15 +140,15 @@ const Home = ({
       
   <section style={{paddingTop:"50px"}}>
     <Suspense fallback={<Loading/>}>
-      <RegistrationSlider detailPages = {registrationDetailPages?.slice(0,15)}/>
+      <RegistrationSlider detailPages = {registrationDetailPages?.slice(0,15)} nearestLocation={nearestLocation}/>
     </Suspense>
     
     <Suspense fallback={<Loading/>}>
-      <HomeCourseSlider detailPages={courseDetailPages}/>
+      <HomeCourseSlider detailPages={courseDetailPages} nearestLocation={nearestLocation}/>
     </Suspense>
 
     <Suspense fallback={<Loading/>}>
-      <ServiceSlider detailPages={serviceDetailPages}/>
+      <ServiceSlider detailPages={serviceDetailPages} nearestLocation={nearestLocation}/>
     </Suspense>
   </section>
 
@@ -161,7 +163,9 @@ const Home = ({
               <ProductSlider detailPages={productDetailPages}/>
             </Suspense>
           </div>
-          <Link href="/products"  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
+          {nearestLocation && 
+          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/products`}  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
+          }
         </div>  
       </div>            
     </div>
