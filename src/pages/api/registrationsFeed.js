@@ -2,7 +2,6 @@
 
 
 import { Feed } from 'feed';
-import home from '../../../lib/api/home';
 import blog from '../../../lib/api/blog';
 import destination from '../../../lib/api/destination';
 import location from '../../../lib/api/location';
@@ -11,11 +10,7 @@ import registration from '../../../lib/api/registration';
 export default async function handler(req, res) {
     const siteUrl = 'https://bzindia.in';
 
-    const { lat, lon } = await location.getLocationFromIP(req);
-
-    // Fetch dynamic content
-    const homeContentRes = await home.getHomeContent();
-    const homeContent = homeContentRes.data;    
+    const { lat, lon } = await location.getLocationFromIP(req);       
 
     const registrationDetailPagesRes = await registration.getDetails("all");
     const registrationDetailPages = registrationDetailPagesRes.data?.results;
@@ -26,8 +21,24 @@ export default async function handler(req, res) {
     const destinationsRes = await destination.getDestinations( lat, lon );
     const destinations  = await destinationsRes.data.slice(0, 12);
 
+    let locationData = {};
+
+    const {slug} = req.query;
+
+    try {
+      const districtRes = await location.getMinimalDistrict(slug);
+      const district = districtRes.data;
+
+      locationData = district;
+    } catch (err) {
+      const stateRes = await location.getMinimalState(slug);
+      const state = stateRes.data;
+
+      locationData = state;
+    }
+
   const feed = new Feed({
-    title: `Registrations - ${homeContent?.[0]?.meta_title || ""} - RSS Feed`,
+    title: `Startup Services in ${locationData?.name} - RSS Feed`,
     description: "List of registrations",
     id: `${siteUrl}/registrations`,
     link: `${siteUrl}/registrations`,

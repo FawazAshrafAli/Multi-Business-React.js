@@ -2,7 +2,6 @@
 
 
 import { Feed } from 'feed';
-import home from '../../../lib/api/home';
 import blog from '../../../lib/api/blog';
 import destination from '../../../lib/api/destination';
 import location from '../../../lib/api/location';
@@ -11,11 +10,7 @@ import course from '../../../lib/api/course';
 export default async function handler(req, res) {
     const siteUrl = 'https://bzindia.in';
 
-    const { lat, lon } = await location.getLocationFromIP(req);
-
-    // Fetch dynamic content
-    const homeContentRes = await home.getHomeContent();
-    const homeContent = homeContentRes.data;        
+    const { lat, lon } = await location.getLocationFromIP(req);         
 
     const courseDetailPagesRes = await course.getDetails("all");
     const courseDetailPages = courseDetailPagesRes.data?.results;
@@ -26,18 +21,34 @@ export default async function handler(req, res) {
     const destinationsRes = await destination.getDestinations( lat, lon );
     const destinations  = await destinationsRes.data.slice(0, 12);
 
+    let locationData = {};
+
+    const {slug} = req.query;
+
+    try {
+      const districtRes = await location.getMinimalDistrict(slug);
+      const district = districtRes.data;
+
+      locationData = district;
+    } catch (err) {
+      const stateRes = await location.getMinimalState(slug);
+      const state = stateRes.data;
+
+      locationData = state;
+    }
+
   const feed = new Feed({
-    title: `Courses - ${homeContent?.[0]?.meta_title || ""} - RSS Feed`,
+    title: `Courses in ${locationData?.name} - RSS Feed`,
     description: "List of courses",
-    id: `${siteUrl}/courses`,
-    link: `${siteUrl}/courses`,
+    id: `${siteUrl}/more-courses`,
+    link: `${siteUrl}/more-courses`,
     language: 'en',
     image: `${siteUrl}/images/logo.svg`,
     favicon: `${siteUrl}/images/Favicon.png`,
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${siteUrl}/courses/rss`,
+      rss2: `${siteUrl}/more-courses/rss`,
     },
     author: {
       name: 'BZ India',

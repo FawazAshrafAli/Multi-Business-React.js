@@ -1,52 +1,51 @@
-// pages/api/rss.js
-
-
 import { Feed } from 'feed';
-import home from '../../../lib/api/home';
 import blog from '../../../lib/api/blog';
 import destination from '../../../lib/api/destination';
 import location from '../../../lib/api/location';
-import company from '../../../lib/api/company';
 import product from '../../../lib/api/product';
 
 export default async function handler(req, res) {
     const siteUrl = 'https://bzindia.in';
 
-    const { lat, lon } = await location.getLocationFromIP(req);
-
-    // Fetch dynamic content
-    const homeContentRes = await home.getHomeContent();
-    const homeContent = homeContentRes.data;    
-
-    const nearestPlaceRes = await location.getNearestPlace(lat, lon);
-    const nearestPlace = nearestPlaceRes.data;
-
-    const stateSlug = nearestPlace.state?.slug;    
+    const { lat, lon } = await location.getLocationFromIP(req);      
 
     const productDetailPagesRes = await product.getProductDetails("all");
     const productDetailPages = productDetailPagesRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
-    const blogs = blogsRes.data.results;
-
-    const companiesRes = await company.getCompanies();
-    const companies = companiesRes.data; 
+    const blogs = blogsRes.data.results;    
 
     const destinationsRes = await destination.getDestinations( lat, lon );
     const destinations  = await destinationsRes.data.slice(0, 12);
 
+    let locationData = {};
+
+    const {slug} = req.query;
+
+    try {
+      const districtRes = await location.getMinimalDistrict(slug);
+      const district = districtRes.data;
+
+      locationData = district;
+    } catch (err) {
+      const stateRes = await location.getMinimalState(slug);
+      const state = stateRes.data;
+
+      locationData = state;
+    }
+
   const feed = new Feed({
-    title: `Products - ${homeContent?.[0]?.meta_title || ""} - RSS Feed`,
+    title: `Products in ${locationData?.name} - RSS Feed`,
     description: "List of nearby available products",
-    id: `${siteUrl}/products`,
-    link: `${siteUrl}/products`,
+    id: `${siteUrl}/more-products`,
+    link: `${siteUrl}/more-products`,
     language: 'en',
     image: `${siteUrl}/images/logo.svg`,
     favicon: `${siteUrl}/images/Favicon.png`,
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${siteUrl}/products/rss`,
+      rss2: `${siteUrl}/more-products/rss`,
     },
     author: {
       name: 'BZ India',

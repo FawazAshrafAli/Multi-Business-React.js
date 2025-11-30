@@ -33,15 +33,15 @@ export default async function handler(req, res) {
   const feed = new Feed({
     title: `Products - ${currentCompany?.meta_title || currentCompany?.name || ""} - RSS Feed`,
     description: `List of products offered by ${currentCompany?.name}`,
-    id: `${siteUrl}/${currentCompany?.slug}/products`,
-    link: `${siteUrl}/${currentCompany?.slug}/products`,
+    id: `${siteUrl}/${currentCompany?.slug}/view-products`,
+    link: `${siteUrl}/${currentCompany?.slug}/view-products`,
     language: 'en',
     image: currentCompany?.logo_url || `${siteUrl}/images/logo.svg`,
     favicon: currentCompany?.favicon_url || `${siteUrl}/images/Favicon.png`,
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${siteUrl}/${currentCompany?.slug}/products/rss`,
+      rss2: `${siteUrl}/${currentCompany?.slug}/view-products/rss`,
     },
     author: {
       name: 'BZ India',
