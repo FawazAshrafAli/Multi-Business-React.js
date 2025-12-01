@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 const CompanyPreview = ({companies}) => {         
 
   return (
     <>
-        <div className="container" data-aos="fade-up">
+        <div className="container">
             <h3>BZindia Group of Joint Ventures</h3>
             <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
             <div className="row">
@@ -24,7 +24,7 @@ const CompanyPreview = ({companies}) => {
                                 <div key={company.slug || companyIndex}>
                                     <h4 style={{paddingBottom: "10px"}}>{company.name}</h4>
                                     <p className="row">
-                                    <span className="col-md-2 home_company_list"><img src={company.logo_url} alt={company.name}/></span>                                  
+                                    <span className="col-md-2 home_company_list"><img src={company.logo_url} alt={company.name} loading='lazy'/></span>                                  
                                     <span className="col-md-10">{company.summary}</span>  
                                     </p>
                         
