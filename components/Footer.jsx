@@ -121,6 +121,8 @@ const Footer = () => {
   useEffect(() => {
     if (!passingSlug || isLocationSlug) return;
 
+    if (["view-products", "view-courses", "view-services", "registrations"].includes(passingSlug)) return;
+
     const fetchCurrentCompany = async () => {
       try {
         const response = await company.getCompany(passingSlug);
@@ -536,7 +538,7 @@ const Footer = () => {
         </div>
 
         <div className="icon-spa call-btn">
-            <Link  itemProp="url" href={`tel:+91${currentCompany?.phone1}`}>
+            <Link  itemProp="url" href={currentCompany?.phone1? `tel:+91${currentCompany?.phone1}`: "#"}>
                 <i className="fa fa-phone" style={{fontSize: "15px", color:"#fff"}} aria-hidden="true"></i> <span>Call us</span>
             </Link>
         </div>
@@ -564,14 +566,14 @@ const Footer = () => {
     <>
       {/* top move button  */}
       <div className="whthspp-btn">
-        <a href={`https://wa.me/${bzindiaContacts?.[0]?.mobile}`} >
+        <a href={bzindiaContacts?.[0]?.mobile? `https://wa.me/${bzindiaContacts?.[0]?.mobile}`: "#"} >
           <i className="fa fa-whatsapp"></i><span>WhatsApp
             <br/><small>{bzindiaContacts?.[0]?.mobile}</small></span>
         </a>
       </div>
 
       <div className="adjust-call">
-        <a href={`tel:${bzindiaContacts?.[0]?.tel}`}>
+        <a href={bzindiaContacts?.[0]?.tel? `tel:${bzindiaContacts?.[0]?.tel}`: "#"}>
           <i className="fa fa-phone"></i><span>PhoneNumber
             <br/><small>{bzindiaContacts?.[0]?.tel}</small></span>
         </a>
