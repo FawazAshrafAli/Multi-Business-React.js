@@ -126,7 +126,7 @@ const Navbar = () => {
     <>
         <nav className="navbar" itemScope="" itemType="http://www.schema.org/SiteNavigationElement">
            <div className="brand-and-icon">
-             <Link href="/" className="navbar-brand"><img itemProp="image" src={logo} alt={currentCompany? `${currentCompany?.name} Logo` : "Logo of BZIndia"} style={{maxHeight: "55px"}} /></Link>
+             <Link href="/" className="navbar-brand"><img itemProp="image" src={logo} alt={currentCompany? `${currentCompany?.name} Logo` : "Logo of BZIndia"} style={{maxHeight: "55px"}} loading='lazy' /></Link>
              <button type="button" className="navbar-toggler" onClick={toggleMenu}
               aria-controls="navbarSupportedContent"
               aria-expanded={isOpen}
@@ -190,7 +190,7 @@ const Navbar = () => {
                                     )) || []}
                                     {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
                                     {nearestLocation && 
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                                     }
                                   </>
                                   : 
@@ -211,7 +211,7 @@ const Navbar = () => {
                                     )) || []}
                                     {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
                                     {nearestLocation && 
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                                     }
                                   </>
                                   : 
@@ -232,7 +232,7 @@ const Navbar = () => {
                                       )) || []}
                                       {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li> */}
                                       {nearestLocation && 
-                                      <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                      <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                                       }
                                     </>
                                     : 
@@ -252,7 +252,7 @@ const Navbar = () => {
                                   {company?.sub_categories?.length > 24 ?
                                     // <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                                     nearestLocation && 
-                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                                    <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                                     
                                     : ""
                                   }
@@ -268,7 +268,7 @@ const Navbar = () => {
                               )) || []}
                               {/* <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${company.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>                               */}
                               {nearestLocation && 
-                              <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
+                              <li itemProp="name"><Link className="btn btn-sm border-0 p-0" itemProp="url" href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/${company.items_url}`}>View More<i className="fa fa-angle-double-right"></i></Link></li>
                               }
                             </ul> 
                           </div>
