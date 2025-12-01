@@ -509,7 +509,7 @@ const ListProduct = ({
 
   <h3>Tags Cloud</h3>
   <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-  <div className="row" data-aos="fade-up">
+  <div className="row">
     <div className="col-md-12 col-sm-12 col-xs-12">
         <div className="tags_cloud">
             {currentCompany?.meta_tags?.map((item, index) => <Link key={item.slug || index + 1} href={`/tag/${item.slug}`} title={item.name}>{item.name}</Link> ) || []}
@@ -524,7 +524,7 @@ const ListProduct = ({
 <section>
     <div className="container-fluid">
 
-        <div className="registration-faq-section my-5" data-aos="fade-up">            
+        <div className="registration-faq-section my-5">            
             <div className="row">
                 <div className="col-md-8">
                     <div className="regstrtn-faq-space">

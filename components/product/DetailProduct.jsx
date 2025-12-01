@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import product from '../../lib/api/product';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import createDOMPurify from 'dompurify';
 
 import $ from 'jquery';
@@ -32,6 +29,12 @@ const DetailProduct = ({
 
   const [sanitizedDescription, setSanitizedDescription] = useState();
   const [qty, setQty] = useState(1);
+
+  let oldPrice;
+
+  if (detailPage?.price) {
+    oldPrice = (1.28 * detailPage?.price);
+  }
 
   useEffect(() => {
     if (user) setShowLogin(false);
@@ -95,12 +98,6 @@ const DetailProduct = ({
       "rating": rating
     })
   }  
-  
-  useEffect(() => {
-    AOS.init({
-      once: true,
-    });
-  }, []);
 
   const handleQtyChange = (e) => {
     setQty(e.target.value);
@@ -150,302 +147,203 @@ const DetailProduct = ({
   }, [detailPage?.slug]); // only re-run when page changes
 
 
+  useEffect(() => {
+        const timeout = setTimeout(() => {
+          import("../../public/js/newScript.js");
+        }, 300); 
+  
+        return () => clearTimeout(timeout);
+      }, []);
+
   return (
     <>    
-    <section className="bg-half" style={{background: "#f1f1f1 url('/images/bg-pattran.png')"}}>
- 
-    
- <div className="container">
+        <div className="container">
+  <nav className="breadcrumb">
+    <Link href="/">Home</Link> › 
+    <Link href={`/${currentCompany?.slug}`}>{currentCompany?.sub_type}</Link> › 
+    <Link href={`/${currentCompany?.slug}/${detailPage?.category_slug}`}>{detailPage?.category_name}</Link> ›
+    <Link href={`/${currentCompany?.slug}/${detailPage?.category_slug}/${detailPage?.sub_category_slug}`}>{detailPage?.sub_category_name}</Link> ›
+    <span>{detailPage?.name?.slice(0,50)}{detailPage?.name?.length > 50 && "..."}</span>
+  </nav>
 
-<div className="row" style={{paddingTop: "40px"}} data-aos="fade-in">
+  <div className="page">
+    {/* ========== GALLERY ========== */}
+    <aside className="gallery">
+      <div className="preview" id="preview">
+        <img id="mainImg" src={detailPage?.image_url || "#"} alt={detailPage?.name}/>
+      </div>
+      <div className="thumb-row" id="thumbRow">
+        <div className="thumb active"><img src={detailPage?.image_url || "#"} data-large={detailPage?.image_url || "#"} alt={detailPage?.name} /></div>
+        {/* <div className="thumb"><img src="https://picsum.photos/id/1074/300/220" data-large="https://picsum.photos/id/1074/900/700" alt=""/></div>
+        <div className="thumb"><img src="https://picsum.photos/id/1080/300/220" data-large="https://picsum.photos/id/1080/900/700" alt=""/></div>
+        <div className="thumb"><img src="https://picsum.photos/id/1084/300/220" data-large="https://picsum.photos/id/1084/900/700" alt=""/></div>
+        <div className="thumb"><img src="https://picsum.photos/id/1081/300/220" data-large="https://picsum.photos/id/1081/900/700" alt=""/></div> */}
+      </div>
+    </aside>
 
-<div className="col-md-5">
-  <div className="pro_details_img">
-    <img src={detailPage?.image_url || "#"} alt={detailPage?.name} style={{maxHeight: "486px", objectFit: "contain"}}/>
-  </div>
-</div>
+    {/* ========== INFO ========== */}
+    <section className="card">
+      <div className="bd">
+        <div className="sub">Brand: <a href="#">{detailPage?.brand_name}</a> • SKU: {detailPage?.sku}</div>
+        <h1 className="title">{detailPage?.name}</h1>
 
-<div className="col-md-7">
-<h1 className="pro_details_header">{detailPage?.name}</h1>
-<div className="client_review" style={{textAlign: "left"}}>
-    <p className="pro_details_reviews">
-   {detailPage?.rating} <span className="fa fa-star checked" aria-hidden="true" style={{color: "#fff"}}></span>
-</p>
- <p style={{display: "contents"}}>{detailPage?.rating_count} Reviews | <a href="#">Add Your Reviews</a></p>
-    
-    </div>
-
-<p className="ecom_price">&#8377;{detailPage?.price}/-  <span>Available: {detailPage?.stock > 0 ? <span className="font_green">In stock</span> : <span className="font_red">Out stock</span>} </span></p>
-
-
-
-    <div className="product-quantity d-flex align-items-center">
-        <div className="quantity-field">
-            <label htmlFor="qty">Qty</label>
-            <input type="number" id="qty" min="1" max="100" value={qty} onChange={handleQtyChange}/>
-            <Link href={detailPage?.buy_now_action === "whatsapp"? `https://api.whatsapp.com/send?phone=91${detailPage?.whatsapp}` : detailPage.external_link || "#"} className="primary_button" target="_blank">Buy Now</Link>
+        <div className="row" style={{gap:"12px", margin:"8px 0 2px"}}>
+          <span className="rating">
+            <svg className="star" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.787 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.211l8.2-1.193z"/></svg>
+            {detailPage?.rating} · {detailPage?.rating_count} reviews
+          </span>
+          <span className="badge">Bestseller</span>
         </div>
 
-        
-    </div>
-    
-<p>{detailPage?.summary}</p>
+        <div className="price" style={{display: "none"}}>
+          <span className="offer" id="offerPrice">₹215</span>
+          <span className="mrp" id="mrpPrice">₹300</span>
+          <span className="badge" id="savePct">Save 28%</span>
+        </div>
 
-    {!detailPage?.hide_features &&
-    <ul className="row list-default no_border">
-      {detailPage?.features?.map((feature, index) => <li key={feature?.slug || index + 1}>{feature?.feature}</li>)}    
-    
-    </ul>
-    }
-  </div>
-</div>
+        <div className="price">
+          <span className="offer">₹{detailPage?.price}</span>
+          <span className="mrp">₹{oldPrice}</span>
+          <span className="badge">Save 28%</span>
+        </div>
+          
+          {detailPage?.stock > 0 ?          
+            <div className="stock"><span className="dot ok"></span><b id="stockText">In stock</b> <span className="help"> — ready to dispatch</span></div>
+          :
+            <div className="stock"><span className="dot no"></span><b id="stockText">Out of stock</b> <span className="help"> — check again later</span></div>
+          }        
 
-                
-               <div className="row">
-                
-                <p id="breadcrumbs" className="font_cl_black" style={{textAlign: "center"}}>
-                    <span>
-                      <span><Link href="/"  >Home</Link></span> » 
-                      <span><Link href={`/${currentCompany?.slug}`}>{currentCompany?.sub_type}</Link></span> » 
-                      <span><Link href={`/${currentCompany?.slug}/${detailPage?.category_slug}`}>{detailPage?.category_name}</Link></span> » 
-                      <span><Link href={`/${currentCompany?.slug}/${detailPage?.category_slug}/${detailPage?.sub_category_slug}`}>{detailPage?.sub_category_name}</Link></span> »                  
-                      <span className="breadcrumb_last" aria-current="page">{detailPage?.name?.slice(0,50)}{detailPage?.name?.length > 50 && "..."}</span>
-                    </span>
-                    </p>
-               </div>
-
-            </div>
-
-       
-        </section>
-  
-  <div id="stick_navbar" style={{padding: "0px 0"}}>    
-    {detailPage&&!detailPage?.hide_support_languages &&
-    <>
-        <div className="communicate_language"><p> <span style={{color: "#ff0", textTransform:"uppercase"}}>Support Languages:</span> English <span style={{color: "#f00"}}>|</span> ಕನ್ನಡ <span style={{color: "#f00"}}>|</span> हिंदी <span style={{color: "#f00"}}>|</span> தமிழ் <span style={{color: "#f00"}}>|</span> മലയാളം <span style={{color: "#f00"}}>|</span> తెలుగు</p></div>
-
-        <NeonPhoneLink currentCompany={currentCompany}/>
-    </>
-    }
-    <div style={{clear:"both"}}></div>
-
-    <toc className="bzindia_toc_scroll">
-      {detailPage?.toc?.map((title, index) => <a key={index} href={`#${slugify(title || "", { lower: true })}-section`}>{title}</a>) || []}
-    </toc>
-
-  
-
-
-</div>
- 
- 
-    {/*banner-slider end */}
-
-<section style={{padding: "30px 0px 0px 0px"}}>
-  <div className="container">
- 
-    <div className="row">
-  <div className="col-md-12 col-sm-12 col-xs-12">
-    <div id="horizontalTab">
-      <ul className="resp-tabs-list">
-      <li>Description</li>
-      <li>Reviews</li>
-      </ul>
-      <div className="resp-tabs-container">
-      <div>
-      <p>
-        <span dangerouslySetInnerHTML={{__html: sanitizedDescription}} />
-      </p>
-      {!detailPage?.hide_bullets && 
-      <ul className="row list-default">
-        {detailPage?.bullet_points?.map((bullet, index) => <li key={bullet?.slug || index + 1} className="col col-md-6 col-12">{bullet?.bullet_point}</li>)}        
-      </ul>
-      }
-    
-    </div>
-      <div>
-
-        <div className="comments-area pb-0">
-          <ul className="media-list list-unstyled mb-0">
-
-            {detailPage?.reviews?.map((review, index) => (
-              <li className="media" key={review?.slug || index + 1}>
-                <a className="float-left pr-3" href="#">
-                    <img className="img-fluid d-block mx-auto rounded-circle" src='/images/co-1.jpg' alt={review?.review_by || review?.name}/>
-                </a>
-
-                <div className="media-body">
-                    
-                    <h4 className="media-heading">{review?.review_by || review?.name} <div className="client_review" style={{textAlign: "left", display: "contents"}}>                      
-                      {[0, 1, 2, 3, 4].map((i) => (
-                    <span
-                        key={i}
-                        className={`fa fa-star${review.rating > i ? " checked" : ""}`}
-                        aria-hidden="true"
-                    ></span>
-                    ))}
-                      </div> ({review?.rating})</h4>
-                    <h6 className="text-muted">{review?.created_date}</h6>
-                    <p className="">{review?.text}</p>
-                </div>
-              </li>
-            ))}            
-            <li className="bar"></li>
-            {/* Post end*/}
-
-            {/* form */}
-        </ul>
-
-          <div className="page-title mt-3 mb-3">
-              <h4><span>Write a Review</span></h4>
-          </div>
-
-          <ul className="media-list list-unstyled mb-0">
- 
-              <li>                  
-                  
-                  {user ? 
-                  <>
-                    <div className="row" style={{paddingBottom: "10px"}}>
-                        <div className="col-lg-12">
-                          <b>Rating: </b>
-                              <div className="client_review" style={{textAlign: "left", display: "contents"}}>
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                <span
-                                    key={i}
-                                    className={`fa fa-star${reviewedRating >= i ? " checked" : ""}`}
-                                    aria-hidden="true"
-                                    onClick={() => handleStar(i)}
-                                ></span>
-                                ))}
-                              </div>
-                                      
-                        </div>
-                    </div>
-                    <form onSubmit={(e) => handleSubmit(e)}>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div className="form-group">
-                                    <textarea placeholder="Your Review" name="text" className="form-control" onChange={(e) => handleChange(e)} value={formData.text || ""} required></textarea>
-                                    <span className="input-focus-effect theme-bg"></span>
-                                </div>
-                            </div>
-
-                  
-                            <div className="col-md-6">
-                                <div className="form-group">
-                                    <input id="name" name="review_by" type="text" placeholder="Name" className="validate form-control" onChange={(e) => handleChange(e)} value={formData.review_by || ""} required/>
-                                    <span className="input-focus-effect theme-bg"></span>
-                                </div>
-                            </div>
-
-                            <div className="col-md-6">
-                                <div className="form-group">
-                                    <input id="email" type="email" placeholder="Email" name="email" className="validate form-control" onChange={(e) => handleChange(e)} value={formData.email || ""} required/>
-                                    <span className="input-focus-effect theme-bg"></span>
-                                </div>
-                            </div>
-
-                            <div className="col-md-12">
-                                <div className="send">
-                                    <button className="primary_button" role="button" type="submit">SEND</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                  </>
-                  :                  
-                  <>
-                    {showLogin ? (
-                      <LoginForm onLoginSuccess={refresh} />
-                    ) : (
-                      <button onClick={() => setShowLogin(true)}>Login</button>
-                    )}
-                  </>
-                  }
-              </li>
-              {/* form */}
-          </ul>
-      </div>
-
-      </div>
-      <div>
-      <p>Suspendisse blandit velit Integer laoreet placerat suscipit. Sed sodales scelerisque commodo. Nam porta cursus lectus. Proin nunc erat, gravida a facilisis quis, ornare id lectus. Proin consectetur nibh quis Integer laoreet placerat suscipit. Sed sodales scelerisque commodo. Nam porta cursus lectus. Proin nunc erat, gravida a facilisis quis, ornare id lectus. Proin consectetur nibh quis urna gravid urna gravid eget erat suscipit in malesuada odio venenatis.</p>
-      </div>
-      </div>
-      </div>
-  </div></div>
-
- 
-  </div>
-</section>
- 
-
-  {/* registration-services-section start */}
- 
- 
-  {!detailPage?.hide_timeline && 
-  <section className="resume segments" id="resume" style={{background: "#ecf2ef", padding: "60px 0px", margin: "0px 0px 0px 0px"}}>
-    <div className="container">
-    <div className="row">
-      <div className="col-md-12 col-sm-12 col-xs-12">
-      <h3 id={`${slugify(detailPage?.timeline_title || "", {"lower": true})}-section`}>{detailPage?.timeline_title}</h3>
-        <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-
-      <ul className="timeline">
-        {detailPage?.timelines?.map((timeline, index) => (
-          <li key={timeline.slug || index + 1}>
-            <h4>{timeline?.heading} </h4>
-            <span>{timeline?.summary}</span>
-          </li> 
-        ))}
-    </ul>
-  </div>
-    </div></div>
-  </section>
-  }
-
-  <section>
-    <div className="container-fluid">
-
-      <div className="registration-faq-section my-5" id="faqs-section">        
-        <div className="row">
-          <div className="col-md-8">
-            <div className="regstrtn-faq-space">
-              <div className="registrsn-fq-scrool-bar-clm">
-                <h3>Product FAQs</h3>
-                <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-                <div className="registrsn-fq-scrool-bar-clm-cntnt">
-                  <div className=" pre-scrollable" style={{height: "340px", overflowY: "auto"}}>
-                    <div itemScope itemProp="mainEntity" itemType="https://schema.org/Question">
-                      <Faq faqs={detailPage?.faqs}/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-4 ">
-            <EnquiryForm company={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+        {/* Colors / Sizes */}
+        <div className="opt">
+          <div className="lbl">Color</div>
+          <div className="swatches" id="colors">
+            {detailPage?.colors?.map((color, index) => <label className={`swatch color ${index === 0? "active" : ""}`} data-value={color.hexa} title={color.name}><input type="radio" name="color" checked /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:`${color.hexa}`}}></span></label>)}
+            {/* <label className="swatch color active" data-value="yellow" title="Yellow"><input type="radio" name="color" checked /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#f59e0b"}}></span></label>
+            <label className="swatch color" data-value="gold" title="Golden"><input type="radio" name="color" /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#fbbf24"}}></span></label>
+            <label className="swatch color" data-value="raw" title="Raw"><input type="radio" name="color" /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#ca8a04"}}></span></label> */}
           </div>
         </div>
+
+        {detailPage?.size &&    
+            <div className="opt">
+                <div className="lbl">Size</div>
+                <div className="swatches" id="sizes">
+                    <label className="swatch active" data-size={detailPage?.size}>{detailPage?.size}</label>
+                    {/* <label className="swatch" data-size="500">500g</label>
+                    <label className="swatch" data-size="1000">1kg</label> */}
+                </div>
+                <div className="help">Price updates with size.</div>
+            </div>
+        }
+
+        <div className="opt">
+          <div className="row">
+            <div className="stepper">
+              <button id="dec">−</button>
+              <input id="qty" value="1" onChange={() => handleQtyChange()} inputMode="numeric" />
+              <button id="inc">+</button>
+            </div>
+            <button className="btn primary" id="addCart">Add to Cart</button>
+            <button className="btn ghost" id="buyNow">Buy Now</button>
+            <button className="btn wish" id="wishBtn">♡ Wishlist</button>
+          </div>
+        </div>
+
+        <div className="opt">
+          <div className="ship">
+            <input className="input" id="pincode" placeholder="Enter pincode for delivery ETA" />
+            <button className="btn ghost" id="checkPin">Check</button>
+   
+          </div>
+          
+          <div className="share">
+      
+                 <a className="ic" title="Share"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M18 8a3 3 0 0 0-2.82 2H8.82a3.001 3.001 0 0 0 0 2h6.36a3 3 0 1 0 .5-2.5l-6.36-.01a3 3 0 1 0 0 2l6.36.01A3 3 0 1 0 18 8z" fill="#111"/></svg></a>
+            <a className="ic" title="Copy link" id="copyLink"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M3.9 12a4 4 0 0 1 4-4h3v2h-3a2 2 0 1 0 0 4h3v2h-3a4 4 0 0 1-4-4Zm12-4h-3v2h3a2 2 0 1 1 0 4h-3v2h3a4 4 0 0 0 0-8Z" fill="#111"/></svg></a>
+            </div>
+          <div className="help" id="pinMsg">Free delivery for orders above ₹499</div>
+           <div className="help">100% secure payments • Easy returns</div>
+        </div>
+
+  
+
+    
+
+{/* Sticky CTA (mobile) */}
+<div className="sticky-cta">
+  <button className="btn ghost" style={{flex:"1"}} id="stickyWish">♡</button>
+  <button className="btn primary" style={{flex:"2"}} id="stickyAdd">Add to Cart</button>
+  <button className="btn" style={{flex:"2",border:"1px solid #d8dee6",background:"#fff"}} id="stickyBuy">Buy Now</button>
+</div>
+
+<div className="toast" id="toast">Added to cart</div>
+
+
+
+
       </div>
-    </div>
-  </section>
+    </section>
+    
+    
+ 
 
-  {detailPage?.meta_tags &&
-  <div className="content_area001" id="tags-section">
-    <TagCloud metaTags={detailPage.meta_tags}/>  
   </div>
-  }
+  
+  
+</div>
 
-  {/* registraton faq setion end */}
 
-  {/* client-testimonial section start */}
+<div className="container">
+  <div className="fullwidth-tabs">
+  <div className="tabs">
+    <div className="tab-head">
+      <button className="tab-btn active" data-tab="desc">Description</button>
+      <button className="tab-btn" data-tab="spec">Specifications</button>
+      <button className="tab-btn" data-tab="rev">Reviews</button>
+      <button className="tab-btn" data-tab="faq">FAQ</button>
+    </div>
 
-  <ReviewSlider testimonials={detailPage?.reviews} />
-        
+    <div className="tab-body" id="tab-desc">
+      <span dangerouslySetInnerHTML={{__html: sanitizedDescription}} />
+    </div>
+
+    <div className="tab-body" id="tab-spec" hidden>
+      <table className="specs">
+        <tbody>
+            <tr><td>Brand</td><td>{detailPage?.brand_name}</td></tr>
+            <tr><td>Category</td><td>{detailPage?.category_name}</td></tr>
+            <tr><td>Sub Category</td><td>{detailPage?.sub_category_name}</td></tr>
+            <tr><td>Item</td><td>{detailPage?.name}</td></tr>
+            {(detailPage?.size || detailPage?.dimension) &&
+              <tr><td>Size</td><td>{detailPage?.size || detailPage?.dimension}</td></tr>
+            }
+        </tbody>
+      </table>
+    </div>
+
+    <div className="tab-body" id="tab-rev" hidden>
+      {detailPage?.reviews?.map((review, index) => {
+        const fullStars = Math.floor(review.rating || 0);
+        const emptyStars = 5 - fullStars;
+
+        const stars = `${'★'.repeat(fullStars)}${'★'.repeat(emptyStars)}`;
+        return (
+        <div className="review" key={review.slug || index + 1}>          
+          <b>{review?.review_by || review?.name}.</b> — {stars} <br/>{review?.text}.
+        </div>
+      )})}      
+    </div>
+
+    <div className="tab-body" id="tab-faq" hidden>
+      {detailPage?.faqs?.map((faq, index) => (
+        <p key={faq?.slug || index + 1}><b>Q.</b> {faq?.question} <br/><b>A.</b> {faq?.answer}</p>
+      ))}
+      {/* <p><b>Q.</b> Any additives? <br/><b>A.</b> No colors or preservatives.</p> */}
+    </div>
+  </div>
+</div>
+
+</div>
     </>
   )
 }

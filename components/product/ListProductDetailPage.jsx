@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 import product from '../../lib/api/product';
 import location from '../../lib/api/location';
@@ -125,19 +123,14 @@ const ListProductDetailPage = ({ blogs, homeContent }) => {
             if (category) msg = "No products available for the provided category.";
             setNoDetailMsg(msg);
         }
-    }, [productDetailPages, productDetailPagesLoading, category]);
-
-    // Initialize AOS
-    useEffect(() => {
-        AOS.init({ once: true });
-    }, []);
+    }, [productDetailPages, productDetailPagesLoading, category]);    
 
     return (
         <>
             <section className="bg-half" style={{ backgroundImage: "url('/images/city-4667143_1920.jpeg')" }}>
                 <div className="bg-overlay"></div>
                 <div className="home-center">
-                    <div className="home-desc-center" data-aos="fade-in">
+                    <div className="home-desc-center">
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-12">
@@ -162,7 +155,7 @@ const ListProductDetailPage = ({ blogs, homeContent }) => {
                 <div className="container">
                     <h2>{category ? `Category: ${category}` : "Products"}</h2>
                     <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-                    <div className="row" data-aos="fade-up">
+                    <div className="row">
                         {productDetailPagesLoading && productDetailPages.length === 0 && <Loading />}
                         {!productDetailPagesLoading && productDetailPages.length === 0 && (
                             <h6 className='text-center text-danger'>{noDetailMsg}</h6>

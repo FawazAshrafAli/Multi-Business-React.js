@@ -2,9 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 import slugify from 'slugify';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import $ from 'jquery';
 import  "/public/easy-responsive-tabs.js";
 
@@ -90,12 +87,6 @@ const MultipageProduct = ({
   
       return () => clearTimeout(timer);
     }, [replacedMultipage?.slug]); // only re-run when page changes
-
-  useEffect(() => {
-    AOS.init({
-      once: true,
-    });
-  }, []);  
   
   return (
     <>    
@@ -104,7 +95,7 @@ const MultipageProduct = ({
     
  <div className="container">
 
-<div className="row" style={{paddingTop: "40px"}} data-aos="fade-in">
+<div className="row" style={{paddingTop: "40px"}}>
 
 <div className="col-md-5">
   <div className="pro_details_img" id="products-section">

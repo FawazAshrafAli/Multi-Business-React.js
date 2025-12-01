@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import $ from 'jquery';
 import "/public/easy-responsive-tabs.js";
 
@@ -60,15 +57,7 @@ const HomeProduct = ({
         };
 
         fetchProductCategories();
-    }, [slug]);     
-
-
-    useEffect(() => {
-        
-        AOS.init({
-              once: true,
-            });
-    }, []);
+    }, [slug]);         
 
     useEffect(() => {
         if (!productCategories) return;
@@ -146,7 +135,7 @@ const HomeProduct = ({
                                                     </div>
                                                 </div>
                                         ))}
-                                        <Link href={`/${slug}/products`} className="primary_button my-3"  style={{margin: "0 auto"}}>VIEW MORE</Link>
+                                        <Link href={`/${slug}/view-products`} className="primary_button my-3"  style={{margin: "0 auto"}}>VIEW MORE</Link>
                                     </div>
                                 </div>
                             </div>
@@ -155,7 +144,7 @@ const HomeProduct = ({
 
 
                         <div className="row" style={{padding: "40px 0 0px 0"}}>
-                            <div className="offerd-service-section" data-aos="fade-up" id="top-products-section">
+                            <div className="offerd-service-section" id="top-products-section">
                                 <ProductSlider detailPages={detailPages?.slice(0, 12)} company={currentCompany}/>
                             </div>
                         </div>            
@@ -172,7 +161,7 @@ const HomeProduct = ({
                 <section>
                     <div className="container-fluid">
 
-                        <div className="product-faq-section"  data-aos="fade-up" style={{padding: "0"}}>                            
+                        <div className="product-faq-section"  style={{padding: "0"}}>                            
                             <div className="row">
                                 <div className="col-md-8">
                                     <div className="regstrtn-faq-space">
@@ -208,7 +197,7 @@ const HomeProduct = ({
                     <div className="container">
                 <div className="row" style={{paddingBottom: "20px"}}>
                     <div className="row">
-                        <div className="col-md-12" data-aos="fade-in">
+                        <div className="col-md-12">
                         <h1>{currentCompany?.name}</h1>
                         <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
                         <span dangerouslySetInnerHTML={{__html: sanitizedDescription}}/>
@@ -221,7 +210,7 @@ const HomeProduct = ({
 
                 <h3 id="tags-section">Tags Cloud</h3>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-                <div className="row" data-aos="fade-in">
+                <div className="row">
                     <div className="col-md-12 col-sm-12 col-xs-12">
                         <div className="tags_cloud">
                             {currentCompany?.meta_tags?.map((item, index) => <Link key={item.slug || index + 1} href={`/tag/${item.slug}`} title={item.name}>{item.name}</Link> ) || []}            

@@ -34,12 +34,12 @@ const ListProductSubCategories = ({locationData, blogs}) => {
     useEffect(() => {
       if (!nearestPlace) return;
 
-      router.push(`/${nearestPlace?.district?.slug}/products`);      
+      router.push(`/${nearestPlace?.district?.slug}/more-products`);      
 
     }, [nearestPlace]);
 
     useEffect(() => {
-      setTitle(`Product Sub Categories`);
+      setTitle(`Products in ${locationData?.name}`);
 
       return () => {
         resetTitle();

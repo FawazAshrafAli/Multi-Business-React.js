@@ -23,7 +23,7 @@ const ListProductDetails = ({locationData, blogs, subCategory}) => {
   useEffect(() => {
     if (!nearestPlace) return;
 
-    router.push(`/${nearestPlace?.district?.slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${nearestPlace?.slug}`);        
+    router.push(`/${nearestPlace?.district?.slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${nearestPlace?.slug}`);        
 
   }, [nearestPlace]);
   

@@ -144,7 +144,7 @@ const ProductSubCategoryPage = ({
     
     <div className="bg-overlay"></div>
     <div className="home-center">
-        <div className="home-desc-center" data-aos="fade-in">
+        <div className="home-desc-center">
             <div className="container">
                 <div className="row">
                     <div className="col-md-12">
@@ -184,7 +184,7 @@ const ProductSubCategoryPage = ({
         <h2>{`${productSubCategory?.name}`}</h2>
         <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-        <div className="row" data-aos="fade-up">
+        <div className="row">
             {details?.map((detail, index) => (
                 <div className="col-md-4" key={detail.slug || index + 1}>
                 {/* POST START */}
