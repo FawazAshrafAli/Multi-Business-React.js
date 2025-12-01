@@ -326,3 +326,100 @@
 //     }
 //   });
 // })();
+
+// Product Detail Start
+/* ======= Simple helpers ======= */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => [...document.querySelectorAll(sel)];
+const toast = (msg='Done')=>{
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1600);
+}
+
+/* ======= Gallery switching ======= */
+$('#thumbRow').addEventListener('click', (e)=>{
+  const img = e.target.closest('img'); if(!img) return;
+  $('#mainImg').src = img.dataset.large;
+  $$('.thumb').forEach(x=>x.classList.remove('active'));
+  e.target.closest('.thumb').classList.add('active');
+});
+
+/* ======= Variant pricing ======= */
+const base = { // MRP & offer by size (₹)
+  250:{mrp:160, offer:120, stock:true},
+  500:{mrp:300, offer:215, stock:true},
+  1000:{mrp:560, offer:399, stock:true}
+};
+let selectedSize = 250;
+const updatePrice = ()=>{
+  const {mrp, offer, stock} = base[selectedSize];
+  $('#offerPrice').textContent = '₹'+offer;
+  $('#mrpPrice').textContent = '₹'+mrp;
+  const pct = Math.round((1 - offer/mrp)*100);
+  $('#savePct').textContent = `Save ${pct}%`;
+  const st = $('#stockText');
+  st.textContent = stock ? 'In stock' : 'Out of stock';
+  st.previousElementSibling.className = 'dot ' + (stock?'ok':'no');
+  $('#addCart').disabled = !stock;
+  $('#buyNow').disabled = !stock;
+};
+if ($('#sizes')) {
+  $('#sizes').addEventListener('click', e=>{
+    const sw = e.target.closest('.swatch'); if(!sw) return;
+    selectedSize = Number(sw.dataset.size);
+    $$('#sizes .swatch').forEach(x=>x.classList.remove('active'));
+    sw.classList.add('active');
+    updatePrice();
+  });
+  updatePrice();
+}
+
+/* color pick just visual */
+$('#colors').addEventListener('click', e=>{
+  const sw = e.target.closest('.swatch'); if(!sw) return;
+  $$('#colors .swatch').forEach(x=>x.classList.remove('active'));
+  sw.classList.add('active');
+});
+
+/* ======= Qty stepper ======= */
+const qty = $('#qty');
+const clamp = v => Math.max(1, Math.min(99, v|0));
+$('#inc').onclick=()=>{qty.value = clamp(+qty.value+1)}
+$('#dec').onclick=()=>{qty.value = clamp(+qty.value-1)}
+qty.oninput=()=>{qty.value = qty.value.replace(/[^0-9]/g,'')}
+
+/* ======= Pincode check (mock) ======= */
+$('#checkPin').onclick=()=>{
+  const p = $('#pincode').value.trim();
+  if(!/^\d{6}$/.test(p)) { $('#pinMsg').textContent='Enter a valid 6-digit pincode'; return; }
+  const eta = ['2-3 days','3-5 days','5-7 days'][Math.floor((+p)%3)];
+  $('#pinMsg').textContent = `Delivery to ${p}: ETA ${eta}`;
+}
+
+/* ======= Tabs ======= */
+$$('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    $$('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['desc','spec','rev','faq'].forEach(id=>{
+      $('#tab-'+id).hidden = id !== btn.dataset.tab;
+    });
+  });
+});
+
+/* ======= Wishlist/Cart buttons ======= */
+const addToCart = src => toast(src?`Added ${qty.value} item(s) from ${src}`:'Added to cart');
+$('#addCart').onclick=()=>addToCart('detail');
+$('#stickyAdd').onclick=()=>addToCart('sticky');
+$('#buyNow').onclick=()=>toast('Proceeding to checkout…');
+$('#stickyBuy').onclick=()=>toast('Proceeding to checkout…');
+$('#wishBtn').onclick=()=>toast('Saved to wishlist');
+$('#stickyWish').onclick=()=>toast('Saved to wishlist');
+
+/* ======= Copy link ======= */
+$('#copyLink').onclick=async ()=>{
+  try{ await navigator.clipboard.writeText(location.href); toast('Link copied'); }
+  catch{ toast('Copy failed'); }
+};
+
+// Product Detail End
