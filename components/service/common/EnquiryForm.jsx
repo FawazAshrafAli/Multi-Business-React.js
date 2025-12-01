@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useEnquiryForm from '../../../hooks/useServiceEnquiry';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import location from '../../../lib/api/location';
 import service from '../../../lib/api/service';
 
@@ -49,11 +46,7 @@ const EnquiryForm = ({company, setMessage, setMessageClass}) => {
             }
         };
 
-        fetchStates();
-
-        AOS.init({
-            once: true,
-        });
+        fetchStates();        
         
     }, []);
 
@@ -90,7 +83,7 @@ const EnquiryForm = ({company, setMessage, setMessageClass}) => {
     };
   return (
     <>
-        <div className="regstrtn-faq-space" data-aos="fade-up">
+        <div className="regstrtn-faq-space">
             <div className="faq-form-section">
                 <h2>Get A Quote</h2>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>

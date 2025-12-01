@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 import slugify from 'slugify';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import $ from 'jquery';
 import  "/public/easy-responsive-tabs.js";
 
@@ -86,13 +83,6 @@ const DetailService = ({
     fetchCompanyRegistrationDetails();
   }, [slug]);
 
-  useEffect(() => {
-    AOS.init({
-      // duration: 500,
-      once: true,
-    });
-  }, []);  
-
   let errors = [
     serviceDetailsError,    
   ]
@@ -108,7 +98,7 @@ const DetailService = ({
       <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
           <div className="bg-overlay"></div>
           <div className="home-center">
-              <div className="home-desc-center" data-aos="fade-in">
+              <div className="home-desc-center">
                   <div className="container">
                       <div className="row">
                           <div className="col-md-8">
@@ -161,7 +151,7 @@ const DetailService = ({
 <section>
   <div className="container">
     <div className="row">
-      <div className="tg-authorbox" data-aos="fade-up">
+      <div className="tg-authorbox">
         <figure className="tg-authorpic">
           <a href="#">
             <img src={detailPage?.image_url || "/images/food-887348_640.jpg"} alt={detailPage?.name} />
@@ -201,7 +191,7 @@ const DetailService = ({
           <h3 id={detailPage?.vertical_title ? `${slugify(detailPage.vertical_title, { lower: true })}-section` : undefined} >{detailPage?.vertical_title}</h3>
           <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
   
-          <div className="row" data-aos="fade-in">
+          <div className="row">
           
             <div className="col-md-12 col-sm-12 col-xs-12">
               <div id="verticalTab">
@@ -233,7 +223,7 @@ const DetailService = ({
           <h3 id={detailPage?.horizontal_title ? `${slugify(detailPage.horizontal_title, { lower: true })}-section` : undefined}>{detailPage?.horizontal_title}</h3>
           <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
           <div className="row">
-            <div className="col-md-12 col-sm-12 col-xs-12" data-aos="fade-in">
+            <div className="col-md-12 col-sm-12 col-xs-12">
               <div id="horizontalTab">
                 <ul className="resp-tabs-list">
                 {detailPage&&detailPage.horizontal_tabs ? detailPage.horizontal_tabs.map((tab) => <li key={tab.id}>{tab.heading}</li>): []}
@@ -263,7 +253,7 @@ const DetailService = ({
         <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
         
         {detailPage&&
-        <div className="row" data-aos="fade-up">
+        <div className="row">
           <div className="col-md-12 col-sm-12 col-xs-12">
             <table>
               <thead>
@@ -289,7 +279,7 @@ const DetailService = ({
       <>
       <h3 id={detailPage?.bullet_title ? `${slugify(detailPage.bullet_title, { lower: true })}-section` : undefined}>{detailPage?.bullet_title}</h3>
       <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-      <ul className="row list-default" data-aos="fade-up">
+      <ul className="row list-default">
         {detailPage&&detailPage.bullet_points?detailPage.bullet_points.map((bullet) => <li key={bullet.id} className="col col-md-6 col-12">{bullet.bullet_point}</li>) : []}
       </ul>
       </>
@@ -311,7 +301,7 @@ const DetailService = ({
  <section className="resume segments" id="resume" style={{background: "#ecf2ef", padding: "60px 0px", margin: "0px 0px 0px 0px"}}>
    <div className="container">
      <div className="row">
-       <div className="col-md-12 col-sm-12 col-xs-12" data-aos="fade-up">
+       <div className="col-md-12 col-sm-12 col-xs-12">
          <h3 id={detailPage?.timeline_title ? `${slugify(detailPage.timeline_title, { lower: true })}-section` : undefined}>{detailPage?.timeline_title}</h3>
          <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
  
@@ -333,7 +323,7 @@ const DetailService = ({
   <section>
     <div className="container-fluid">
 
-      <div className="registration-faq-section my-5" id="faqs-section" data-aos="fade-up">        
+      <div className="registration-faq-section my-5" id="faqs-section">        
         <div className="row">
           <div className="col-md-8">
 

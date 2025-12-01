@@ -38,7 +38,7 @@ const ListServiceSubCategories = ({locationData, blogs}) => {
     }, [nearestPlace]);
 
     useEffect(() => {
-      setTitle(`Service Sub Categories`);
+      setTitle(`Services in ${locationData?.name}`);
 
       return () => {
         resetTitle();

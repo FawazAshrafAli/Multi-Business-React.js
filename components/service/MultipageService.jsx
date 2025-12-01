@@ -2,9 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react';
 import createDOMPurify from 'dompurify';
 import slugify from 'slugify';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import service from '../../lib/api/service';
 
 import $ from 'jquery';
@@ -94,12 +91,6 @@ const MultipageService = ({
     fetchCompanyServiceDetails();
 }, [slug]);
 
-  useEffect(() => {
-    AOS.init({
-      once: true,
-    });
-  }, []);  
-
   
   [
     serviceDetailsError,     
@@ -114,7 +105,7 @@ const MultipageService = ({
     <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
             <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-8">
@@ -194,7 +185,7 @@ const MultipageService = ({
 <section>
   <div className="container">
     <div className="row">
-      <div className="tg-authorbox" data-aos="fade-up">
+      <div className="tg-authorbox">
         <figure className="tg-authorpic">
           <Link href={replacedMultipage?.image_url || "/images/food-887348_640.jpg"} target='_blank'>
           <img src={replacedMultipage?.image_url || "/images/food-887348_640.jpg"} alt={replacedMultipage?.title} />
@@ -234,7 +225,7 @@ const MultipageService = ({
               <h3 id={replacedMultipage?.vertical_title ? `${slugify(replacedMultipage?.vertical_title, { lower: true })}-section` : undefined} >{replacedMultipage?.vertical_title}</h3>
               <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-              <div className="row" data-aos="fade-in">
+              <div className="row">
               
               <div className="col-md-12 col-sm-12 col-xs-12">
                   <div id="verticalTab">
@@ -266,7 +257,7 @@ const MultipageService = ({
                 <h3 id={replacedMultipage?.horizontal_title ? `${slugify(replacedMultipage?.horizontal_title, { lower: true })}-section` : undefined}>{replacedMultipage?.horizontal_title}</h3>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
                 <div className="row">
-                <div className="col-md-12 col-sm-12 col-xs-12" data-aos="fade-in">
+                <div className="col-md-12 col-sm-12 col-xs-12">
                     <div id="horizontalTab">
                     <ul className="resp-tabs-list">
                     {replacedMultipage&&replacedMultipage?.horizontal_tabs ? replacedMultipage?.horizontal_tabs.map((tab) => <li key={tab.id}>{tab.heading}</li>): []}
@@ -295,7 +286,7 @@ const MultipageService = ({
               <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
               
               {replacedMultipage&&
-                <div className="row" data-aos="fade-up">
+                <div className="row">
                   <div className="col-md-12 col-sm-12 col-xs-12">
                     <table>
                       <thead>
@@ -321,7 +312,7 @@ const MultipageService = ({
             <>
               <h3 id={replacedMultipage?.bullet_title ? `${slugify(replacedMultipage?.bullet_title, { lower: true })}-section` : undefined}>{replacedMultipage?.bullet_title}</h3>
               <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-              <ul className="row list-default" data-aos="fade-up">
+              <ul className="row list-default">
                   {replacedMultipage&&replacedMultipage?.bullet_points?replacedMultipage?.bullet_points.map((bullet) => <li key={bullet.id} className="col col-md-6 col-12">{bullet.bullet_point}</li>) : []}
               </ul>
             </>
@@ -345,7 +336,7 @@ const MultipageService = ({
         <section className="resume segments" id="resume" style={{background: "#ecf2ef", padding: "60px 0px", margin: "0px 0px 0px 0px"}}>
         <div className="container">
             <div className="row">
-            <div className="col-md-12 col-sm-12 col-xs-12" data-aos="fade-up">
+            <div className="col-md-12 col-sm-12 col-xs-12">
                 <h3 id={replacedMultipage?.timeline_title ? `${slugify(replacedMultipage?.timeline_title, { lower: true })}-section` : undefined}>{replacedMultipage?.timeline_title}</h3>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
@@ -366,7 +357,7 @@ const MultipageService = ({
 
       <section>
         <div className="container-fluid">
-          <div className="service-faq-section my-5" id="faqs-section" data-aos="fade-up">            
+          <div className="service-faq-section my-5" id="faqs-section">            
             <div className="row">
               <div className="col-md-8">
                 <div className="regstrtn-faq-space">

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import useEnquiryForm from '../../../hooks/useServiceEnquiry';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import location from '../../../lib/api/location';
 import service from '../../../lib/api/service';
 
@@ -47,11 +44,7 @@ const ServicePopUpForm = ({company, setMessage, setMessageClass, handleClose}) =
             }
         };
 
-        fetchStates();
-
-        AOS.init({
-            once: true,
-        });
+        fetchStates();        
         
     }, []);
 

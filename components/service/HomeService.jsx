@@ -10,9 +10,6 @@ import company from '../../lib/api/company'
 
 import LargeServiceSlider from './common/LargeServiceSlider'
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 const HomeService = ({
     slug, currentCompany, companyTypeSlug, 
     detailPages, testimonials, 
@@ -36,14 +33,7 @@ const HomeService = ({
 
         fetchClients();
 
-    }, [slug]);
-    
-    useEffect(() => {
-        AOS.init({
-            once: true,
-        });
-    }, []);
-    
+    }, [slug]);    
 
   return (
     <>                  
@@ -56,7 +46,7 @@ const HomeService = ({
   <section>
     <div className="container-fluid">
 
-      <div className="service-faq-section my-5"  data-aos="fade-up">        
+      <div className="service-faq-section my-5">        
         <div className="row">
           <div className="col-md-8">
 

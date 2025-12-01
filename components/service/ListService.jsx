@@ -2,9 +2,6 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 
-import AOS from "aos";
-import "aos/dist/aos.css";
-
 import LogoContext from "../context/LogoContext";
 import TitleContext from "../context/TitleContext";
 import PhoneNumberContext from "../context/PhoneNumberContext";
@@ -125,10 +122,6 @@ const ListService = ({ currentCompany, testimonials }) => {
   }, [currentCompany]);
 
   useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
-
-  useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
           setMessage(null);
@@ -153,7 +146,7 @@ const ListService = ({ currentCompany, testimonials }) => {
       >
         <div className="bg-overlay"></div>
         <div className="home-center">
-          <div className="home-desc-center" data-aos="fade-in">
+          <div className="home-desc-center">
             <div className="container">
               <div className="row">
                 <div className="col-md-12">
@@ -202,7 +195,7 @@ const ListService = ({ currentCompany, testimonials }) => {
             <span className="deg3"></span>
           </p>
 
-          <div className="row" data-aos="fade-up">
+          <div className="row">
             {details?.length > 0 ? (
               details.map((detail, index) => (
                 <div
@@ -236,7 +229,7 @@ const ListService = ({ currentCompany, testimonials }) => {
                             aria-hidden="true"
                           ></i>
                           <Link
-                            href={`/${currentCompany?.slug}/services?category=${detail.service?.category_name}`}
+                            href={`/${currentCompany?.slug}/view-services?category=${detail.service?.category_name}`}
                           >
                             <small>{detail.service?.category_name}</small>
                           </Link>
