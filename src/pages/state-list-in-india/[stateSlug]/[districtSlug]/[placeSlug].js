@@ -9,6 +9,7 @@ import product from '../../../../../lib/api/product';
 import registration from '../../../../../lib/api/registration';
 import service from '../../../../../lib/api/service';
 import course from '../../../../../lib/api/course';
+import pMap from 'p-map';
 
 export default function StateLocation({
   homeContent, metaTags, blogs, courseDetailPages,
@@ -64,11 +65,39 @@ export async function getServerSideProps(context) {
 
     const params = context.query;
 
-    const [homeRes, metaTagRes, blogsRes] = await Promise.all([
-      home.getHomeContent(),
-      metaTag.getMetaTags(),
-      blog.getBlogs(`/blog_api/blogs`),        
-    ]);
+    let district;
+    let state; 
+    let place;   
+
+    let centerCoordinate;
+    let neighboringPlaces = [];
+
+    let placeSlug = params.placeSlug;    
+
+    let faqs;    
+    const companySlug = "all";
+
+    async function safe(fn, fallback) {
+        try {
+            return await fn();
+        } catch (e) {
+            console.error("SSR API error:", e?.message);
+            return fallback;
+        }
+    }
+
+    const [
+      homeRes, metaTagRes, blogsRes,
+      courseRes, serviceRes, registrationRes, productRes
+    ] = await pMap([
+    () => safe(() => home.getHomeContent(), { data: [] }),
+    () => safe(() => metaTag.getMetaTags(), { data: { results: [] } }),
+    () => safe(() => blog.getBlogs(`/blog_api/blogs`), { data: { results: [] } }),
+    () => safe(() => course.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => service.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => registration.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => product.getSliderProductDetails(companySlug), { data: { results: [] } }),
+    ], fn => fn(), { concurrency: 3 });       
 
     const homeContent = {
         "title": homeRes.data?.[0]?.title,
@@ -80,6 +109,7 @@ export async function getServerSideProps(context) {
     const metaTags = (metaTagRes.data.results || [])
     .slice(0, 12)
     .map(tag => ({"slug": tag.slug, "name": tag.name}));
+
 
     const blogs = (blogsRes.data.results || [])
         .slice(0, 12)
@@ -96,87 +126,6 @@ export async function getServerSideProps(context) {
         meta_tags: b.meta_tags?? null,
         }));    
 
-    let { lat, lon } = await location.getLocationFromIP(context.req);    
-    
-    let district;
-    let state; 
-    let place;   
-
-    let centerCoordinate;
-
-    let placeSlug = params.placeSlug;    
-
-    let faqs;    
-
-    if (placeSlug) {
-        const placeRes = await location.getPlace(placeSlug);
-        place = placeRes.data;
-
-        
-        const centerCoordinateRes = await location.getPlaceCenter(placeSlug);
-        centerCoordinate = centerCoordinateRes.data;
-        
-        if (centerCoordinate?.latitude && centerCoordinate?.longitude) {
-          lat = centerCoordinate?.latitude
-          lon = centerCoordinate?.longitude
-        }
-
-        faqs = [
-          {
-            question: `Where is ${place.name} located?`,
-            answer: `${place.name} is a town situated in the ${place.district?.name} district of ${place.state?.name}, India.`              
-          },
-          {
-            question: `What is the PIN code of ${place.name}?`,
-            answer: `The official postal PIN code of ${place.name} is ${place?.pincodes[0]?.pincode}.`
-          },
-          {
-            question: `Which district and state does Kottakkal belong to?`,
-            answer: `${place.name} is part of ${place.district?.name} district in the state of ${place.state?.name}, India.`              
-          },
-          {
-            question: `What are the geographic coordinates of ${place.name}`,
-            answer: `The approximate latitude and longitude of ${place.name} are ${centerCoordinate?.latitude}° N, ${centerCoordinate?.longitude}° E.`              
-          },
-          {
-            question: `How can I reach ${place.name}?`,
-            answer: `${place.name} is accessible by road from nearby towns and cities. Depending on your location, it may also be reachable via nearby railway stations or airports.`              
-          },
-          {
-            question: `What is the time zone of ${place.name}?`,
-            answer: `${place.name} follows Indian Standard Time (IST), UTC +5:30.`              
-          },
-          {
-            question: `What are the nearby major towns or cities to ${place.name}?`,
-            answer: `The proximity of ${place.name} to nearby towns or cities depends on its geographic location within the district or state. Nearby urban centers usually provide access to broader facilities such as transportation hubs, hospitals, and higher education institutions.`              
-          },
-        ]
-    }
-
-    district = place?.district;
-    state = place?.state;
-
-    let districtSlug = district.slug;
-    let stateSlug = state.slug;
-
-    if (stateSlug === params.stateSlug && districtSlug === params.districtSlug) {
-      isLocationPage = true;
-    }
-
-    const companySlug = "all";
-                
-    const [
-        courseRes,
-        serviceRes,
-        registrationRes,
-        productRes
-    ] = await Promise.all([
-        course.getSliderDetails(companySlug),
-        service.getSliderDetails(companySlug),
-        registration.getSliderDetails(companySlug),
-        product.getSliderProductDetails(companySlug)
-    ]);
-
     const courseDetailPages = (courseRes.data?.results || [])
       .slice(0, 12)
       .map(c => ({
@@ -191,6 +140,7 @@ export async function getServerSideProps(context) {
       ending_date: c.course.ending_date?? null,
       starting_date: c.course.starting_date?? null,
       duration: c.course.duration?? null,
+      duration_type: c.course.duration_type?? null,
       program_name: c.course.program_name?? null,
       rating: c.course.rating?? null,
       rating_count: c.course.rating_count?? null,
@@ -203,7 +153,8 @@ export async function getServerSideProps(context) {
       name: s.name?? null,
       price: s.price?? null,
       image_url: s.image_url?? null,
-      duration_count: s.duration_count?? null,
+      duration: s.duration?? null,
+      duration_type: s.duration_type?? null,
       url: s.url?? null,
 
       sub_category_name: s.sub_category_name?? null,
@@ -255,16 +206,76 @@ export async function getServerSideProps(context) {
           "rating": review.rating?? null,
       })),
     }));   
+    
+    let { lat, lon } = await location.getLocationFromIP(context.req);
 
-    const neighboringPlacesRes = await location.getNearbyPlaces(lat, lon);
-    const neighboringPlaces = neighboringPlacesRes?.data?.filter(item => item.slug !== place?.slug);
+    if (lat && lon) {
+      const neighboringPlacesRes = await location.getNearbyPlaces(lat, lon);
+      neighboringPlaces = neighboringPlacesRes?.data?.filter(item => item.slug !== place?.slug);
+    }    
+
+    if (placeSlug) {
+        const [placeRes, centerCoordinateRes] = await pMap([
+            () => safe(() => location.getPlace(placeSlug), { data: [] }),
+            () => safe(() => location.getPlaceCenter(placeSlug), { data: [] }),            
+            ], fn => fn(), { concurrency: 3 }); 
+
+        place = placeRes.data;        
+        centerCoordinate = centerCoordinateRes.data;
+        
+        if (centerCoordinate?.latitude && centerCoordinate?.longitude) {
+          lat = centerCoordinate?.latitude
+          lon = centerCoordinate?.longitude
+        }
+
+        faqs = [
+          {
+            question: `Where is ${place.name} located?`,
+            answer: `${place.name} is a town situated in the ${place.district?.name} district of ${place.state?.name}, India.`              
+          },
+          {
+            question: `What is the PIN code of ${place.name}?`,
+            answer: `The official postal PIN code of ${place.name} is ${place?.pincodes[0]?.pincode}.`
+          },
+          {
+            question: `Which district and state does Kottakkal belong to?`,
+            answer: `${place.name} is part of ${place.district?.name} district in the state of ${place.state?.name}, India.`              
+          },
+          {
+            question: `What are the geographic coordinates of ${place.name}`,
+            answer: `The approximate latitude and longitude of ${place.name} are ${centerCoordinate?.latitude}° N, ${centerCoordinate?.longitude}° E.`              
+          },
+          {
+            question: `How can I reach ${place.name}?`,
+            answer: `${place.name} is accessible by road from nearby towns and cities. Depending on your location, it may also be reachable via nearby railway stations or airports.`              
+          },
+          {
+            question: `What is the time zone of ${place.name}?`,
+            answer: `${place.name} follows Indian Standard Time (IST), UTC +5:30.`              
+          },
+          {
+            question: `What are the nearby major towns or cities to ${place.name}?`,
+            answer: `The proximity of ${place.name} to nearby towns or cities depends on its geographic location within the district or state. Nearby urban centers usually provide access to broader facilities such as transportation hubs, hospitals, and higher education institutions.`              
+          },
+        ]
+    }
+
+    district = place?.district;
+    state = place?.state;
+
+    let districtSlug = district.slug;
+    let stateSlug = state.slug;
+
+    if (stateSlug === params.stateSlug && districtSlug === params.districtSlug) {
+      isLocationPage = true;
+    }           
 
     const overviewHeading = `${place?.name} - Overview`;
     const heading = `Places near ${place.name}`;
 
     const articleBody = `
         <section class="content_area001" style="padding: 30px 0px 40px 0px; margin-bottom: 0px; border-bottom: 1px solid #ddd;">
-            <div class="container" data-aos="fade-in">
+            <div class="container">
             <div class="row">
                 <div class="col-md-12 col-sm-12 col-xs-12">
                 <h3>${overviewHeading.toUpperCase() || ""}</h3>
@@ -292,7 +303,7 @@ export async function getServerSideProps(context) {
             </ul>
 
             <div class="row" style="padding: 30px; margin-top: 20px;" id="slug-location-map">
-                <div class="col-md-12" data-aos="fade-up" style="background: #fff; padding: 0;">
+                <div class="col-md-12" style="background: #fff; padding: 0;">
                 ${
                     `<iframe src="https://www.google.com/maps?q=${centerCoordinate?.latitude},${centerCoordinate?.longitude}&z=15&output=embed" style="border: 0; width: 100%; height: 340px;"></iframe>`
                 }

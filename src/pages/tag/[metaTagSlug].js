@@ -6,11 +6,13 @@ import blog from '../../../lib/api/blog';
 import location from '../../../lib/api/location';
 import company from '../../../lib/api/company';
 import ListMetaTag from '../../../components/ListMetaTag';
+import pMap from 'p-map';
 
 export default function TagPage({
   homeContent, metaTags, blogs,
   companies, currentTag, matchingItems,
-  metaTagLocation, mostMatchingCompany
+  metaTagLocation, mostMatchingCompany,
+  structuredData
 }) {
   return (
     <>
@@ -31,8 +33,112 @@ export default function TagPage({
       /> 
 
       <Head>
-        <script type="application/ld+json">
-          {JSON.stringify(
+          {structuredData.map((schema, i) => (
+            <script key={i} type="application/ld+json">
+              {schema}
+            </script>
+          ))}        
+      </Head>
+
+      <ListMetaTag
+      blogs={blogs}
+      
+      companies={companies}
+      initialMetaTags={metaTags}
+      currentMetaTag={currentTag}
+      initialMatchingItems={matchingItems}
+      metaTagLocation={metaTagLocation}
+      mostMatchingCompany={mostMatchingCompany}
+      />
+    </>
+  );
+}
+
+export async function getServerSideProps(context) {
+
+  try {
+    const query = context.query;
+    let metaTagSlug = query?.metaTagSlug
+    const orginalTagSlug = metaTagSlug;
+    let currentTagRes;    
+
+    let matchingLocation;
+
+    async function safe(fn, fallback) {
+        try {
+            return await fn();
+        } catch (e) {
+            console.error("SSR API error: ", e?.message);
+            return fallback;
+        } 
+    }
+
+    const [
+        metaTagLocationRes, homeRes, metaTagsRes,
+        blogsRes, companiesRes
+    ] = await pMap([
+        () => safe(() => location.getUrlLocation(undefined, metaTagSlug), {data: []}),
+        () => safe(() => home.getHomeContent(), {date: []}),
+        () => safe(() => metaTag.getMetaTags(), {date: {results: []}}),
+        () => safe(() => blog.getBlogs(`/blog_api/blogs`), {data: {results: []}}),
+        () => safe(() => company.getCompanies(), {data: []}),
+    ], fn => fn(), {concurrency: 3});
+    
+    const metaTagLocation = metaTagLocationRes.data;        
+    const homeData = homeRes.data;        
+    const metaTagsData = metaTagsRes.data?.results;    
+    const blogsData = blogsRes.data?.results;    
+    const companiesData = companiesRes.data; 
+
+    if (metaTagLocation) {
+        matchingLocation = metaTagLocation?.data;
+    }
+
+    if (
+        metaTagLocation?.match_type &&
+        ["state", "district", "place"].includes(metaTagLocation?.match_type) &&
+        matchingLocation?.slug
+    ) {
+        metaTagSlug = metaTagSlug?.replace(matchingLocation?.slug, "place_name");
+    }
+
+    try {
+        if (metaTagSlug?.includes("india")) {
+            const replacedMetaTagSlug = metaTagSlug?.replace("india", "place_name");
+            
+            if (replacedMetaTagSlug) {
+                try {
+                    currentTagRes = await metaTag.getMetaTag(replacedMetaTagSlug);
+                } catch {
+                    currentTagRes = await metaTag.getMetaTag(metaTagSlug);
+                }
+            }
+        } else {
+            currentTagRes = await metaTag.getMetaTag(metaTagSlug);
+        }
+
+    } catch (err) {
+        if (matchingLocation) {
+            currentTagRes = await metaTag.getMetaTag(orginalTagSlug);
+        }
+    }
+    const currentTag = currentTagRes?.data;
+
+    const initialUrl = `/meta_tag_api/matching_items/${currentTag?.slug}/?limit=9&offset=0`;
+
+    const [mostMatchingCompanyRes, matchingItemsRes] = await pMap([
+        () => safe(() => metaTag.getMostMatchingCompany(currentTag?.slug), {data:[]}),
+        () => safe(() => metaTag.getMatchingItems(initialUrl), {data:{results: []}}),
+    ], fn => fn(), {concurrency: 3});
+
+    const mostMatchingCompany = mostMatchingCompanyRes.data?.[0] || null
+    const matchingItems = matchingItemsRes.data?.results;
+
+    const matchingItemsTags = matchingItems
+    ?.flatMap(item => (item?.meta_tags || []).slice(0, 12));
+
+    const structuredData = [
+        JSON.stringify(
               {
                   "@context": "https://schema.org",
                   "@type": "CollectionPage",
@@ -65,85 +171,82 @@ export default function TagPage({
                   "mainEntity": {
                       "@type": "ItemList",
                       "itemListElement": matchingItems?.map(item => (
-                          item.company_type_name == "Service" ?
+                          item?.company_type_name == "Service" ?
                           {
                               "@type": "Service",
-                              "name": item.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
-                              "description": item.meta_description || "",
-                              "image": item.image_url || "",
-                              "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
+                              "name": item?.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
+                              "description": item?.meta_description || "",
+                              "image": item?.image_url || "",
+                              "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
                           }
-                          : item.company_type_name == "Product" ?
+                          : item?.company_type_name == "Product" ?
                           {
                               "@type": "Product",
-                              "name": item.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
-                              "description": item.meta_description || "",
-                              "image": item.image_url || "",
-                              "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`,
+                              "name": item?.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
+                              "description": item?.meta_description || "",
+                              "image": item?.image_url || "",
+                              "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`,
                               "offers": {
                                   "@type": "Offer",
                                   "priceCurrency": "INR",
-                                  "price": item.price || "",
+                                  "price": item?.price || "",
                                   "availability": "https://schema.org/InStock",
-                                  "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
+                                  "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
                               }
                           }
-                          : item.company_type_name == "Education" ?
+                          : item?.company_type_name == "Education" ?
                           {
                               "@context": "https://schema.org",
                               "@type": "Course",
-                              "name": item.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
-                              "description": item.meta_description || "",
+                              "name": item?.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
+                              "description": item?.meta_description || "",
                               "provider": {
                                   "@type": "Organization",
-                                  "name": item.company_name
+                                  "name": item?.company_name
                               },
                               "hasCourseInstance": {
                                   "@type": "CourseInstance",
-                                  "courseMode": [item.mode],
-                                  "startDate": item.start_date,
-                                  "endDate": item.end_date,
-                                  "courseWorkload": `P${item.duration}M`,
+                                  "courseMode": [item?.mode],
+                                  "startDate": item?.start_date,
+                                  "endDate": item?.end_date,
+                                  "courseWorkload": `P${item?.duration}M`,
                                   "location": {
                                       "@type": "VirtualLocation",
-                                      "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
+                                      "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
                                   }
                               },
                               "offers": {
                                   "@type": "Offer",
-                                  "price": item.price || "",
+                                  "price": item?.price || "",
                                   "priceCurrency": "INR",
                                   "category": item?.category,
                                   "availability": "http://schema.org/InStock"
                               },
                               "aggregateRating": {
                                   "@type": "AggregateRating",
-                                  "ratingValue": item.rating,
+                                  "ratingValue": item?.rating,
                                   "bestRating": "5",
-                                  "ratingCount": item.rating_count
+                                  "ratingCount": item?.rating_count
                               },
-                              "image": item.image_url || "",
-                              "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`,
+                              "image": item?.image_url || "",
+                              "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`,
                               "inLanguage": "English"
                           }
-                          : item.company_type_name == "Registration" ?
+                          : item?.company_type_name == "Registration" ?
                           {
                               "@type": "GovernmentService",
-                              "name": item.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
-                              "description": item.meta_description || "",
-                              "image": item.image_url || "",
-                              "url": `https://bzindia.in/${item.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
+                              "name": item?.title?.replace("place_name", metaTagLocation?.data?.name || "India") || "",
+                              "description": item?.meta_description || "",
+                              "image": item?.image_url || "",
+                              "url": `https://bzindia.in/${item?.url?.replace("place_name", metaTagLocation?.data?.slug || "india")}/`
                           }
                           : null
                       )).filter(Boolean) || []
                   }                                    
-              },
-              null, 2
-          )}
-          </script>
+              }              
+          ),          
 
-          <script type="application/ld+json">
-              {JSON.stringify({
+          JSON.stringify({
               "@context": "http://schema.org",
               "@type": "LocalBusiness",
               "name": "BZIndia",
@@ -187,11 +290,9 @@ export default function TagPage({
                   "areaServed": "IN"
                   },
               ].filter(Boolean)
-              }, null, 2)}
-          </script>
+              }),          
 
-          <script type="application/ld+json">
-              {JSON.stringify(
+          JSON.stringify(
                   {
                   "@context": "http://schema.org",
                   "@type": "BreadcrumbList",
@@ -212,106 +313,25 @@ export default function TagPage({
                           {
                               "@type": "ListItem",
                               "position": 3,
-                              "name": currentTag.name?.replace("place_name", metaTagLocation?.data?.name || "India"),
-                              "item": `https://bzindia.in/${currentTag.slug?.replace("place_name", metaTagLocation?.data?.slug || "india")}`
+                              "name": currentTag?.name?.replace("place_name", metaTagLocation?.data?.name || "India"),
+                              "item": `https://bzindia.in/${currentTag?.slug?.replace("place_name", metaTagLocation?.data?.slug || "india")}`
                           },  
                   ]
-                  },
-                  null, 2
-              )}
-              </script>
-      </Head>
-
-      <ListMetaTag
-      blogs={blogs}
-      
-      companies={companies}
-      initialMetaTags={metaTags}
-      currentMetaTag={currentTag}
-      initialMatchingItems={matchingItems}
-      metaTagLocation={metaTagLocation}
-      mostMatchingCompany={mostMatchingCompany}
-      />
-    </>
-  );
-}
-
-export async function getServerSideProps(context) {
-
-  try {
-    const query = context.query;
-    let metaTagSlug = query.metaTagSlug
-    const orginalTagSlug = metaTagSlug;
-
-    const metaTagLocationRes = await location.getUrlLocation(undefined, metaTagSlug);
-    const metaTagLocation = metaTagLocationRes.data;
-
-    const matchingLocation = metaTagLocation.data;
-    let currentTagRes;
-    
-    if (
-        metaTagLocation?.match_type &&
-        ["state", "district", "place"].includes(metaTagLocation.match_type) &&
-        matchingLocation?.slug
-    ) {
-    metaTagSlug = metaTagSlug.replace(matchingLocation?.slug, "place_name");
-    }
-
-    const homeRes = await home.getHomeContent();
-    const homeData = homeRes.data;
-
-    const metaTagsRes = await metaTag.getMetaTags();
-    const metaTagsData = metaTagsRes.data.results;
-
-    try {
-        if (metaTagSlug.includes("india")) {
-            const replacedMetaTagSlug = metaTagSlug.replace("india", "place_name");
-            
-            if (replacedMetaTagSlug) {
-                try {
-                    currentTagRes = await metaTag.getMetaTag(replacedMetaTagSlug);
-                } catch {
-                    currentTagRes = await metaTag.getMetaTag(metaTagSlug);
-                }
-            }
-        } else {
-            currentTagRes = await metaTag.getMetaTag(metaTagSlug);
-        }
-
-    } catch (err) {
-        if (matchingLocation) {
-            currentTagRes = await metaTag.getMetaTag(orginalTagSlug);
-        }
-    }
-    const currentTag = currentTagRes.data;
-
-    const mostMatchingCompanyRes = await metaTag.getMostMatchingCompany(currentTag?.slug);
-    const mostMatchingCompany = mostMatchingCompanyRes.data?.[0] || null
-
-    const initialUrl = `/meta_tag_api/matching_items/${currentTag?.slug}/?limit=9&offset=0`;
-
-    const matchingItemsRes = await metaTag.getMatchingItems(initialUrl);
-    const matchingItems = matchingItemsRes.data.results;
-    
-    const matchingItemsTags = matchingItems
-    ?.flatMap(item => (item.meta_tags || []).slice(0, 12));
-
-    const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
-    const blogsData = blogsRes.data.results;
-
-    const companiesRes = await company.getCompanies();
-    const companiesData = companiesRes.data; 
+                  }                  
+              ),              
+    ]
 
     return {
       props: {
         homeContent: homeData || {},
-        metaTags: matchingItemsTags || metaTagsData?.slice(0,12) || {},
+        metaTags: matchingItemsTags || metaTagsData?.slice(0,12) || [],
         blogs: Array.isArray(blogsData) ? blogsData.slice(0, 12) : [],
-        companies: companiesData?.slice(0,12) || {},        
-        matchingItems: matchingItems || {},
+        companies: companiesData?.slice(0,12) || [],        
+        matchingItems: matchingItems || [],
         currentTag: currentTag || {},
         metaTagLocation: metaTagLocation || {},
         mostMatchingCompany: mostMatchingCompany?? null,
+        structuredData: structuredData || [],
       },
     };
 
@@ -320,14 +340,15 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        homeContent: [],
+        homeContent: {},
         metaTags: [],
         blogs: [],
         companies: [],        
         matchingItems: [],
-        currentTag: [],
-        metaTagLocation: [],
-        mostMatchingCompany: [],
+        currentTag: {},
+        metaTagLocation: {},
+        mostMatchingCompany: null,
+        structuredData: [],
       }
     }
   }

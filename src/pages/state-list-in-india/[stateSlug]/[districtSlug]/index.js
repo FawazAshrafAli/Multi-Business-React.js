@@ -1,34 +1,36 @@
-import SeoHead from '../../../components/SeoHead';
-import metaTag from '../../../lib/api/metaTag';
-import blog from '../../../lib/api/blog';
-import location from '../../../lib/api/location';
-import ListLocations from '../../../components/ListLocations';
-import home from '../../../lib/api/home';
+import SeoHead from '../../../../../components/SeoHead';
+import metaTag from '../../../../../lib/api/metaTag';
+import blog from '../../../../../lib/api/blog';
+import location from '../../../../../lib/api/location';
+import ListLocations from '../../../../../components/ListLocations';
+import home from '../../../../../lib/api/home';
 import Head from 'next/head';
-import product from '../../../lib/api/product';
-import registration from '../../../lib/api/registration';
-import service from '../../../lib/api/service';
-import course from '../../../lib/api/course';
+import product from '../../../../../lib/api/product';
+import registration from '../../../../../lib/api/registration';
+import service from '../../../../../lib/api/service';
+import course from '../../../../../lib/api/course';
+import pMap from 'p-map';
 
 export default function StateLocation({
   homeContent, metaTags, blogs, courseDetailPages,
   serviceDetailPages, registrationDetailPages, productDetailPages,
-  faqs, state, centerCoordinate, structuredData
+  faqs, state, centerCoordinate, district, structuredData, 
+  isLocationPage
 }) {
-
+  if (!isLocationPage) return;
   return (
     <>
       <SeoHead
-      meta_description={`Discover ${state?.name}, one of the most beautiful states in India, along with a complete list of districts, towns, and key locations.` }
-      meta_title={`${state?.name}- Overview | Explore State-Wise, District-Wise & City Locations - ${homeContent?.[0]?.meta_title || ""}`}
+      meta_description={`Discover ${district?.name}, one of the most beautiful districts in ${district?.state?.name} state of India, along with a complete list of places, towns, and key locations.`}
+      meta_title={`${district?.name}- Overview | Explore State-Wise, District-Wise & City Locations - ${homeContent?.[0]?.meta_title || ""}`}
       metaTags={metaTags}
       
       blogs={blogs}
 
-      url = {`https://bzindia.in/state-list-in-india/${state?.slug}`}
+      url = {`https://bzindia.in/state-list-in-india/${state?.slug}/${district?.slug}/`}
       />
 
-      <Head>        
+      <Head>
         {structuredData.map((schema, i) => (
           <script key={i} type="application/ld+json">
             {schema}
@@ -37,9 +39,8 @@ export default function StateLocation({
       </Head>
       
       <ListLocations
-      
       blogs={blogs}
-      metaTags={metaTags}
+      metaTags={metaTags}      
       courseDetailPages={courseDetailPages}
       registrationDetailPages={registrationDetailPages}
       productDetailPages={productDetailPages}
@@ -47,20 +48,50 @@ export default function StateLocation({
       state={state}
       centerCoordinate={centerCoordinate}
       faqs={faqs}
+      initialDistrict={district}
       />
     </>
   );
 }
 
 export async function getServerSideProps(context) {
-  try {      
+  try {   
+    let isLocationPage = false;
+
     const params = context.query;
 
-    const [homeRes, metaTagRes, blogsRes] = await Promise.all([
-      home.getHomeContent(),
-      metaTag.getMetaTags(),
-      blog.getBlogs(`/blog_api/blogs`),        
-    ]);
+    let stateSlug = "all";
+    let district;    
+    let state;    
+
+    let centerCoordinate;
+
+    let districtSlug = params.districtSlug;
+
+    let faqs; 
+    const companySlug = "all";
+
+    async function safe(fn, fallback) {
+        try {
+            return await fn();
+        } catch (e) {
+            console.error("SSR API error:", e?.message);
+            return fallback;
+        }
+    }
+
+    const [
+        homeRes, metaTagRes, blogsRes,
+        courseRes, serviceRes, registrationRes, productRes
+    ] = await pMap([
+    () => safe(() => home.getHomeContent(), { data: [] }),
+    () => safe(() => metaTag.getMetaTags(), { data: { results: [] } }),
+    () => safe(() => blog.getBlogs(`/blog_api/blogs`), { data: { results: [] } }),
+    () => safe(() => course.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => service.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => registration.getSliderDetails(companySlug), { data: { results: [] } }),
+    () => safe(() => product.getSliderProductDetails(companySlug), { data: { results: [] } }),
+    ], fn => fn(), { concurrency: 3 }); 
 
     const homeContent = {
         "title": homeRes.data?.[0]?.title,
@@ -76,76 +107,17 @@ export async function getServerSideProps(context) {
     const blogs = (blogsRes.data.results || [])
         .slice(0, 12)
         .map(b => ({
-        id: b.id,
-        title: b.title,
-        slug: b.slug,
-        summary: b.summary,
-        image_url: b.image_url,
-        published_date: b.published_date,
-        updated: b.updated,
-        get_absolute_url: b.get_absolute_url,
-        content: b.content,
-        meta_tags: b.meta_tags,
+        id: b.id?? null,
+        title: b.title?? null,
+        slug: b.slug?? null,
+        summary: b.summary?? null,
+        image_url: b.image_url?? null,
+        published_date: b.published_date?? null,
+        updated: b.updated?? null,
+        get_absolute_url: b.get_absolute_url?? null,
+        content: b.content?? null,
+        meta_tags: b.meta_tags?? null,
         }));       
-    
-    let stateSlug = "all";
-    let state;
-
-    let centerCoordinate;
-
-    stateSlug = params.stateSlug;
-
-    let faqs;
-    
-    if (stateSlug != "all") {
-
-      const stateRes = await location.getState(stateSlug);
-      state = stateRes.data;
-      
-      const centerCoordinateRes = await location.getStateCenter(stateSlug);
-      centerCoordinate = centerCoordinateRes.data;
-
-        faqs = [
-          {
-            question: `What is the importance of ${state?.name || "India" }?`,
-            answer: `${state?.name} plays an important role in its region due to its cultural, historical, and economic relevance.`              
-          },
-          {
-            question: `What are the major industries or occupations in ${state?.name || "India" }?`,
-            answer: `${state?.name} is known for industries and occupations that contribute to local economic development and employment.`              
-          },
-          {
-            question: `What is the best time to visit ${state?.name || "India" }?`,
-            answer: `The ideal time to visit ${state?.name} depends on local climate, but generally falls between October and March.`              
-          },
-          {
-            question: `How can I reach ${state?.name || "India" }?`,
-            answer: `${state?.name} can be reached by road, rail, and in many cases, air, depending on its connectivity and location.`              
-          },
-          {
-            question: `What are the popular attractions in ${state?.name || "India" }?`,
-            answer: `${state?.name} offers various local attractions, including historical sites, cultural landmarks, and natural beauty.`              
-          },
-          {
-            question: `How many district are there in ${state?.name} State?`,
-            answer: `There are ${state?.districts?.length} districts in ${state?.name} State.`
-          }
-        ]
-    }
-
-    const companySlug = "all";
-        
-    const [
-        courseRes,
-        serviceRes,
-        registrationRes,
-        productRes
-    ] = await Promise.all([
-        course.getSliderDetails(companySlug),
-        service.getSliderDetails(companySlug),
-        registration.getSliderDetails(companySlug),
-        product.getSliderProductDetails(companySlug)
-    ]);
 
     const courseDetailPages = (courseRes.data?.results || [])
       .slice(0, 12)
@@ -156,14 +128,15 @@ export async function getServerSideProps(context) {
       price: c.course?.price?? null,
       url: c.url?? null,
       meta_description: c.meta_description?? null,
-      company_name: c.course.company_name?? null,
-      mode: c.course.mode?? null,
-      ending_date: c.course.ending_date?? null,
-      starting_date: c.course.starting_date?? null,
-      duration: c.course.duration?? null,
-      program_name: c.course.program_name?? null,
-      rating: c.course.rating?? null,
-      rating_count: c.course.rating_count?? null,
+      company_name: c.course?.company_name?? null,
+      mode: c.course?.mode?? null,
+      ending_date: c.course?.ending_date?? null,
+      starting_date: c.course?.starting_date?? null,
+      duration: c.course?.duration?? null,
+      duration_type: c.course?.duration_type?? null,
+      program_name: c.course?.program_name?? null,
+      rating: c.course?.rating?? null,
+      rating_count: c.course?.rating_count?? null,
       }));
 
   const serviceDetailPages = (serviceRes.data?.results || [])
@@ -173,7 +146,8 @@ export async function getServerSideProps(context) {
       name: s.name?? null,
       price: s.price?? null,
       image_url: s.image_url?? null,
-      duration_count: s.duration_count?? null,
+      duration: s.duration?? null,
+      duration_type: s.duration_type?? null,
       url: s.url?? null,
 
       sub_category_name: s.sub_category_name?? null,
@@ -224,56 +198,102 @@ export async function getServerSideProps(context) {
           "text": review.text?? null,
           "rating": review.rating?? null,
       })),
-    })); 
+    }));
+
+    if (districtSlug) {
+        const [
+                districtRes, centerCoordinateRes, 
+            ] = await pMap([
+            () => safe(() => location.getDistrict(districtSlug), { data: [] }),
+            () => safe(() => location.getDistrictCenter(districtSlug), { data: [] }),
+            ], fn => fn(), { concurrency: 3 });
+
+        district = districtRes.data;
+        centerCoordinate = centerCoordinateRes.data;
+
+        faqs = [
+          {
+            question: `What is the importance of ${district?.name}?`,
+            answer: `${district?.name} plays an important role in its region due to its cultural, historical, and economic relevance.`              
+          },
+          {
+            question: `What are the major industries or occupations in ${district?.name}?`,
+            answer: `${district?.name} is known for industries and occupations that contribute to local economic development and employment.`              
+          },
+          {
+            question: `What is the best time to visit ${district?.name}?`,
+            answer: `The ideal time to visit ${district?.name} depends on local climate, but generally falls between October and March.`              
+          },
+          {
+            question: `How can I reach ${district?.name}?`,
+            answer: `${district?.name} can be reached by road, rail, and in many cases, air, depending on its connectivity and location.`              
+          },
+          {
+            question: `What are the popular attractions in ${district?.name || "India" }?`,
+            answer: `${district?.name} offers various local attractions, including historical sites, cultural landmarks, and natural beauty.`              
+          },
+          {
+            question: `How many places are there in ${district.name} District?`,
+            answer: `There are ${district.places?.length} places in ${district.name} District.`
+          }
+        ]
+    }
+
+    state = district?.state;
+    stateSlug = state?.slug;
+
+    if (stateSlug === params.stateSlug) {
+      isLocationPage = true;
+    }
     
 
     const structuredData = [
       JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": `${state.name || ""} - Districts and Locations`,
-        "url": `https://bzindia.in/state-list-in-india/${state.slug}`,
-        "description": `Discover ${state.name || ""}, one of the most beautiful states in India, along with a complete list of districts, towns, and key locations.`,
-        "image": [
-              "https://bzindia.in/images/location_delhi.jpeg",
-              "https://bzindia.in/images/location_mumbai.jpeg",
-              "https://bzindia.in/images/location_himachalpradesh.jpeg",
-              "https://bzindia.in/images/location_kerala.jpeg",
-              "https://bzindia.in/images/location_jammu.jpeg",
-              "https://bzindia.in/images/location_karnataka.jpeg"
-        ],
-        "mainEntity": {
-          "@type": "Place",
-          "name": state.name || "",
-          "url": `https://bzindia.in/state-list-in-india/${state.slug}`,
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": centerCoordinate?.latitude || "",
-            "longitude": centerCoordinate?.longitude || ""
-          },
-          "address": {
-            "@type": "PostalAddress",
-            "addressRegion": state.name || "",
-            "addressCountry": "India"
-          },
-          "containedInPlace": {
-            "@type": "AdministrativeArea",
-            "name": state.name || ""
-          },
-          "hasMap": `https://www.google.com/maps?q=${centerCoordinate?.latitude},${centerCoordinate?.longitude}&z=15&output=embed`
-        },
-        "itemList": {
-          "@type": "ItemList",
-          "name": `Districts in ${state.name || ""}`,
-          "itemListOrder": "ascending",
-          "itemListElement": state.districts?.map((district, index) => ({
-            "@type": "ListItem",
-            "position": index + 1,
-            "name": district.name || "",
-            "url": `https://bzindia.in/state-list-in-india/${state.slug}/${district.slug}`
-          }))
-        }
-      }
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": `${district?.name || ""} - Places and Locations`,
+            "url": `https://bzindia.in/state-list-in-india/${district?.state?.slug}/${district?.slug}`,
+            "description": `Discover ${district?.name || ""}, one of the most beautiful districts in ${district?.state?.name || ""} state of India, along with a complete list of places, towns, and key locations.`,
+            "image": [
+                    "https://bzindia.in/images/location_delhi.jpeg",
+                    "https://bzindia.in/images/location_mumbai.jpeg",
+                    "https://bzindia.in/images/location_himachalpradesh.jpeg",
+                    "https://bzindia.in/images/location_kerala.jpeg",
+                    "https://bzindia.in/images/location_jammu.jpeg",
+                    "https://bzindia.in/images/location_karnataka.jpeg"
+              ],
+            "mainEntity": {
+              "@type": "Place",
+              "name": district?.name || "",
+              "url": `https://bzindia.in/state-list-in-india/${district?.state?.slug}/${district?.slug}`,
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": centerCoordinate?.latitude || "",
+                "longitude": centerCoordinate?.longitude || ""
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressRegion": district?.name || "",
+                "addressCountry": "India"
+              },
+              "containedInPlace": {
+                "@type": "AdministrativeArea",
+                "name": district?.name || ""
+              },
+              "hasMap": `https://www.google.com/maps?q=${centerCoordinate?.latitude},${centerCoordinate?.longitude}&z=15&output=embed`
+            },
+            "itemList": {
+              "@type": "ItemList",
+              "name": `Places in ${district?.name || ""}`,
+              "itemListOrder": "ascending",
+              "itemListElement": district?.places?.map((place, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "name": place.name || "",
+                "url": `https://bzindia.in/state-list-in-india/${district?.state?.slug}/${district?.slug}/${place.slug}`
+              }))
+            }
+          }
       ),      
 
       JSON.stringify({
@@ -344,7 +364,13 @@ export async function getServerSideProps(context) {
             "@type": "ListItem",
             "position": 3,
             "name": state?.name || "",
-            "item": `https://bzindia.in/state-list-in-india/${state?.slug}`
+            "item": `https://bzindia.in/state-list-in-india/${state?.slug}/`
+            },
+            {
+            "@type": "ListItem",
+            "position": 4,
+            "name": district?.name || "",
+            "item": `https://bzindia.in/state-list-in-india/${state?.slug}/${district?.slug}/`
             },
           ]                   
           }
@@ -403,7 +429,7 @@ export async function getServerSideProps(context) {
                 "image": detail?.image_url || "",
                 "description": detail?.meta_description || "",
                 "sku": detail?.sku || "",
-                "url": `https://bzindia.in/${detail?.company_slug || ""}`,
+                "url": `https://bzindia.in/${detail?.company_slug}`,
                 "category": detail?.category || "",
                 "offers": {
                     "@type": "Offer",
@@ -528,17 +554,18 @@ export async function getServerSideProps(context) {
                       "ratingValue": Number(detailpage.rating),
                       "bestRating": 5,
                       "ratingCount": Number(detailpage.rating_count)
-                    } : undefined,
+                    } : undefined,                      
                 }))
       }),            
       
     ];
 
+
     return {
       props: {
         homeContent,
         metaTags,
-        blogs,                        
+        blogs,                
         courseDetailPages,
         serviceDetailPages,
         registrationDetailPages,
@@ -546,7 +573,9 @@ export async function getServerSideProps(context) {
         faqs: faqs || [],
         state: state || [],
         centerCoordinate: centerCoordinate || [],
-        structuredData
+        district: district || [],
+        structuredData,
+        isLocationPage
       },
     };
 
@@ -557,7 +586,8 @@ export async function getServerSideProps(context) {
       props: {
         homeContent: [],
         metaTags: [],
-        blogs: [],                               
+        blogs: [],                      
+        states: [],
         courseDetailPages: [],
         serviceDetailPages: [],
         registrationDetailPages: [],
@@ -565,7 +595,9 @@ export async function getServerSideProps(context) {
         faqs: [],
         state: [],
         centerCoordinate: [],
-        structuredData: []
+        district: [],
+        structuredData: [],
+        isLocationPage: false,
       }
     }
   }

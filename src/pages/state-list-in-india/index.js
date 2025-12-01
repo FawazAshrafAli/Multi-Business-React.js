@@ -9,6 +9,7 @@ import course from '../../../lib/api/course';
 import product from '../../../lib/api/product';
 import registration from '../../../lib/api/registration';
 import service from '../../../lib/api/service';
+import pMap from 'p-map';
 
 export default function StateListInIndia({
   homeContent, metaTags, blogs, states, courseDetailPages,
@@ -51,14 +52,33 @@ export default function StateListInIndia({
 }
 
 export async function getServerSideProps(context) {
-  try {
-    const [homeRes, metaTagRes, blogsRes] = await Promise.all([
-        home.getHomeContent(),
-        metaTag.getMetaTags(),
-        blog.getBlogs(`/blog_api/blogs`),        
-    ]);
+  try {                
+      const companySlug = "all";
 
-    const homeContent = {
+      async function safe(fn, fallback) {
+        try {
+          return await fn();
+        } catch (e) {
+          console.error("SSR API error:", e?.message);
+          return fallback;
+        }
+      }
+
+      const [
+        homeRes, metaTagRes, blogsRes, statesRes,
+        courseRes, serviceRes, registrationRes, productRes
+      ] = await pMap([
+        () => safe(() => home.getHomeContent(), { data: [] }),
+        () => safe(() => metaTag.getMetaTags(), { data: { results: [] } }),
+        () => safe(() => blog.getBlogs(`/blog_api/blogs`), { data: { results: [] } }),
+        () => safe(() => location.getMinimalStates(), { data: [] }),
+        () => safe(() => course.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => service.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => registration.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => product.getSliderProductDetails(companySlug), { data: { results: [] } }),
+      ], fn => fn(), { concurrency: 3 });
+      
+      const homeContent = {
         "title": homeRes.data?.[0]?.title,
         "meta_title": homeRes.data?.[0]?.meta_title,
         "meta_description": homeRes.data?.[0]?.meta_description,
@@ -84,11 +104,89 @@ export async function getServerSideProps(context) {
         meta_tags: b.meta_tags,
         }));
 
-    const statesRes = await location.getMinimalStates();
-    const stateData = statesRes.data;   
-
+    const states = statesRes.data;   
     
-    let states;    
+
+      const courseDetailPages = (courseRes.data?.results || [])
+        .slice(0, 12)
+        .map(c => ({
+        id: c.id?? null,
+        name: c.course?.name?? null,
+        image_url: c.course?.image_url?? null,
+        price: c.course?.price?? null,
+        url: c.url?? null,
+        meta_description: c.meta_description?? null,
+        company_name: c.course?.company_name?? null,
+        mode: c.course?.mode?? null,
+        ending_date: c.course?.ending_date?? null,
+        starting_date: c.course?.starting_date?? null,
+        duration: c.course?.duration?? null,
+        duration_type: c.course?.duration_type?? null,
+        program_name: c.course?.program_name?? null,
+        rating: c.course?.rating?? null,
+        rating_count: c.course?.rating_count?? null,
+        }));
+
+    const serviceDetailPages = (serviceRes.data?.results || [])
+        .slice(0, 12)
+        .map(s => ({
+        id: s.id?? null,
+        name: s.name?? null,
+        price: s.price?? null,
+        image_url: s.image_url?? null,
+        duration: s.duration?? null,
+        duration_type: s.duration_type?? null,
+        url: s.url?? null,
+
+        sub_category_name: s.sub_category_name?? null,
+        company_sub_type: s.company_sub_type?? null,
+        company_slug: s.company_slug?? null,
+        category_name: s.category_name?? null,
+        meta_description: s.meta_description?? null,
+        }));
+
+    const registrationDetailPages = (registrationRes.data?.results || [])
+        .slice(0, 12)
+        .map(r => ({
+        id: r.id?? null,
+        title: r.registration?.title?? null,
+        price: r.registration?.price?? null,
+        image_url: r.registration?.image_url?? null,
+        url: r.url?? null,
+        company_slug: r.company_slug?? null,
+        company_sub_type: r.company_sub_type?? null,
+        meta_description: r.meta_description?? null,
+        image_url: r.registration?.image_url?? null,
+        sub_type: r.registration?.sub_type?? null,
+        type_name: r.registration?.type_name?? null,
+        }));
+
+    const productDetailPages = (productRes.data?.results || [])
+        .slice(0, 12)
+        .map(p => ({
+        id: p.id?? null,
+        name: p.product?.name?? null,
+        price: p.product?.price?? null,
+        image_url: p.product?.image_url?? null,
+        url: p.url?? null,
+
+        category: p.product?.category_name?? null,
+        company_sub_type: p.company_sub_type?? null,
+        company_slug: p.company_slug?? null,
+        meta_description: p.meta_description?? null,
+        sku: p.product?.sku?? null,
+        rating: p.product?.rating?? null,
+        rating_count: p.product?.rating_count?? null,
+        product_reviews: (p.product?.reviews || [])
+        .slice(0, 5)
+        .map(review => ({
+            "review_by": review.review_by?? null,
+            "name": review.name ?? null,
+            "created": review.created?? null,
+            "text": review.text?? null,
+            "rating": review.rating?? null,
+        })),
+      }));         
 
     const faqs = [
           {
@@ -120,99 +218,6 @@ export async function getServerSideProps(context) {
             answer: "No. Each state may have one or more official languages, often based on regional and cultural preferences."
           },
         ]    
-
-      const companySlug = "all";
-    
-      const [
-          courseRes,
-          serviceRes,
-          registrationRes,
-          productRes
-      ] = await Promise.all([
-          course.getSliderDetails(companySlug),
-          service.getSliderDetails(companySlug),
-          registration.getSliderDetails(companySlug),
-          product.getSliderProductDetails(companySlug)
-      ]);
-
-      const courseDetailPages = (courseRes.data?.results || [])
-        .slice(0, 12)
-        .map(c => ({
-        id: c.id?? null,
-        name: c.course?.name?? null,
-        image_url: c.course?.image_url?? null,
-        price: c.course?.price?? null,
-        url: c.url?? null,
-        meta_description: c.meta_description?? null,
-        company_name: c.course.company_name?? null,
-        mode: c.course.mode?? null,
-        ending_date: c.course.ending_date?? null,
-        starting_date: c.course.starting_date?? null,
-        duration: c.course.duration?? null,
-        program_name: c.course.program_name?? null,
-        rating: c.course.rating?? null,
-        rating_count: c.course.rating_count?? null,
-        }));
-
-    const serviceDetailPages = (serviceRes.data?.results || [])
-        .slice(0, 12)
-        .map(s => ({
-        id: s.id?? null,
-        name: s.name?? null,
-        price: s.price?? null,
-        image_url: s.image_url?? null,
-        duration_count: s.duration_count?? null,
-        url: s.url?? null,
-
-        sub_category_name: s.sub_category_name?? null,
-        company_sub_type: s.company_sub_type?? null,
-        company_slug: s.company_slug?? null,
-        category_name: s.category_name?? null,
-        meta_description: s.meta_description?? null,
-        }));
-
-    const registrationDetailPages = (registrationRes.data?.results || [])
-        .slice(0, 12)
-        .map(r => ({
-        id: r.id?? null,
-        title: r.registration?.title?? null,
-        price: r.registration?.price?? null,
-        image_url: r.registration?.image_url?? null,
-        url: r.url?? null,
-        company_slug: r.company_slug?? null,
-        company_sub_type: r.company_sub_type?? null,
-        meta_description: r.meta_description?? null,
-        image_url: r.registration.image_url?? null,
-        sub_type: r.registration.sub_type?? null,
-        type_name: r.registration.type_name?? null,
-        }));
-
-    const productDetailPages = (productRes.data?.results || [])
-        .slice(0, 12)
-        .map(p => ({
-        id: p.id?? null,
-        name: p.product?.name?? null,
-        price: p.product?.price?? null,
-        image_url: p.product?.image_url?? null,
-        url: p.url?? null,
-
-        category: p.product.category_name?? null,
-        company_sub_type: p.company_sub_type?? null,
-        company_slug: p.company_slug?? null,
-        meta_description: p.meta_description?? null,
-        sku: p.product.sku?? null,
-        rating: p.product.rating?? null,
-        rating_count: p.product.rating_count?? null,
-        product_reviews: (p.product.reviews || [])
-        .slice(0, 5)
-        .map(review => ({
-            "review_by": review.review_by?? null,
-            "name": review.name ?? null,
-            "created": review.created?? null,
-            "text": review.text?? null,
-            "rating": review.rating?? null,
-        })),
-      }));   
 
     const structuredData = [
       JSON.stringify(
@@ -527,7 +532,7 @@ export async function getServerSideProps(context) {
         homeContent,
         metaTags,
         blogs,                        
-        states: stateData || {},
+        states: states || {},
         courseDetailPages,
         serviceDetailPages,
         registrationDetailPages,
