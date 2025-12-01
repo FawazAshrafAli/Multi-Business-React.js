@@ -15,7 +15,8 @@ export default function useFetchSubTypes() {
   
           try {
               if (!params) params = 'limit=9&offset=0';
-              const response = await registration.getSubTypes(slug, typeSlug, params);
+              const passingParams = `listing_type=location&${params}`;
+              const response = await registration.getSubTypes(slug, typeSlug, passingParams);
   
               setSubTypes(prev => {
                   const existingSlugs = new Set(prev.map(item => item.slug));

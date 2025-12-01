@@ -18,10 +18,11 @@ export default function useFetchServSubCategories() {
       setServSubCategoriesLoading(true);
 
       try {
+        const passingParams = `listing_type=location&${params}`
         const response = await service.getSubCategories(
           slug,
           categorySlug,
-          params
+          passingParams
         );
 
         setServSubCategories((prev) => {
