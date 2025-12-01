@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 import Loading from '../Loading';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 const CompanyIntro = ({name, description, loading}) => {
   const [sanitizedDescription, setSanitizedDescription] = useState([]);
   
@@ -15,13 +12,7 @@ const CompanyIntro = ({name, description, loading}) => {
       const sanitized = DOMPurify.sanitize(description || '')    
 
       setSanitizedDescription(sanitized);
-  }, [description]);
-  
-  useEffect(() => {
-    AOS.init({
-      once: true,
-    });
-  }, [name, description, loading])
+  }, [description]);  
 
   if (loading) {
     return <Loading/>
@@ -31,7 +22,7 @@ const CompanyIntro = ({name, description, loading}) => {
       <section className="inner_home_content_sec">
           <div className="container">
           <div className="row">
-              <div className="col-md-12" data-aos="fade-up"> 
+              <div className="col-md-12" > 
               
               <h1>{name}</h1>
                                 

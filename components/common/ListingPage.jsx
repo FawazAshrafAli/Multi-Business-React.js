@@ -25,6 +25,12 @@ import useFetchServiceDetails from '../../hooks/useFetchServiceDetails';
 import AutoPopUp from './AutoPopUp';
 import LogoContext from '../context/LogoContext';
 import { useCitySearch } from '../../hooks/useCitySearch';
+import CourseEnquiryForm from '../education/common/EnquiryForm';
+import ProductEnquiryForm from '../product/common/EnquiryForm';
+import ServiceEnquiryForm from '../service/common/EnquiryForm';
+import RegistrationEnquiryForm from '../registration/common/EnquiryForm';
+import NearestLocationContext from '../context/NearesLocationContext';
+import { useRouter } from 'next/router';
 
 const ListingPage = ({
   items, itemsType, childPlace, parentPlace, 
@@ -33,13 +39,12 @@ const ListingPage = ({
   subCategory, specialization,
 
   state, district
-}) => {
+}) => {  
 
     const shuffle = useShuffle();
-    const loaderRef = useRef(null);  
-    
-    const [nearbyCscCenters, setNearbyCscCenters] = useState([]);
-    const [nearbyCscCentersLoading, setNearbyCscCentersLoading] = useState(true);  
+    const loaderRef = useRef(null);     
+    const router = useRouter();
+    const { slug } = router.query;
     
     const [productCompanies, setProductCompanies] = useState();
     const [productCompaniesLoading, setProductCompaniesLoading] = useState(true);
@@ -87,33 +92,15 @@ const ListingPage = ({
     const [firstProductMultipage, setFirstProductMultipage] = useState(null);
 
     const {setLogo, resetLogo} = useContext(LogoContext);
+    const {nearestLocation} = useContext(NearestLocationContext);
 
     useEffect(() => {
-      if (itemsType != "State" && itemsType != "District") return;
-      if (!state && !district) return;
+      if (!nearestLocation || !slug) return;
 
-        let latitude = state?.latitude;
-        let longitude = state?.longitude;
-
-        if (district) {
-          latitude = district?.latitude;
-          longitude = district?.longitude;
-        }        
-
-          const fetchNearbyCscCenters = async () => {
-              try {
-              const response = await location.getNearbyCscCenters(latitude, longitude);
-              setNearbyCscCenters(response.data?.slice(0, 6));        
-              } catch (err) {
-              console.error("Error in fetching nearby csc centers: ", err);
-              } finally {
-              setNearbyCscCentersLoading(false);
-              }
-          };          
-          
-          fetchNearbyCscCenters();
-      }, [state, district, itemsType]) 
-
+      if (nearestLocation?.district?.slug === slug) {
+        locationData = {...nearestLocation}
+      }
+    }, [nearestLocation, slug]);
 
     useEffect(() => {      
       if (!subType?.slug || !locationData || itemsType != "RegistrationDetail") return;
@@ -344,9 +331,11 @@ const ListingPage = ({
       if (typeof window === 'undefined' || (!subType?.content && subCategory?.content && specialization?.content)) return;
   
         const infoContent = subType?.content || subCategory?.content || specialization?.content || "";
+
+        const replacedContent = infoContent?.replace("place_name", locationData?.name);
   
         const DOMPurify = createDOMPurify(window);
-        const sanitized = DOMPurify.sanitize( infoContent || '');         
+        const sanitized = DOMPurify.sanitize( replacedContent || '');         
   
         setSanitizedContent(sanitized);
       }, [subType?.content, subCategory?.content, specialization?.content]);
@@ -653,7 +642,7 @@ useEffect(() => {
   // ];
 
   const ITEMS = [
-    {"name": "Filings", "ending_url": "filings"}, 
+    {"name": "Startup Services", "ending_url": "startup-services"}, 
     {"name": "Products", "ending_url": "products"}, 
     {"name": "Services", "ending_url": "services"}, 
     {"name": "Courses", "ending_url": "courses"}, 
@@ -746,53 +735,53 @@ useEffect(() => {
 
           : itemsType === "RegistrationSubType" ?
             <>
-              <Link href={`/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
-              <span>Filings</span>              
+              <Link href={`/${locationData?.slug}`}>{locationData?.name}</Link> <span>›</span>
+              <span>Startup Services</span>              
             </>
 
           : itemsType === "RegistrationDetail" ?
             <>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/filings`}>Filings</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services`}>Startup Services</Link> <span>›</span>
               <span>{subType?.starting_title} {subType?.name} {subType?.ending_title} {locationData?.name}</span>
             </>
 
           : itemsType === "ProductSubCategory" ?
             <>
-              <Link href={`/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.slug}`}>{locationData?.name}</Link> <span>›</span>
               <span>Products</span>              
             </>
 
           : itemsType === "ProductDetail" ?
             <>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/products`}>Products</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products`}>Products</Link> <span>›</span>
               <span>{subCategory?.starting_title} {subCategory?.name} {subCategory?.ending_title} {locationData?.name}</span>
             </>
 
           : itemsType === "CourseSpecialization" ?
             <>
-              <Link href={`/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.slug}`}>{locationData?.name}</Link> <span>›</span>
               <span>Courses</span>              
             </>
 
           : itemsType === "CourseDetail" ?
             <>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/courses`}>Courses</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses`}>Courses</Link> <span>›</span>
               <span>{specialization?.starting_title} {specialization?.name} {specialization?.ending_title} {locationData?.name}</span>
             </>
 
           : itemsType === "ServiceSubCategory" ?
             <>
-              <Link href={`/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.slug}`}>{locationData?.name}</Link> <span>›</span>
               <span>Services</span>              
             </>
 
           : itemsType === "ServiceDetail" ?
             <>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
-              <Link href={`/${locationData?.district_slug || locationData?.state_slug}/more-services`}>Services</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}`}>{locationData?.district_name || locationData?.state_name || locationData?.name}</Link> <span>›</span>
+              <Link href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services`}>Services</Link> <span>›</span>
               <span>{subCategory?.starting_title} {subCategory?.name} {subCategory?.ending_title} {locationData?.name}</span>
             </>
 
@@ -814,7 +803,7 @@ useEffect(() => {
             <>Common Service Centers {parentPlace?.name || ""} <small>({`${items?.length || 0} Centers`})</small></>  
 
             : itemsType === "RegistrationSubType" ?
-            <>Filing {locationData?.name || ""} </>  
+            <>Startup Services {locationData?.name || ""} </>  
 
             : itemsType === "RegistrationDetail" ?
             <>{subType?.starting_title} {subType?.name} {subType?.ending_title} {locationData?.name} </>
@@ -948,22 +937,22 @@ useEffect(() => {
             `/${district.state_slug}/csc/common-service-center-${district.slug}`
 
           : itemsType === "RegistrationSubType" ?
-          `/${district.slug}/filings`
+          `/${district.slug}/startup-services`
 
           : itemsType === "RegistrationDetail" ?
-          `/${district.state_slug}/filings/${subType?.location_slug || subType?.slug}-${district.slug}`
+          `/${district.state_slug}/startup-services/${subType?.location_slug || subType?.slug}-${district.slug}`
           
           : itemsType === "ProductSubCategory" ?
-          `/${district.slug}/products`
+          `/${district.slug}/more-products`
 
           : itemsType === "ProductDetail" ?
-          `/${district.state_slug}/products/${subCategory?.location_slug || subCategory?.slug}-${district.slug}`
+          `/${district.state_slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${district.slug}`
 
           : itemsType === "CourseSpecialization" ?
-          `/${district.slug}/courses`
+          `/${district.slug}/more-courses`
 
           : itemsType === "CourseDetail" ?
-          `/${district.state_slug}/courses/${specialization?.location_slug || specialization?.slug}-${district.slug}`
+          `/${district.state_slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${district.slug}`
 
           : itemsType === "ServiceSubCategory" ?
           `/${district.slug}/more-services`
@@ -1166,7 +1155,7 @@ useEffect(() => {
             <a href={`https://www.google.com/maps?q=${center.latitude},${center.longitude}`} target="_blank" rel="noopener noreferrer" style={{padding: "5px 8px"}} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-compass" aria-hidden="true"></i></a>
             {/* <Link href={`${stateSlug ? `/${stateSlug}`: ""}/${parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link> */}
             <Link href={`/${center.district?.slug || parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link>
-            <a href={`tel:+91${center.contact_number}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+            <a href={center.contact_number? `tel:+91${center.contact_number}`: "#"} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
           </div>
         </div>
       </div>
@@ -1229,7 +1218,7 @@ useEffect(() => {
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Time Required</span>
                 <span className="bz_meta_sep">:</span>
-                <span className="bz_meta_value">{subType?.duration || "Unavailable"}</span>
+                <span className="bz_meta_value">{subType?.duration? `${subType?.duration} ${subType?.duration_type || ""}` : "Unavailable"}</span>
               </div>
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Service</span>
@@ -1243,7 +1232,7 @@ useEffect(() => {
               </div>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/filings/${subType?.location_slug || subType?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/${subType?.location_slug || subType?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1310,7 +1299,7 @@ useEffect(() => {
     <div className="bz_meta_row">
       <span className="bz_meta_label">Time Required</span>
       <span className="bz_meta_sep">:</span>
-      <span className="bz_meta_value">{detail.time_required || "Unavailable"}</span>
+      <span className="bz_meta_value">{detail.time_required? `${detail.time_required} ${detail.duration_type || ""}` : "Unavailable"}</span>
     </div>
     <div className="bz_meta_row">
       <span className="bz_meta_label">Service</span>
@@ -1385,7 +1374,7 @@ useEffect(() => {
     <div className="bz_meta_row">
       <span className="bz_meta_label">Time Required</span>
       <span className="bz_meta_sep">:</span>
-      <span className="bz_meta_value">{firstRegistrationMultipage.time_required || "Unavailable"}</span>
+      <span className="bz_meta_value">{firstRegistrationMultipage.time_required? `${firstRegistrationMultipage.time_required} ${firstRegistrationMultipage.duration_type || ""}`  : "Unavailable"}</span>
     </div>
     <div className="bz_meta_row">
       <span className="bz_meta_label">Service</span>
@@ -1414,19 +1403,19 @@ useEffect(() => {
       <div className="bznew_list_product-hero">
         <div className="bznew_list_feature-row">
           <div className="bznew_list_imgbox">
-            <img alt="Filings" src={registrationSubTypes?.filter(subType => subType?.image_url && subType)?.[0]?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"} loading='lazy' />                 
+            <img alt="Startup Services" src={registrationSubTypes?.filter(subType => subType?.image_url && subType)?.[0]?.image_url || "https://admin.bzindia.in/media/course/Diploma-in-Building-Management-System-DBMS.jpg"} loading='lazy' />                 
           </div>
           <div className="bznew_list_product-body">
             <h2 className="bznew_list_title">
-              StartUp Services
+              Startup Services
             </h2>
             <div className="bz_meta">    
               <ul className="bz_inline-bullet-list">
-                {registrationSubTypes?.map((subType, index) => <li key={subType?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/filings/${subType?.location_slug || subType?.slug}-${state?.slug || district?.slug}`}>{subType?.name}</Link></li>)}      
+                {registrationSubTypes?.map((subType, index) => <li key={subType?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/startup-services/${subType?.location_slug || subType?.slug}-${state?.slug || district?.slug}`}>{subType?.name}</Link></li>)}      
               </ul>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${state?.slug || district?.slug}/filings/`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${state?.slug || district?.slug}/startup-services/`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1444,11 +1433,11 @@ useEffect(() => {
             </h2>
             <div className="bz_meta">    
               <ul className="bz_inline-bullet-list">
-                {productSubCategories?.map((subCategory, index) => <li key={subCategory?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/products/${subCategory?.location_slug || subCategory?.slug}-${state?.slug || district?.slug}`}>{subCategory?.name}</Link></li>)}      
+                {productSubCategories?.map((subCategory, index) => <li key={subCategory?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${state?.slug || district?.slug}`}>{subCategory?.name}</Link></li>)}      
               </ul>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${state?.slug || district?.slug}/products/`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${state?.slug || district?.slug}/more-products/`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1466,11 +1455,11 @@ useEffect(() => {
             </h2>
             <div className="bz_meta">    
               <ul className="bz_inline-bullet-list">
-                {courseSpecializations?.map((specialization, index) => <li key={specialization?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/courses/${specialization?.location_slug || specialization?.slug}-${state?.slug || district?.slug}`}>{specialization?.name}</Link></li>)}      
+                {courseSpecializations?.map((specialization, index) => <li key={specialization?.slug || index + 1}><Link href={`/${state?.slug || district?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${state?.slug || district?.slug}`}>{specialization?.name}</Link></li>)}      
               </ul>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${state?.slug || district?.slug}/courses/`} className="bznew_list_btn primary">Read More</a>
+              <a href={`/${state?.slug || district?.slug}/more-courses/`} className="bznew_list_btn primary">Read More</a>
               <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
@@ -1602,7 +1591,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
+                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
                   <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
@@ -1831,7 +1820,7 @@ useEffect(() => {
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Duration</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{specialization?.duration || "Unavailable"}</span>
+                  <span className="bz_meta_value">{specialization?.duration? `${specialization?.duration} ${specialization?.duration_type || ""}` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Course Mode</span>
@@ -1845,7 +1834,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization?.location_slug || specialization?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
                   <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
@@ -1914,7 +1903,7 @@ useEffect(() => {
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Duration</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{detail?.course?.duration || "Unavailable"}</span>
+                  <span className="bz_meta_value">{detail?.course?.duration? `${detail?.course?.duration} ${detail?.course?.duration_type || ""}` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Course Mode</span>
@@ -1988,7 +1977,7 @@ useEffect(() => {
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Duration</span>
                   <span className="bz_meta_sep">:</span>
-                  <span className="bz_meta_value">{firstCourseMultipage.duration || "Unavailable"}</span>
+                  <span className="bz_meta_value">{firstCourseMultipage.duration? `${firstCourseMultipage.duration} ${firstCourseMultipage.duration_type || ""}` : "Unavailable"}</span>
                 </div>
                 <div className="bz_meta_row">
                   <span className="bz_meta_label">Course Mode</span>
@@ -2072,7 +2061,7 @@ useEffect(() => {
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Duration</span>
                 <span className="bz_meta_sep">:</span>
-                <span className="bz_meta_value">{subCategory?.duration || "Unavailable"}</span>
+                <span className="bz_meta_value">{subCategory?.duration? `${subCategory?.duration} ${subCategory?.duration_type || ""}` : "Unavailable"}</span>
               </div>
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Service</span>
@@ -2154,7 +2143,7 @@ useEffect(() => {
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Duration</span>
                 <span className="bz_meta_sep">:</span>
-                <span className="bz_meta_value">{detail?.service?.duration || "Unavailable"}</span>
+                <span className="bz_meta_value">{detail?.service?.duration? `${detail?.service?.duration} ${detail?.service?.duration_type || ""}` : "Unavailable"}</span>
               </div>
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Service</span>
@@ -2228,7 +2217,7 @@ useEffect(() => {
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Duration</span>
                 <span className="bz_meta_sep">:</span>
-                <span className="bz_meta_value">{firstServiceMultipage?.duration || "Unavailable"}</span>
+                <span className="bz_meta_value">{firstServiceMultipage?.duration? `${firstServiceMultipage?.duration} ${firstServiceMultipage?.duration_type || ""}` : "Unavailable"}</span>
               </div>
               <div className="bz_meta_row">
                 <span className="bz_meta_label">Service</span>
@@ -2268,13 +2257,29 @@ useEffect(() => {
 
       {/* right */}
       <aside className="col-12 col-lg-3">
-      <div className="bznew_list_card p-3">
+        {/* {currentCompany?.company_type === "Education" ?
+          <CourseEnquiryForm company={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+          
+          :currentCompany?.company_type === "Service" ?
+          <ServiceEnquiryForm company={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+
+          :currentCompany?.company_type === "Product" ?
+          <ProductEnquiryForm company={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+
+          :currentCompany?.company_type === "Registration" ?
+          <RegistrationEnquiryForm company={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+
+          :null        
+        } */}
+          <div className="bznew_list_card p-3">
+          {/* {!currentCompany && */}
+          <div className="faq-form-section" style={{padding: "0px 0px 20px 0px", boxShadow: "none", marginBottom:"25px", borderRadius: "0", border: "0", borderBottom:"1px solid var(--line)"}}>
+          <h2 style={{color:"#000"}}>ENQUIRE NOW</h2>
+          <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>                              
+            <GeneralEnquiryForm setMessage={setMessage} setMessageClass={setMessageClass}/>
+          </div>
+          {/* } */}
         
-               <div className="faq-form-section" style={{padding: "0px 0px 20px 0px", boxShadow: "none", marginBottom:"25px", borderRadius: "0", border: "0", borderBottom:"1px solid var(--line)"}}>
-                <h2 style={{color:"#000"}}>ENQUIRE NOW</h2>
-                <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-                 <GeneralEnquiryForm setMessage={setMessage} setMessageClass={setMessageClass}/>
-              </div>
       
         
           <h3 className="h6">Popular Products</h3>
@@ -2316,7 +2321,7 @@ useEffect(() => {
           }</h2>
           <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-          <div className="row" data-aos="fade-up">
+          <div className="row">
             <div className="col-md-12">
               {(itemsType === "RegistrationDetail" || itemsType === "ProductDetail" || itemsType === "CourseDetail")?
                <div style={{textAlign: "left"}} dangerouslySetInnerHTML={{__html:sanitizedContent}} />
@@ -2348,7 +2353,7 @@ Through CSCs, citizens gain access to affordable and high-quality services in ar
   ) && 
 <div className="container">
   <div className="row">
-    <div className="col-md-12" data-aos="fade-up">
+    <div className="col-md-12">
       <div className="regstrtn-faq-space">
         <div className="registrsn-fq-scrool-bar-clm">
           <h3 id="slug-faqs">{itemsType === "RegistrationDetail"? subType?.name : "CSC"} FAQ'S</h3>

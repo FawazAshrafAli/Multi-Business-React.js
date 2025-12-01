@@ -11,13 +11,28 @@ const BannerSlider = ({slug}) => {
   const [banners, setBanners] = useState([]);
   const [bannersLoading, setBannersLoading] = useState(true);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!slug) return;
 
-    const fetchBanners = async() => {
+    const fetchBanners = async () => {
       try {
         const response = await company.getBanners(slug);
         setBanners(response.data);
+
+        const firstImage = response.data?.[0]?.image_url;
+        if (firstImage) {
+          const exists = document.querySelector(
+            `link[rel="preload"][as="image"][href="${firstImage}"]`
+          );
+
+          if (!exists) {
+            const link = document.createElement("link");
+            link.rel = "preload";
+            link.as = "image";
+            link.href = firstImage;
+            document.head.appendChild(link);
+          }
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -27,6 +42,7 @@ const BannerSlider = ({slug}) => {
 
     fetchBanners();
   }, [slug]);
+
 
   if (bannersLoading) return <Loading/>;
 
@@ -40,7 +56,7 @@ const BannerSlider = ({slug}) => {
       {banners?.map((banner, index) => (
         <div className="slider-item" key={banner.slug || index + 1}>
           <div className="slider-bg">
-          <img src={banner.image_url || ""} alt={banner.title} style={{maxHeight: "700px", objectFit: "cover"}}/>
+          <img src={banner.image_url || ""} alt={banner.title} style={{maxHeight: "700px", objectFit: "cover"}} loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : 'auto'} />
             <div className="overlay"></div>
             <div className="slider-content">
               <h2>{banner.title}</h2>

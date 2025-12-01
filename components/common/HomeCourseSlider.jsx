@@ -40,7 +40,7 @@ const HomeCourseSlider = ({detailPages, nearestLocation}) => {
     
           </div>
           {nearestLocation && 
-          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/courses`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/more-courses`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
           }
 
       </div>

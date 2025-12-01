@@ -4,9 +4,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from 'react-slick'
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import { clientSlider } from '/public/w3/js/slider';
 import Loading from '../Loading';
 
@@ -20,10 +17,7 @@ const ClientSlider = ({clients, loading, error, detailPage, multipage, heading})
             ...clientSlider,
             ...(clients.length < 7 ? { slidesToShow: clients.length } : {})
         });
-
-        AOS.init({
-            once: true,
-        });
+        
     }, [clients]);
 
     if (loading) {
@@ -40,7 +34,7 @@ const ClientSlider = ({clients, loading, error, detailPage, multipage, heading})
             <h2 className="text-center">{heading || "MAJOR CLIENTS"}</h2>
             <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
             {/*  venture slider */}
-            <div className="major-clients-slider" data-aos="fade-up">
+            <div className="major-clients-slider" >
                 <Slider {...sliderSettings}>
                 {clients?clients.map((client) => (
                     <div className="major-clients-slider_padd" key={client.slug}>

@@ -5,6 +5,7 @@ import Slider from "react-slick";
 
 import { offeredServiceSettings } from '/public/w3/js/slider';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ProductSlider = ({detailPages}) => {    
 
@@ -19,8 +20,8 @@ const ProductSlider = ({detailPages}) => {
                         <div className="product-grid" style={{maxWidth: "309px"}}>
                             <div className="product-image">
                                 <Link href={`/${detail.url}`} className="image"  >
-                                    <img className="pic-1" src={detail.image_url || "/images/img-3.jpg"} alt={detail.name} style={{height: "262.95px", width: "277.4px", objectFit: "contain", objectPosition: "center"}} loading='lazy' />
-                                    <img className="pic-2" src={detail.image_url || "/images/img-4.jpg"} alt={detail.name} style={{height: "262.95px", width: "277.4px", objectFit: "contain", objectPosition: "center"}} loading='lazy' />
+                                    <Image className="pic-1" src={detail.image_url || "/images/img-3.jpg"} alt={detail.name} width={277.4} height={262.95} style={{objectFit: "contain", objectPosition: "center"}} loading='lazy' />
+                                    <Image className="pic-2" src={detail.image_url || "/images/img-4.jpg"} alt={detail.name} width={277.4} height={262.95} style={{objectFit: "contain", objectPosition: "center"}} loading='lazy' />
                                 </Link>
                                 <span className="product-sale-label">sale!</span>
                                 <ul className="social">

@@ -22,8 +22,8 @@ const ServiceSlider = ({detailPages, nearestLocation}) => {
                                     <figure className="picher_doc">
                                         <img src={detail.image_url || "/images/Automation-Training-Institute-in-India.webp"} alt={detail?.name} height="360.5" style={{objectFit: 'cover'}} loading='lazy' />
                                         <div className="opacity-medium bg-extra-black"></div>
-                                        {detail.duration_count&&<div className="date_top">
-                                        <span><a href="#" tabIndex="0">Duration: {detail.duration_count} days</a></span>
+                                        {detail.duration&&<div className="date_top">
+                                        <span><a href="#" tabIndex="0">Duration: {detail.duration} {detail.duration_type || ""}</a></span>
                                         </div>}
                                         <div className="inner_text">
                                         <h3 className="show_tital">{detail.name}</h3>
@@ -42,7 +42,7 @@ const ServiceSlider = ({detailPages, nearestLocation}) => {
 
                     </div>
                     {nearestLocation &&
-                    <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/more-services`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+                    <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/more-services`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
                     }
                 </div>
             </div>
