@@ -115,7 +115,7 @@ const ProgramPage = ({ slug, currentCompany, programSlug, courseProgram }) => {
             <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
                 <div className="bg-overlay"></div>
                 <div className="home-center">
-                    <div className="home-desc-center" data-aos="fade-in">
+                    <div className="home-desc-center">
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-12">
@@ -142,7 +142,7 @@ const ProgramPage = ({ slug, currentCompany, programSlug, courseProgram }) => {
                     <h2>{courseProgram?.name}</h2>
                     <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-                    <div className="row" data-aos="fade-up">
+                    <div className="row">
                         {specializations.map((spec, index) => (
                             <div className="col-md-4" key={spec.slug || index}>
                                 <article className="post detail-post">

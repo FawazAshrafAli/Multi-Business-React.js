@@ -6,6 +6,7 @@ import Slider from 'react-slick'
 
 import { clientSlider } from '/public/w3/js/slider';
 import Loading from '../../Loading';
+import Image from 'next/image';
 
 const PartnerSlider = ({partners, loading, error, detailPage, heading}) => {
     const sliderSettings = {
@@ -34,7 +35,7 @@ const PartnerSlider = ({partners, loading, error, detailPage, heading}) => {
                     <div className="major-clients-slider_padd" key={partner.slug}>
                         <div>
                             <a href="#">
-                            <img src={partner?.image_url || "#"} alt={partner.name} style={{height: "125px"}}/>
+                            <Image src={partner?.image_url || "#"} alt={partner.name} width={150} height={125} loading='lazy'/>
                             </a>
                         </div>
                     </div>

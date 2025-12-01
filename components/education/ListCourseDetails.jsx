@@ -23,7 +23,7 @@ const ListCourseDetails = ({locationData, blogs, specialization}) => {
   useEffect(() => {
     if (!nearestPlace) return;
 
-    router.push(`/${nearestPlace?.district?.slug}/courses/${specialization?.location_slug || specialization?.slug}-${nearestPlace?.slug}`);        
+    router.push(`/${nearestPlace?.district?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${nearestPlace?.slug}`);        
 
   }, [nearestPlace]);
   

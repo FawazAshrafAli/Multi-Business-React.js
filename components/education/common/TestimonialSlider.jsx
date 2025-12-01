@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 
-const TestimonialSlider = ({testimonials, loading}) => {
+const TestimonialSlider = ({testimonials}) => {
 
     const sliderSettings = {
         ...clientTestimonialSlider,
@@ -24,7 +24,7 @@ const TestimonialSlider = ({testimonials, loading}) => {
 
             {testimonials && testimonials.length > 0 && (
             <Slider {...sliderSettings}>
-            {testimonials?testimonials.slice(0,12).map((testimonial) => (
+            {testimonials?.slice(0,12).map((testimonial) => (
                 <div className="client-testimonial-slider-padd" key={testimonial.slug}>
                 <div className="client-testimonal-box">
                 <div className="testmnl-clin-img-bg">
@@ -58,7 +58,7 @@ const TestimonialSlider = ({testimonials, loading}) => {
                 </div>
                 </div>
             </div>
-            )): []}                            
+            )) || []}                            
             </Slider>
             )}
 

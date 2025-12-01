@@ -51,7 +51,7 @@ const LargeCourseSlider = ({company, courseDetails, loading}) => {
                         </Slider>
 
                     </div>
-                    <Link href={`/${company?.slug}/courses`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
+                    <Link href={`/${company?.slug}/view-courses`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>
                 </div>
             </div>
         )}

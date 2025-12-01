@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 
 import course from '../../lib/api/course';
 import location from '../../lib/api/location';
@@ -105,12 +103,7 @@ const ListMultipageCourse = ({blogs, homeContent}) => {
 
     observer.observe(loaderRef.current);
     return () => observer.disconnect();
-  }, [nextUrl]);
-
-  // AOS animations
-  useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
+  }, [nextUrl]);  
 
   // Log errors
   [courseDetailPagesError, nearbyPlacesError].forEach(err => err && console.error(err));
@@ -120,7 +113,7 @@ const ListMultipageCourse = ({blogs, homeContent}) => {
       <section className="bg-half" style={{ backgroundImage: "url('/images/city-4667143_1920.jpeg')" }}>
         <div className="bg-overlay"></div>
         <div className="home-center">
-          <div className="home-desc-center" data-aos="fade-in">
+          <div className="home-desc-center">
             <div className="container">
               <div className="row">
                 <div className="col-md-12">
@@ -143,7 +136,7 @@ const ListMultipageCourse = ({blogs, homeContent}) => {
 
       <section className="cleints-listing-secion py-5 h2_second">
         <div className="container">
-          <div className="row" data-aos="fade-up" >
+          <div className="row" >
             {courseDetailPages.map((detail, index) => (
               <div className="col-md-4" key={detail.slug + index}>
                 <article className="post detail-post">

@@ -4,12 +4,30 @@ import Faq from '../common/Faq';
 
 import course from '../../lib/api/course';
 
-import PartnerSlider from './home/PartnerSlider';
-import BannerSlider from '../common/BannerSlider';
-import CompanyIntro from '../common/CompanyIntro';
-import TestimonialSlider from './common/TestimonialSlider';
-import LargeCourseSlider from './home/LargeCourseSlider';
 import EnquiryForm from './common/EnquiryForm';
+import dynamic from 'next/dynamic';
+import Loading from '../Loading';
+
+const PartnerSlider = dynamic(() => import('./home/PartnerSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const LargeCourseSlider = dynamic(() => import('./home/LargeCourseSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const BannerSlider = dynamic(() => import('../common/BannerSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const CompanyIntro = dynamic(() => import('../common/CompanyIntro.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const TestimonialSlider = dynamic(() => import('./common/TestimonialSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
 
 const HomeEducation = ({
     slug, company, detailPages, testimonials,

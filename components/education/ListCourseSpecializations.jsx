@@ -33,12 +33,12 @@ const ListCourseSpecializations = ({locationData, blogs}) => {
      useEffect(() => {
        if (!nearestPlace) return;
  
-       router.push(`/${nearestPlace?.district?.slug}/courses`);      
+       router.push(`/${nearestPlace?.district?.slug}/more-courses`);      
  
      }, [nearestPlace]);
  
      useEffect(() => {
-       setTitle(`Courses`);
+       setTitle(`Courses in ${locationData?.name}`);
  
        return () => {
          resetTitle();
