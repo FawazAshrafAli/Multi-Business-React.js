@@ -13,7 +13,7 @@ import NearestLocationContext from '../context/NearesLocationContext';
 
 export default function AppLayout({ children }) {    
 
-  const [title, setTitle] = useState('BZIndia - Find the top companies in India');
+  const [title, setTitle] = useState('');
 
   const [blogs, setBlogs] = useState([]);
   const [placeLocation, setLocation] = useState(null);
