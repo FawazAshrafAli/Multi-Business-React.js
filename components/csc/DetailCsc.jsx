@@ -343,7 +343,7 @@ const DetailCsc = ({
 </div>
 </section>   
 
- <section className="bg-half main_slide_bx" style={{padding: "20px 0px", background: "linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%), url() no-repeat fixed center top / cover"}} data-aos="fade-in">
+ <section className="bg-half main_slide_bx" style={{padding: "20px 0px", background: "linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%), url() no-repeat fixed center top / cover"}}>
  <div className="container">
  <div className="row">
  <div className="col-2 col-md-1 college-logo"><img src={"/images/csc_logo.jpg"} alt=""/></div>
@@ -374,7 +374,7 @@ const DetailCsc = ({
  
 
 
-<div id="stick_navbar" style={{padding: "0px 0", background: "#005c9f"}} data-aos="fade-in">
+<div id="stick_navbar" style={{padding: "0px 0", background: "#005c9f"}}>
 <div className="communicate_language"><p> Common Service Centers (CSC) in {locationData?.name || "India"}</p> </div>
 
 <div className="csc_near_dv">
@@ -407,7 +407,7 @@ const DetailCsc = ({
     <div className="container">
 
 
-<div className="row" style={{padding: "40px 0 0px 0",textAlign: "center"}} data-aos="fade-down">
+<div className="row" style={{padding: "40px 0 0px 0",textAlign: "center"}}>
   <div className="offerd-service-section" style={{margin: "0"}}>
       <h2 id="slug-info">{center?.title} – e-Governance Services, Digital Seva, Common Service Center</h2>
       <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
@@ -464,11 +464,11 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
 <div className="row" style={{padding:"30px 30px 25px 30px", borderRadius: "30px", marginTop:"45px", background:"#fff"}} id="slug-contact">
 
 
-<div className="col-md-4" data-aos="fade-in">
+<div className="col-md-4">
 <h4 className="contact_area_head">Location Map</h4>
 <iframe id="slug-location-map" src={`https://www.google.com/maps?q=${center?.latitude || ""},${center?.longitude|| ""}&z=15&output=embed`} style={{border:"0", width: "100%", height: "350px"}}></iframe>
 </div>
-<div className="col-md-4" data-aos="fade-in" style={{background:"#fff"}}>
+<div className="col-md-4" style={{background:"#fff"}}>
 <h4 className="contact_area_head">Address Details</h4>
 <div style={{display:"block"}} itemScope itemType="http://schema.org/GovernmentOffice">
       
@@ -501,7 +501,7 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
 
 </div>
 
-<div className="col-md-4" data-aos="fade-in">
+<div className="col-md-4">
 <h4 className="contact_area_head">Opening Time</h4>
 
 <ul id="MainContent_ulTimings" className="bTimings">
@@ -691,7 +691,7 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
     
     <div className="container">
     <div className="row">
-          <div className="col-md-8" data-aos="fade-up">
+          <div className="col-md-8">
 
             <div className="regstrtn-faq-space">
 
@@ -802,7 +802,7 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
 
           <div className="col-md-4 ">
 
-            <div className="regstrtn-faq-space aos-init" data-aos="fade-up">
+            <div className="regstrtn-faq-space">
 
               <div className="faq-form-section">
                 <h2 id="slug-apply">APPLY NOW !</h2>
@@ -822,7 +822,7 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
   
   
   <section className="content_area001" style={{padding: "30px 0px 40px 0px", marginBottom: "40px", borderBottom: "1px solid #ddd"}} id="csc-state-wise">
-    <div className="container" data-aos="fade-in">
+    <div className="container">
  
         
       <div className="row">
@@ -847,7 +847,7 @@ The {center?.name || "CSC center"}, located in the <strong><a href="#">{center?.
 
  
   <section className="content_area001" style={{padding: "0px 0px 40px 0px", marginBottom: "0px", borderBottom: "0px solid #ddd"}} id="slug-tags">
-    <div className="container" data-aos="fade-in">
+    <div className="container">
 
     <TagCloud metaTags={metaTags}/>
 
