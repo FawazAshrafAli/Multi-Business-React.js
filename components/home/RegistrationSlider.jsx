@@ -24,7 +24,7 @@ const RegistrationSlider = ({detailPages, nearestLocation}) => {
                     <div className="offerd-service-section-clm-cntnt">
                       <div>
                         <div className="offerd-srvs-clm-icon">
-                          <img src={`${detail?.image_url || "/images/Company-Registration-India.svg" }`} alt={detail?.title}/>
+                          <img src={`${detail?.image_url || "/images/Company-Registration-India.svg" }`} alt={detail?.title} loading='lazy'/>
                         </div>
                         <div className="offerd-srvs-clm-text">
                           <h5>{detail?.title}</h5>
@@ -41,7 +41,7 @@ const RegistrationSlider = ({detailPages, nearestLocation}) => {
     
           </div>
           {nearestLocation &&
-          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/filings`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>          
+          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/startup-services`}  className="primary_button" style={{margin: "0 auto"}}>View More</Link>          
           }
         </div>
       </div>
