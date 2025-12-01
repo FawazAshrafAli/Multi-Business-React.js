@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useContext } from 'react';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import Navbar from './Navbar'
 import TitleContext from './context/TitleContext';
 import PhoneNumberContext from './context/PhoneNumberContext';
@@ -48,17 +45,11 @@ const Header = () => {
 
     setQuoteFormVisibility(!quoteFormVisibility)
 
-  }
-
-  useEffect(() => {
-    AOS.init({
-      once: true,
-    });
-  }, []);
+  }  
 
   return (
     <>
-<header className="inner-hom-banner-section" id="banner-top"  itemScope="itemScope" itemType="https://schema.org/WPHeader" data-aos="fade-in">
+<header className="inner-hom-banner-section" id="banner-top"  itemScope="itemScope" itemType="https://schema.org/WPHeader">
       
           <div className="cmpany-logo-top-section">
            <div className="cmpny-logo d-flex justify-content-center p-2">

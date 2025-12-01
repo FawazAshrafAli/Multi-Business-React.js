@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import Link from 'next/link';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
 import createDOMPurify from 'dompurify';
 
 import metaTag from '../lib/api/metaTag';
@@ -280,16 +278,6 @@ const ListMetaTag = ({
         return () => observer.disconnect();
     }, [nextItemUrl]);
 
-
-
-
-
-    useEffect(() => {
-            AOS.init({
-            once: true,
-        });
-    }, []);
-
     [
         matchingItemsError, metaTagsError
     ].map(error => {
@@ -321,7 +309,7 @@ const ListMetaTag = ({
 <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
     <div className="bg-overlay"></div>
     <div className="home-center">
-        <div className="home-desc-center" data-aos="fade-in">
+        <div className="home-desc-center">
             <div className="container">
                 <div className="row">
                     <div className="col-md-12">
@@ -357,7 +345,7 @@ const ListMetaTag = ({
         <h2>{(Array.isArray(currentMetaTag) || (typeof currentMetaTag === "object")) ? `${currentMetaTag.name?.replace("place_name", matchingLocation?.name || "India")}`: "Tags"}</h2>
         <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-        <div className="row" data-aos="fade-up">
+        <div className="row">
             {(Array.isArray(currentMetaTag) || (typeof currentMetaTag === "object")) ? 
             
                 <>
@@ -469,7 +457,7 @@ const ListMetaTag = ({
                             return (
                         <div className="col-md-4" key={tag.slug ? `${tag.slug}-${index}` : `tag-${index}`}>
                             <article className="post item-post">
-                            <div className="post-preview">
+                            {/* <div className="post-preview">
                                 <Link href={`/tag/${modifiedSlug}`} >
                                 <img 
                                     src={tag.image || '/images/building-3697342_1280.jpg'} 
@@ -480,7 +468,7 @@ const ListMetaTag = ({
                                     }}
                                 />
                                 </Link>
-                            </div>
+                            </div> */}
 
                             <div className="post-header">
                                 <h4 className="post-title">

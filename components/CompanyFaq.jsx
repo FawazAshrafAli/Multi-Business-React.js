@@ -1,9 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
 import Link from 'next/link';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import LogoContext from './context/LogoContext';
 import TitleContext from './context/TitleContext';
 import PhoneNumberContext from './context/PhoneNumberContext';
@@ -51,12 +48,6 @@ const CompanyFaq = ({
     }, [currentCompany]);        
 
     useEffect(() => {
-        AOS.init({
-          once: true,
-        });
-      }, []);
-
-    useEffect(() => {
         if (message) {
         const timer = setTimeout(() => {
             setMessage(null);
@@ -78,7 +69,7 @@ const CompanyFaq = ({
         <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
             <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -105,7 +96,7 @@ const CompanyFaq = ({
         <section className="cleints-listing-secion py-5 h2_second">
             <div className="container">
 
-                <div className="row" data-aos="fade-up">
+                <div className="row">
                     <div className="regstrtn-faq-space">
                         <div className="registrsn-fq-scrool-bar-clm">
                             <h3>{company?.name} FAQs</h3>

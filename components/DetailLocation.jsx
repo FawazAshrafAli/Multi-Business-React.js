@@ -2,9 +2,6 @@ import React, { useEffect, useState, useRef, useContext } from 'react'
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import Cookies from 'js-cookie';
 
 import destination from '../lib/api/destination';
@@ -423,13 +420,7 @@ const DetailLocation = ({
         if (error) {
             console.error(error);
         }
-    });
-
-    useEffect(() => {
-            AOS.init({
-            once: true,
-        });
-    }, []);
+    });    
 
   return (
     <>      
@@ -444,7 +435,7 @@ const DetailLocation = ({
         background:
           "linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%)",
       }}
-      data-aos="fade-in"
+     
     >
       <div className="desti_container">
         <Slider ref={sliderRef} {...settings}>
@@ -578,7 +569,7 @@ const DetailLocation = ({
  
   
   <section className="content_area001" style={{padding: "30px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
-    <div className="container" data-aos="fade-in">
+    <div className="container">
  
           
         <div className="row">
@@ -618,7 +609,7 @@ const DetailLocation = ({
       
       
       <div className="row" style={{padding:"30px", marginTop:"20px"}} id="slug-location-map">
-<div className="col-md-12" data-aos="fade-up" style={{background:"#fff", padding:"0"}}>
+<div className="col-md-12" style={{background:"#fff", padding:"0"}}>
     {!centerCoordinate ?
     <Loading/>
     :
@@ -645,7 +636,7 @@ const DetailLocation = ({
     
     <div className="container">
     <div className="row">
-          <div className="col-md-8" data-aos="fade-up">
+          <div className="col-md-8">
 
             <div className="regstrtn-faq-space">
 
@@ -668,7 +659,7 @@ const DetailLocation = ({
           </div>
 
           <div className="col-md-4 ">
-            <div className="regstrtn-faq-space" data-aos="fade-up">
+            <div className="regstrtn-faq-space">
               <div className="faq-form-section">
                   <h2>Apply Now</h2>
                   <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
@@ -705,7 +696,7 @@ const DetailLocation = ({
   </section>
  
   <section className="content_area001" style={{padding: "0px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
-    <div className="container" data-aos="fade-up">
+    <div className="container">
  
     <TagCloud metaTags={metaTags}/>
   </div>
@@ -722,7 +713,7 @@ const DetailLocation = ({
           <div className="offerd-service-section" style={{margin: "0"}}>
             <ProductSlider detailPages={productDetailPages}  multipage={true}/>
           </div>
-          <Link href="/products"  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
+          <Link href={`/${place?.district?.slug || "delhi"}/more-products`}  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
         </div>  
       </div>            
     </div>

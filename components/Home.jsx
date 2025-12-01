@@ -1,6 +1,5 @@
-import React, {lazy, Suspense, useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
-import 'aos/dist/aos.css';
 import CompanyPreview from './home/CompanyPreview.jsx';
 
 import metaTag from '../lib/api/metaTag';
@@ -14,15 +13,40 @@ import { useSearchParams } from 'next/navigation.js';
 import BlogContext from './context/BlogContext.jsx';
 import TitleContext from './context/TitleContext.jsx';
 import NearestLocationContext from './context/NearesLocationContext.jsx';
+import dynamic from 'next/dynamic.js';
 
-const VentureSlider = lazy(() => import('./home/VentureSlider.jsx'));
-const RegistrationSlider = lazy(() => import('./home/RegistrationSlider.jsx'));
-const ServiceSlider = lazy(() => import('./common/ServiceSlider.jsx')); 
-const ProductSlider = lazy(() => import('./common/ProductSlider.jsx'));
-const TagCloud = lazy(() => import('./home/TagCloud.jsx'));
-const MainContent = lazy(() => import('./home/MainContent.jsx'));
-const Results = lazy(() => import('./Results.jsx'));
-const HomeCourseSlider = lazy(() => import('./common/HomeCourseSlider.jsx'));
+const VentureSlider = dynamic(() => import('./home/VentureSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const RegistrationSlider = dynamic(() => import('./home/RegistrationSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const ServiceSlider = dynamic(() => import('./common/ServiceSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const ProductSlider = dynamic(() => import('./common/ProductSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const TagCloud = dynamic(() => import('./home/TagCloud.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const MainContent = dynamic(() => import('./home/MainContent.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const Results = dynamic(() => import('./Results.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
+const HomeCourseSlider = dynamic(() => import('./common/HomeCourseSlider.jsx'), {
+  ssr: false,
+  loading: () => <Loading />
+});
 
 const Home = ({
   homeContent, metaTags, blogs, companies,
@@ -38,6 +62,14 @@ const Home = ({
   const { setBlogs, resetBlogs } = useContext(BlogContext);
   const { setTitle, resetTitle } = useContext(TitleContext);  
   const { nearestLocation } = useContext(NearestLocationContext);
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = "/images/city-4667143_1920.jpeg";
+    document.head.appendChild(link);
+  }, []);
 
   useEffect(() => {
       if (blogs) setBlogs(blogs);      
@@ -87,27 +119,15 @@ const Home = ({
     }
   }, [companies, companyTypes]);  
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      import("aos").then(AOS => {
-        AOS.init();
-      });
-    }
-  }, []);
-
-  
-
   return (
     s ? 
-      <Suspense fallback={<Loading/>}>
-        <Results query={s} />
-      </Suspense>
+      <Results query={s} />
       :
     
     <>  
 
        {/* banner-slider start  */}
-<section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}} data-aos="fade-in">
+<section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}} >
 
    {/* banner-serch-bar-section-start  */}
 
@@ -129,9 +149,7 @@ const Home = ({
 
   {/* join venture-slider-section start   */}
 
-  <Suspense fallback={<Loading/>}>
-    <VentureSlider companies={companies} />       
-  </Suspense>
+  <VentureSlider companies={companies} />       
 
   {/* join venture-slider-section end   */}
   <section className="content_area001" style={{padding: "0px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
@@ -139,17 +157,14 @@ const Home = ({
   </section>
       
   <section style={{paddingTop:"50px"}}>
-    <Suspense fallback={<Loading/>}>
-      <RegistrationSlider detailPages = {registrationDetailPages?.slice(0,15)} nearestLocation={nearestLocation}/>
-    </Suspense>
     
-    <Suspense fallback={<Loading/>}>
-      <HomeCourseSlider detailPages={courseDetailPages} nearestLocation={nearestLocation}/>
-    </Suspense>
+    <RegistrationSlider detailPages = {registrationDetailPages?.slice(0,15)} nearestLocation={nearestLocation}/>    
+    
+    
+    <HomeCourseSlider detailPages={courseDetailPages} nearestLocation={nearestLocation}/>    
 
-    <Suspense fallback={<Loading/>}>
-      <ServiceSlider detailPages={serviceDetailPages} nearestLocation={nearestLocation}/>
-    </Suspense>
+    
+    <ServiceSlider detailPages={serviceDetailPages} nearestLocation={nearestLocation}/>    
   </section>
 
 
@@ -159,12 +174,10 @@ const Home = ({
       <div className="row">
         <div className="row" style={{padding: "40px 0 0px 0", textAlign: "center"}}>
           <div className="offerd-service-section" style={{margin: "0"}}>
-            <Suspense fallback={<Loading/>}>
-              <ProductSlider detailPages={productDetailPages}/>
-            </Suspense>
+            <ProductSlider detailPages={productDetailPages}/>
           </div>
           {nearestLocation && 
-          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug}/products`}  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
+          <Link href={`/${nearestLocation?.district?.slug || nearestLocation?.state?.slug || "delhi"}/more-products`}  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
           }
         </div>  
       </div>            
@@ -178,16 +191,12 @@ const Home = ({
   <section className="content_area001">
     <div className="container">
       
-      {!homeContent ? <Loading/> :
-        <Suspense fallback={<Loading/>}>
-          <MainContent homeContent={homeContent}/>
-        </Suspense>
+      {!homeContent ? <Loading/> :        
+          <MainContent homeContent={homeContent}/>        
       }
 
-      {!metaTag ? <Loading/> :
-        <Suspense fallback={<Loading/>}>
-          <TagCloud metaTags={metaTags}/>  
-        </Suspense>
+      {!metaTag ? <Loading/> :        
+          <TagCloud metaTags={metaTags}/>          
       }
 
     </div>

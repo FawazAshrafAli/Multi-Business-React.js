@@ -1,9 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import LogoContext from './context/LogoContext'
 import TitleContext from './context/TitleContext'
 import PhoneNumberContext from './context/PhoneNumberContext'
@@ -60,12 +57,6 @@ const CompanyFaqDetail = ({
         };
     }, [currentCompany]);    
 
-    useEffect(() => {
-        AOS.init({
-            once: true,
-        });
-        }, []);
-
   return (
     <>  
         
@@ -77,7 +68,7 @@ const CompanyFaqDetail = ({
         <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
             <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -118,7 +109,7 @@ const CompanyFaqDetail = ({
                 <h1>{currentFaq?.question}</h1>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-                <div className="row" data-aos="fade-up">
+                <div className="row">
                 <div className="col-md-12">
                 <p className='text-start'>
                     <span dangerouslySetInnerHTML={{__html: sanitizedAnswer}} />

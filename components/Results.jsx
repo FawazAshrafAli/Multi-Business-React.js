@@ -2,9 +2,6 @@ import React, { useEffect, useState, useContext, useRef } from 'react'
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import Loading from './Loading';
 import search from '../lib/api/search';
 import TitleContext from './context/TitleContext';
@@ -62,13 +59,7 @@ const Results = ({query}) => {
         return () => {
             return resetTitle;
         }
-    }, [query])
-
-    useEffect(() => {
-            AOS.init({
-            once: true,
-        });
-    }, []);
+    }, [query])    
 
     const handleChange = (e) => {
         setFormData({
@@ -95,7 +86,7 @@ const Results = ({query}) => {
   return (
     <>          
 
-        <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}} data-aos="fade-in" >
+        <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}} >
             <div className="banner-sech-bar">
                 <div className="banner-serch-bar-cntnt">
                     <h2>SEARCH YOUR NEEDS</h2>                    
@@ -116,7 +107,7 @@ const Results = ({query}) => {
             <h2>{`You Searched for ${query}`}</h2>
             <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-            <div className="row" data-aos="fade-up">
+            <div className="row" >
                 <>
                     {matchingItemsLoading && matchingItems.length === 0 && <Loading />}
 

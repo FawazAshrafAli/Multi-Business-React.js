@@ -2,9 +2,6 @@ import React, {useContext, useEffect, useState} from 'react'
 import Link from 'next/link.js';
 import Cookies from 'js-cookie';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import Message from './common/Message'
 
 import location from '../lib/api/location';
@@ -179,13 +176,7 @@ const BzIndiaContactForm = ({homeContent, blogs}) => {
         } else {
         console.warn('easyResponsiveTabs is not loaded properly');
         }
-    }, [bzindiaContacts]);
-
-    useEffect(() => {
-        AOS.init({
-            once: true,
-        });
-        }, [bzindiaContacts]);
+    }, [bzindiaContacts]);    
 
     if (statesError) return <div>Error: {statesError}</div>;    
 
@@ -198,7 +189,7 @@ const BzIndiaContactForm = ({homeContent, blogs}) => {
           <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
           <div className="bg-overlay"></div>
           <div className="home-center">
-              <div className="home-desc-center" data-aos="fade-in">
+              <div className="home-desc-center">
                   <div className="container">
                       <div className="row">
                           <div className="col-md-12">
@@ -238,7 +229,7 @@ const BzIndiaContactForm = ({homeContent, blogs}) => {
               <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
               
-      <div className="row" data-aos="fade-in">
+      <div className="row">
               
             <div className="col-md-12 col-sm-12 col-xs-12">
               <div id="verticalTab">

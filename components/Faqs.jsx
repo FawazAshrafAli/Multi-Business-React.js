@@ -1,8 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import $ from 'jquery';
 import '/public/easy-responsive-tabs';
 import Link from 'next/link.js';
@@ -84,13 +81,7 @@ const Faqs = ({
       $tabs.first().addClass('resp-tab-active');
       $contents.first().addClass('resp-tab-content-active').show();
     }
-  }, [bzindiaFaqs, companies]);
-  
-  useEffect(() => {
-          AOS.init({
-          once: true,
-      });
-  }, [bzindiaFaqs, companies]);
+  }, [bzindiaFaqs, companies]);  
   
 
   return (
@@ -100,7 +91,7 @@ const Faqs = ({
         <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
             <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -126,7 +117,7 @@ const Faqs = ({
    {/* home -banner section-end  */}
     <br/>
   <section className="content_area001" style={{padding: "0px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
-    <div className="container" data-aos="fade-up">
+    <div className="container">
             <h3>Frequently Asked Questions - FAQs</h3>
             <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
             <div className="row">

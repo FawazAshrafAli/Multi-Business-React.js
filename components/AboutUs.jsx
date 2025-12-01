@@ -2,9 +2,6 @@ import React, { useEffect, useState, useContext } from 'react'
 import createDOMPurify from 'dompurify';
 import Link from 'next/link';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import BlogContext from './context/BlogContext';
 import TitleContext from './context/TitleContext';
 
@@ -45,13 +42,7 @@ const AboutUS = ({blogs, homeContent, aboutUs}) => {
           const sanitized = DOMPurify.sanitize( content || '');         
     
           setSanitizedContent(sanitized);
-    }, [aboutUs]);        
-
-    useEffect(() => {
-        AOS.init({
-          once: true,
-        });
-      }, []);    
+    }, [aboutUs]);              
 
   return (
     <>  
@@ -60,7 +51,7 @@ const AboutUS = ({blogs, homeContent, aboutUs}) => {
         <section className="bg-half" style={{backgroundImage: "url('/images/city-4667143_1920.jpeg')"}}>
             <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -87,7 +78,7 @@ const AboutUS = ({blogs, homeContent, aboutUs}) => {
                 <h2>Who We Are</h2>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
 
-                <div className="row" data-aos="fade-up" style={{textAlign: "initial"}}>
+                <div className="row" style={{textAlign: "initial"}}>
                 <div className="col-md-12">
                 <div dangerouslySetInnerHTML={{__html: sanitizedContent}}/>
                 </div>

@@ -4,9 +4,6 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/router';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import Cookies from 'js-cookie';
 
 import destination from '../lib/api/destination';
@@ -460,12 +457,6 @@ const ListLocations = ({
       }
   }, [message]);
 
-    useEffect(() => {
-            AOS.init({
-            once: true,
-        });
-    }, []);
-
     [
         companiesError, nearbyPlacesError, destinationsError, districtsError
     ].map(error => {
@@ -487,7 +478,7 @@ const ListLocations = ({
         background:
           "linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%)",
       }}
-      data-aos="fade-in"
+     
     >
       <div className="desti_container">
         <Slider ref={sliderRef} {...settings}>
@@ -621,7 +612,7 @@ const ListLocations = ({
  
   
   <section className="content_area001" style={{padding: "30px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
-    <div className="container" data-aos="fade-in">
+    <div className="container">
  
           
 
@@ -677,7 +668,7 @@ states?.map((state, index) => <li itemProp="name" className="col col-md-3 col-12
       
       
       <div className="row" style={{padding:"30px", marginTop:"20px"}} id="slug-location-map">
-<div className="col-md-12" data-aos="fade-up" style={{background:"#fff", padding:"0"}}>
+<div className="col-md-12" style={{background:"#fff", padding:"0"}}>
 <iframe src={`https://www.google.com/maps?q=${centerCoordinate?.latitude || 20.5937},${centerCoordinate?.longitude || 78.9629}&z=15&output=embed`} style={{border:"0", width: "100%", height: "340px"}}></iframe>
 
 {/* https://www.google.com/maps?q=11.1876748,76.2531472&amp;z=15&amp;output=embed */}
@@ -702,7 +693,7 @@ states?.map((state, index) => <li itemProp="name" className="col col-md-3 col-12
     
     <div className="container">
     <div className="row">
-          <div className="col-md-8" data-aos="fade-up">
+          <div className="col-md-8">
 
             <div className="regstrtn-faq-space">
 
@@ -725,7 +716,7 @@ states?.map((state, index) => <li itemProp="name" className="col col-md-3 col-12
           </div>
 
           <div className="col-md-4 ">
-            <div className="regstrtn-faq-space" data-aos="fade-up">
+            <div className="regstrtn-faq-space">
               <div className="faq-form-section">
                   <h2>Apply Now</h2>
                   <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
@@ -762,7 +753,7 @@ states?.map((state, index) => <li itemProp="name" className="col col-md-3 col-12
   </section>
  
   <section className="content_area001" style={{padding: "0px 0px 40px 0px", marginBottom: "0px", borderBottom: "1px solid #ddd"}}>
-    <div className="container" data-aos="fade-up">
+    <div className="container">
     
       <TagCloud metaTags={metaTags}/>
     </div>
@@ -779,7 +770,7 @@ states?.map((state, index) => <li itemProp="name" className="col col-md-3 col-12
           <div className="offerd-service-section" style={{margin: "0"}}>
             <ProductSlider detailPages={productDetailPages?.slice(0,12)}/>
           </div>
-          <Link href="/products"  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
+          <Link href={`/${district?.slug || state?.slug || "delhi"}/more-products`}  className="primary_button" style={{margin: "0 auto"}}>Buy More</Link>
         </div>  
       </div>            
     </div>

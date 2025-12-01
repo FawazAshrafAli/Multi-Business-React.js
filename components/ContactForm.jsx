@@ -4,9 +4,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import Cookies from 'js-cookie'
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import LogoContext from './context/LogoContext';
 import TitleContext from './context/TitleContext';
 import PhoneNumberContext from './context/PhoneNumberContext';
@@ -213,13 +210,7 @@ const ContactForm = () => {
 
     if (error) {
         console.error(error);
-    }
-
-    useEffect(() => {
-        AOS.init({
-            once: true,
-        });
-        }, []);
+    }    
 
     if (error) {
         console.error(error)
@@ -236,7 +227,7 @@ const ContactForm = () => {
             
           <div className="bg-overlay"></div>
             <div className="home-center">
-                <div className="home-desc-center" data-aos="fade-in">
+                <div className="home-desc-center">
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
@@ -263,7 +254,7 @@ const ContactForm = () => {
             <div className="container">
                 <h2>Contact Us</h2>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>
-                <div className="row" data-aos="fade-in">
+                <div className="row">
               
                     <div className="col-md-12 col-sm-12 col-xs-12">
                         <div id="verticalTab">
