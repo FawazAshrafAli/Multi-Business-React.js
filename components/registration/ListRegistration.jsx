@@ -2,9 +2,6 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-
 import LogoContext from '../context/LogoContext';
 import TitleContext from '../context/TitleContext';
 import PhoneNumberContext from '../context/PhoneNumberContext';
@@ -109,11 +106,6 @@ const ListRegistration = ({ currentCompany, testimonials }) => {
     };
   }, [currentCompany]);
 
-  // AOS init
-  useEffect(() => {
-    AOS.init({ once: true });
-  }, []);
-
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
@@ -139,7 +131,7 @@ const ListRegistration = ({ currentCompany, testimonials }) => {
       >
         <div className="bg-overlay"></div>
         <div className="home-center">
-          <div className="home-desc-center" data-aos="fade-in">
+          <div className="home-desc-center">
             <div className="container">
               <div className="row">
                 <div className="col-md-12">
@@ -187,7 +179,7 @@ const ListRegistration = ({ currentCompany, testimonials }) => {
             <span className="deg3"></span>
           </p>
 
-          <div className="row" data-aos="fade-up">
+          <div className="row">
             {detailsLoading && details.length === 0 && <Loading />}
             {!detailsLoading && details.length === 0 && (
               <h6 className="text-center text-danger">{noDetailMsg}</h6>

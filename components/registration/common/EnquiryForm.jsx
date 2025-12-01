@@ -85,7 +85,7 @@ const EnquiryForm = ({company, setMessage, setMessageClass}) => {
 
   return (
     <>
-        <div className="regstrtn-faq-space aos-init" data-aos="fade-up">
+        <div className="regstrtn-faq-space">
             <div className="faq-form-section">
                 <h2>Register Now</h2>
                 <p className="flip"><span className="deg1"></span><span className="deg2"></span><span className="deg3"></span></p>

@@ -59,12 +59,12 @@ const ListRegistrationSubTypes = ({locationData, blogs}) => {
     useEffect(() => {
       if (!nearestPlace) return;
 
-      router.push(`/${nearestPlace?.district?.slug}/filings`);      
+      router.push(`/${nearestPlace?.district?.slug}/startup-services`);      
 
     }, [nearestPlace]);
 
     useEffect(() => {
-      setTitle(`Sub Types`);
+      setTitle(`Startup Services in ${locationData?.name}`);
 
       return () => {
         resetTitle();

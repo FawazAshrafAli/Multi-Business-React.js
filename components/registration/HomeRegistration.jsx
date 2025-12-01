@@ -68,7 +68,7 @@ const HomeRegistration = ({
             <div className="container-fluid">
                 <div className="registration-faq-section my-5"  >                  
                     <div className="row">
-                        <div className="col-md-8" data-aos="fade-up">
+                        <div className="col-md-8">
                             <div className="regstrtn-faq-space">
                                 <div className="registrsn-fq-scrool-bar-clm">
                                     <h3>Company FAQs</h3>

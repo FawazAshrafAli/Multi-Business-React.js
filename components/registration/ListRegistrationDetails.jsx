@@ -58,12 +58,12 @@ const ListRegistrationDetails = ({locationData, blogs, subType}) => {
     useEffect(() => {
         if (!nearestPlace) return;
 
-        router.push(`/${nearestPlace?.district?.slug}/filings/${subType?.locationSlug || subType?.slug}-${nearestPlace?.slug}`);        
+        router.push(`/${nearestPlace?.district?.slug}/startup-services/${subType?.locationSlug || subType?.slug}-${nearestPlace?.slug}`);        
 
     }, [nearestPlace]);
 
     useEffect(() => {
-    setTitle(`Filings`);
+    setTitle(`Startup Services`);
 
     return () => {
         resetTitle();
