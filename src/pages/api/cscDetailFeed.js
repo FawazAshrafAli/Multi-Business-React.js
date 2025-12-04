@@ -3,6 +3,7 @@ import { Feed } from 'feed';
 import blog from '../../../lib/api/blog';
 import location from '../../../lib/api/location';
 import directory from '../../../lib/api/directory';
+import service from '../../../lib/api/service';
 
 export default async function handler(req, res) {
     const {slug, cscSlug} = req.query;
@@ -91,7 +92,7 @@ export default async function handler(req, res) {
             updated: new Date(),
             generator: 'Feed for Next.js',
             feedLinks: {
-            rss2: `${siteUrl}/${slug}/csc/rss`,
+            rss2: `${siteUrl}/${slug}/csc/feed`,
             },
             author: {
             name: 'BZIndia',
@@ -147,7 +148,7 @@ export default async function handler(req, res) {
         faqs?.forEach((faq, index) => {
             feed.addItem({
             title: faq.question,
-            id: `${faq}-${index+1}`,            
+            id: index+1, 
             description: faq.question,
             content: `
                 <p><strong>Q:</strong> ${faq.question}</p>
@@ -190,7 +191,7 @@ export default async function handler(req, res) {
             updated: new Date(),
             generator: 'Feed for Next.js',
             feedLinks: {
-            rss2: `${siteUrl}/${slug}/csc/rss`,
+            rss2: `${siteUrl}/${slug}/csc/feed`,
             },
             author: {
             name: 'BZIndia',

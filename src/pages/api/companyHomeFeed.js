@@ -1,4 +1,4 @@
-// pages/api/rss.js
+
 import { Feed } from 'feed';
 import location from '../../../lib/api/location';
 import company from '../../../lib/api/company';
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
           updated: new Date(currentCompany?.updated || new Date()),
           generator: 'Feed for Next.js',
           feedLinks: {
-            rss2: `${siteUrl}/${slug}/rss`,
+            rss2: `${siteUrl}/${slug}/feed`,
           },
           author: {
             name: currentCompany?.name,
@@ -173,7 +173,7 @@ export default async function handler(req, res) {
           updated: new Date(Date()),
           generator: 'Feed for Next.js',
           feedLinks: {
-            rss2: `${siteUrl}/${slug}/rss`,
+            rss2: `${siteUrl}/${slug}/feed`,
           },
           author: {
             name: "BzIndia",

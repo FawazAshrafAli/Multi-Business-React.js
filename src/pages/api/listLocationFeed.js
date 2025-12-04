@@ -1,4 +1,4 @@
-// pages/api/rss.js
+
 
 import { Feed } from 'feed';
 import destination from '../../../lib/api/destination';
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${url}/rss`,
+      rss2: `${url}/feed`,
     },
     author: {
       name: "BzIndia",

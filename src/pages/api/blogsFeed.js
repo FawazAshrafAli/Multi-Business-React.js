@@ -1,4 +1,4 @@
-    // pages/api/rss.js
+    
 
     import { Feed } from 'feed';
     import home from '../../../lib/api/home';
@@ -59,7 +59,7 @@
         updated: new Date(),
         generator: 'Feed for Next.js',
         feedLinks: {
-        rss2: `${siteUrl}${currentCompany? `/${currentCompany?.slug}` : ""}/learn/rss`,
+        rss2: `${siteUrl}${currentCompany? `/${currentCompany?.slug}` : ""}/learn/feed`,
         },
         author: {
         name: 'BZ India',

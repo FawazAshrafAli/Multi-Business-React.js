@@ -1,4 +1,4 @@
-    // pages/api/rss.js
+    
 
     import { Feed } from 'feed';
     import home from '../../../lib/api/home';
@@ -47,7 +47,7 @@ import metaTag from '../../../lib/api/metaTag';
             updated: new Date(),
             generator: 'Feed for Next.js',
             feedLinks: {
-            rss2: `${siteUrl}/tag/rss`,
+            rss2: `${siteUrl}/tag/feed`,
             },
             author: {
             name: 'BZ India',

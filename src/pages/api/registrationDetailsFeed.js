@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${siteUrl}/${currentCompany?.slug}/registrations/rss`,
+      rss2: `${siteUrl}/${currentCompany?.slug}/registrations/feed`,
     },
     author: {
       name: 'BZ India',

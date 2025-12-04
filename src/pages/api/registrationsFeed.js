@@ -1,54 +1,82 @@
-// pages/api/rss.js
-
-
 import { Feed } from 'feed';
 import blog from '../../../lib/api/blog';
-import destination from '../../../lib/api/destination';
 import location from '../../../lib/api/location';
 import registration from '../../../lib/api/registration';
 
-export default async function handler(req, res) {
-    const siteUrl = 'https://bzindia.in';
-
-    const { lat, lon } = await location.getLocationFromIP(req);       
-
-    const registrationDetailPagesRes = await registration.getDetails("all");
-    const registrationDetailPages = registrationDetailPagesRes.data?.results;
-
-    const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
-    const blogs = blogsRes.data.results;
-
-    const destinationsRes = await destination.getDestinations( lat, lon );
-    const destinations  = await destinationsRes.data.slice(0, 12);
-
-    let locationData = {};
-
+export default async function handler(req, res) {    
     const {slug} = req.query;
 
+    const siteUrl = 'https://bzindia.in';
+    
+    let isSubTypeListingPage = false;
+    let state, district;
+    let locationData = {};
+
+    const getImageMimeType = (url) => {
+        if (url.endsWith('.png')) return 'image/png';
+        if (url.endsWith('.webp')) return 'image/webp';
+        if (url.endsWith('.jpg') || url.endsWith('.jpeg')) return 'image/jpeg';
+        return 'image/*';
+    };
+
     try {
-      const districtRes = await location.getMinimalDistrict(slug);
-      const district = districtRes.data;
-
-      locationData = district;
-    } catch (err) {
       const stateRes = await location.getMinimalState(slug);
-      const state = stateRes.data;
+      state = stateRes.data;
 
-      locationData = state;
-    }
+      const stateCenterRes = await location.getMinimalState(slug);
+      const stateCenter = stateCenterRes.data;
 
-  const feed = new Feed({
+      locationData = {
+          ...state, 
+          "latitude": stateCenter?.latitude, "longitude": stateCenter?.longitude
+      }
+
+      isSubTypeListingPage = true;
+  } catch (err) {
+
+      const districtRes = await location.getMinimalDistrict(slug);
+      district = districtRes.data;
+
+      const districtCenterRes = await location.getDistrictCenter(slug);
+      const districtCenter = districtCenterRes.data;
+
+      locationData = {
+          ...district, 
+          "latitude": districtCenter?.latitude, "longitude": districtCenter?.longitude
+      }
+
+      isSubTypeListingPage = true;
+  }
+
+  let feed;
+
+  if (isSubTypeListingPage) {
+    const subTypeRes = await registration.getSubTypes("all");
+    const subTypes = subTypeRes.data?.results;
+
+    const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
+    const blogs = blogsRes.data.results;  
+    
+    const address_list = [];
+
+    if (locationData?.name) address_list.push(locationData?.name);
+    if (locationData?.district_name) address_list.push(locationData?.district_name);
+    if (locationData?.state_name) address_list.push(locationData?.state_name);
+
+    const address = address_list.join(", ");
+
+    feed = new Feed({
     title: `Startup Services in ${locationData?.name} - RSS Feed`,
-    description: "List of registrations",
-    id: `${siteUrl}/registrations`,
-    link: `${siteUrl}/registrations`,
+    description: `Get online registrations in ${address} with expert consultants and quick approvals.`,
+    id: `${siteUrl}/${slug}/startup-services`,
+    link: `${siteUrl}/${slug}/startup-services`,
     language: 'en',
     image: `${siteUrl}/images/logo.svg`,
     favicon: `${siteUrl}/images/Favicon.png`,
     updated: new Date(),
     generator: 'Feed for Next.js',
     feedLinks: {
-      rss2: `${siteUrl}/registrations/rss`,
+      rss2: `${siteUrl}/${slug}/startup-services/feed`,
     },
     author: {
       name: 'BZ India',
@@ -57,13 +85,17 @@ export default async function handler(req, res) {
   });    
 
   // Add registrations
-  registrationDetailPages?.forEach((detail) => {
+  subTypes?.forEach((subType) => {
     feed.addItem({
-      title: detail.registration?.sub_type?.name,
-      id: `${siteUrl}/${detail.url}`,
-      link: `${siteUrl}/${detail.url}`,
-      description: detail.meta_description?.slice(0,300) || "",
-      date: new Date(detail.modified || Date.now()),
+      title: subType.name,
+      id: `${siteUrl}/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/${subType.location_slug || subType.slug}-${locationData?.slug}`,
+      link: `${siteUrl}/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/${subType.location_slug || subType.slug}-${locationData?.slug}`,
+      description: subType.meta_description?.slice(0,300) || "",
+      date: new Date(subType.updated || Date.now()),      
+      enclosure: subType.image_url ? {
+          url: `${subType.image_url}`,  
+          type: getImageMimeType(subType.image_url)
+      } : undefined
     });
   });
 
@@ -75,19 +107,13 @@ export default async function handler(req, res) {
       link: `${siteUrl}/learn/${post.slug}`,
       description: post.summary?.slice(0,300),
       date: new Date(post.published_on || DataTransfer.now()),
-    });
-  });
-
-  // Add destinations
-  destinations.slice(0, 12).forEach((dest) => {
-    feed.addItem({
-      title: dest.name,
-      id: `${siteUrl}/destination/${dest.slug}`,
-      link: `${siteUrl}/destination/${dest.slug}`,
-      description: dest.meta_description?.slice(0,300) || `Learn more about ${dest.name}`,
-      date: new Date(dest.updated || Date.now()),
+      enclosure: post.image_url ? {
+          url: `${post.image_url}`,  
+          type: getImageMimeType(post.image_url)
+      } : undefined
     });
   });  
+  }  
 
   res.setHeader('Content-Type', 'application/rss+xml');
   res.write(feed.rss2());

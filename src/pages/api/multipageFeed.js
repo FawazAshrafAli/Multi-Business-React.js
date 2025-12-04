@@ -1,4 +1,4 @@
-// pages/api/rss.js
+
 
 
 import { Feed } from 'feed';
@@ -469,7 +469,7 @@ export default async function handler(req, res) {
         :isServiceSubCategoryPage? serviceSubCategory.url 
         :isProductCategoryPage? productCategory.url 
         :isProductSubCategoryPage? productSubCategory.url 
-        : undefined}/rss`,
+        : undefined}/feed`,
     },
     author: {
       name: currentCompany?.name,

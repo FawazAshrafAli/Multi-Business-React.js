@@ -1,4 +1,4 @@
-// pages/api/rss.js
+
 
 import { Feed } from 'feed';
 import home from '../../../lib/api/home';
