@@ -45,6 +45,9 @@ const ListingPage = ({
     const loaderRef = useRef(null);     
     const router = useRouter();
     const { slug } = router.query;
+
+    const [computedLocation, setComputedLocation] = useState({});
+    const [contactNumber, setContactNumber] = useState(null);
     
     const [productCompanies, setProductCompanies] = useState();
     const [productCompaniesLoading, setProductCompaniesLoading] = useState(true);
@@ -92,15 +95,50 @@ const ListingPage = ({
     const [firstProductMultipage, setFirstProductMultipage] = useState(null);
 
     const {setLogo, resetLogo} = useContext(LogoContext);
-    const {nearestLocation} = useContext(NearestLocationContext);
+    const {nearestLocation} = useContext(NearestLocationContext);    
 
     useEffect(() => {
-      if (!nearestLocation || !slug) return;
+      let phoneNumber;
+
+      if (currentCompany) {
+
+        if (currentCompany?.phone1) {
+          phoneNumber = currentCompany?.phone1;
+        } else {
+          phoneNumber = null;
+        }
+
+      } else {
+        phoneNumber = "9845272560";
+      }
+
+      setContactNumber(phoneNumber);
+
+    }, [currentCompany]);    
+
+    useEffect(() => {
+      if (!nearestLocation?.district?.slug || !slug) return;
 
       if (nearestLocation?.district?.slug === slug) {
-        locationData = {...nearestLocation}
+        setComputedLocation({...computedLocation,          
+          "starting_slug": nearestLocation?.district?.slug,
+          "ending_slug": nearestLocation?.slug,
+        })
+
       }
-    }, [nearestLocation, slug]);
+    }, [nearestLocation?.district?.slug, slug]);
+
+    useEffect(() => {
+      if (!nearestLocation?.state?.slug || !slug) return;
+
+      if (nearestLocation?.state?.slug === slug) {
+        setComputedLocation({...computedLocation,
+          "starting_slug": nearestLocation?.state?.slug,
+          "ending_slug": nearestLocation?.district?.slug,
+        })
+
+      }
+    }, [nearestLocation?.state?.slug, slug]);
 
     useEffect(() => {      
       if (!subType?.slug || !locationData || itemsType != "RegistrationDetail") return;
@@ -562,7 +600,8 @@ const ListingPage = ({
       nextProdParams, prodSubCategoriesLoading,
       nextProductDetailsParams, productDetailsLoading, subCategory?.slug,
       eduSpecializationsLoading, specialization?.slug, nextCourseDetailUrl,
-      courseDetailsLoading, nextServParams, servSubCategoriesLoading
+      courseDetailsLoading, nextServParams, servSubCategoriesLoading,
+      computedLocation
     ]);
 
     useEffect(() => {
@@ -688,7 +727,7 @@ useEffect(() => {
     {/* PRODUCTS */}
     <h4 className="bz_cat_heading">Products</h4>    
     {productCompaniesLoading ? <Loading/> :
-    productCompanies?.map((company, index) => <Link key={company.slug || index} className="bznew_list_catItem" href={`/${company.slug}`}>{company.name}</Link>)}    
+    productCompanies?.map((company, index) => <Link key={company.slug || index} className="bznew_list_catItem" href={`/${company.slug}`} >{company.name}</Link>)}    
 
     {/* COURSES */}
     <h4 className="bz_cat_heading">Courses</h4>
@@ -707,11 +746,11 @@ useEffect(() => {
 
     {/* USEFUL DIRECTORIES */}
     <h4 className="bz_cat_heading">Useful Directories</h4>
-    <a className="bznew_list_catItem" href="#">Common Service Centre</a>
-    <a className="bznew_list_catItem" href="#">Post Office &amp; Pincode</a>
-    <a className="bznew_list_catItem" href="#">Bank &amp; IFSC</a>
-    <a className="bznew_list_catItem" href="#">Judicial Courts</a>
-    <a className="bznew_list_catItem" href="#">Police Station</a>
+    <Link className="bznew_list_catItem" href={`/${computedLocation?.starting_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug || district?.state?.slug || state?.slug}/csc/${(computedLocation?.ending_slug || district?.slug) ? `common-service-center-${computedLocation?.ending_slug || locationData?.slug || district?.slug}` : ""}`}>Common Service Centre</Link>
+    <Link className="bznew_list_catItem" href="#">Post Office &amp; Pincode</Link>
+    <Link className="bznew_list_catItem" href="#">Bank &amp; IFSC</Link>
+    <Link className="bznew_list_catItem" href="#">Judicial Courts</Link>
+    <Link className="bznew_list_catItem" href="#">Police Station</Link>
   </div>
 </div>
 
@@ -1062,7 +1101,7 @@ useEffect(() => {
     <div className="bz_cat_group mt-3">
       <strong className="bz_cat_heading">Useful Directories</strong>
       <div className="bznew_list_list">
-        <Link href="#"><span className="bznew_list_dot"></span>Common Service Centre</Link>
+        <Link href={`/${computedLocation?.starting_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug || district?.state?.slug || state?.slug}/csc/${(computedLocation?.ending_slug || district?.slug) ? `common-service-center-${computedLocation?.ending_slug || locationData?.slug || district?.slug}` : ""}`}><span className="bznew_list_dot"></span>Common Service Centre</Link>
         <Link href="#"><span className="bznew_list_dot"></span>Post Office & Pincode</Link>
         <Link href="#"><span className="bznew_list_dot"></span>Bank & IFSC</Link>
         <Link href="#"><span className="bznew_list_dot"></span>Judicial Courts</Link>
@@ -1153,7 +1192,6 @@ useEffect(() => {
 </div>
 <div className="bznew_list_cta">
             <a href={`https://www.google.com/maps?q=${center.latitude},${center.longitude}`} target="_blank" rel="noopener noreferrer" style={{padding: "5px 8px"}} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-compass" aria-hidden="true"></i></a>
-            {/* <Link href={`${stateSlug ? `/${stateSlug}`: ""}/${parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link> */}
             <Link href={`/${center.district?.slug || parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link>
             <a href={center.contact_number? `tel:+91${center.contact_number}`: "#"} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
           </div>
@@ -1169,7 +1207,7 @@ useEffect(() => {
         const fullStars = Math.floor(subType.rating || 0);
         const hasHalfStar = subType.rating % 1 === 0.5;
         const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-        
+
         return(
             <div className="bznew_list_product-hero" key={`${subType?.slug}-${index+1}`}>
               <div className="bznew_list_feature-row">
@@ -1194,7 +1232,7 @@ useEffect(() => {
                           </span>
                         }
                         {[...Array(emptyStars)].map((_, i) => (
-                          <span className="bz_star bz_star--empty">
+                          <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                             </svg>
@@ -1232,8 +1270,8 @@ useEffect(() => {
               </div>
             </div>
             <div className="bznew_list_cta">
-              <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/${subType?.location_slug || subType?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`/${computedLocation?.starting_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/${subType?.location_slug || subType?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1275,7 +1313,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1314,7 +1352,7 @@ useEffect(() => {
   </div>
             <div className="bznew_list_cta">
               <a href={`/${detail.url}`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1350,7 +1388,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1389,7 +1427,7 @@ useEffect(() => {
   </div>
             <div className="bznew_list_cta">
               <a href={`/${firstRegistrationMultipage.url}`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1416,7 +1454,7 @@ useEffect(() => {
             </div>
             <div className="bznew_list_cta">
               <a href={`/${state?.slug || district?.slug}/startup-services/`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1438,7 +1476,7 @@ useEffect(() => {
             </div>
             <div className="bznew_list_cta">
               <a href={`/${state?.slug || district?.slug}/more-products/`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1460,7 +1498,7 @@ useEffect(() => {
             </div>
             <div className="bznew_list_cta">
               <a href={`/${state?.slug || district?.slug}/more-courses/`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1482,7 +1520,7 @@ useEffect(() => {
             </div>
             <div className="bznew_list_cta">
               <a href={`/${state?.slug || district?.slug}/more-services/`} className="bznew_list_btn primary">Read More</a>
-              <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+              <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
             </div>
           </div>
         </div>
@@ -1512,7 +1550,7 @@ useEffect(() => {
 <div className="bznew_list_cta">
             {/* <Link href={`${stateSlug ? `/${stateSlug}`: ""}/${parentPlace?.slug}/csc/${center.slug}`} className="bznew_list_btn primary">Read More</Link> */}
             {/* <Link href={`/${district?.state?.slug || state?.slug}/csc/${district?.slug ? `common-service-center-${district?.slug}` : ""}`} className="bznew_list_btn primary">Read More</Link> */}
-             {/* <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a> */}
+             {/* <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a> */}
           </div>
         </div>
       </div>
@@ -1552,7 +1590,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1591,8 +1629,8 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -1634,7 +1672,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1674,7 +1712,7 @@ useEffect(() => {
               </div>
               <div className="bznew_list_cta">
                   <a href={`/${detail?.url}`} className="bznew_list_btn primary">Buy Now</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -1752,7 +1790,7 @@ useEffect(() => {
               </div>
                 <div className="bznew_list_cta">
                   <a href={`/${firstProductMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -1794,7 +1832,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1834,8 +1872,8 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -1877,7 +1915,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1918,7 +1956,7 @@ useEffect(() => {
               </div>
               <div className="bznew_list_cta">
                   <a href={`/${detail?.url}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -1953,7 +1991,7 @@ useEffect(() => {
               </span>
             }
             {[...Array(emptyStars)].map((_, i) => (
-              <span className="bz_star bz_star--empty">
+              <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                 </svg>
@@ -1992,7 +2030,7 @@ useEffect(() => {
               </div>
                 <div className="bznew_list_cta">
                   <a href={`/${firstCourseMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -2036,7 +2074,7 @@ useEffect(() => {
                           </span>
                         }
                         {[...Array(emptyStars)].map((_, i) => (
-                          <span className="bz_star bz_star--empty">
+                          <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                             </svg>
@@ -2075,8 +2113,8 @@ useEffect(() => {
               </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -2118,7 +2156,7 @@ useEffect(() => {
                           </span>
                         }
                         {[...Array(emptyStars)].map((_, i) => (
-                          <span className="bz_star bz_star--empty">
+                          <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                             </svg>
@@ -2158,7 +2196,7 @@ useEffect(() => {
               </div>
               <div className="bznew_list_cta">
                   <a href={`/${detail?.url}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
             </div>
@@ -2193,7 +2231,7 @@ useEffect(() => {
                           </span>
                         }
                         {[...Array(emptyStars)].map((_, i) => (
-                          <span className="bz_star bz_star--empty">
+                          <span className="bz_star bz_star--empty" key={`empty-star-${i}`}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 18l-6.2 3.3 1.2-6.8-5-4.9 6.9-1L12 2z"/>
                             </svg>
@@ -2231,8 +2269,10 @@ useEffect(() => {
               </div>
               </div>
                 <div className="bznew_list_cta">
-                  <a href={`/${firstServiceMultipage?.url}`} className="bznew_list_btn primary">Read More</a>
-                  <a href="#" className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  <Link href={`/${firstServiceMultipage?.url}`} className="bznew_list_btn primary">Read More</Link>
+                  {contactNumber && 
+                  <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
+                  }
                 </div>
               </div>
             </div>
