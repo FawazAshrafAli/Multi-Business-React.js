@@ -126,10 +126,11 @@
   // click on any category item -> close + scroll to top
   menu.addEventListener('click', (e)=>{
     const link = e.target.closest('.bznew_list_catItem');
-    if (!link) return;
 
+    if (!link) return;
+    
     // prevent navigation for now (you can route in React)
-    e.preventDefault();
+    // e.preventDefault();
 
     // close the dropdown
     close();
@@ -337,12 +338,14 @@ const toast = (msg='Done')=>{
 }
 
 /* ======= Gallery switching ======= */
-$('#thumbRow').addEventListener('click', (e)=>{
-  const img = e.target.closest('img'); if(!img) return;
-  $('#mainImg').src = img.dataset.large;
-  $$('.thumb').forEach(x=>x.classList.remove('active'));
-  e.target.closest('.thumb').classList.add('active');
-});
+if ($('#thumbRow')) {
+  $('#thumbRow').addEventListener('click', (e)=>{
+    const img = e.target.closest('img'); if(!img) return;
+    $('#mainImg').src = img.dataset.large;
+    $$('.thumb').forEach(x=>x.classList.remove('active'));
+    e.target.closest('.thumb').classList.add('active');
+  });
+}
 
 /* ======= Variant pricing ======= */
 const base = { // MRP & offer by size (₹)
@@ -375,25 +378,36 @@ if ($('#sizes')) {
 }
 
 /* color pick just visual */
-$('#colors').addEventListener('click', e=>{
-  const sw = e.target.closest('.swatch'); if(!sw) return;
-  $$('#colors .swatch').forEach(x=>x.classList.remove('active'));
-  sw.classList.add('active');
-});
+if ($('#colors')) {
+  $('#colors').addEventListener('click', e=>{
+    const sw = e.target.closest('.swatch'); if(!sw) return;
+    $$('#colors .swatch').forEach(x=>x.classList.remove('active'));
+    sw.classList.add('active');
+  });
+
+}
 
 /* ======= Qty stepper ======= */
 const qty = $('#qty');
 const clamp = v => Math.max(1, Math.min(99, v|0));
-$('#inc').onclick=()=>{qty.value = clamp(+qty.value+1)}
-$('#dec').onclick=()=>{qty.value = clamp(+qty.value-1)}
-qty.oninput=()=>{qty.value = qty.value.replace(/[^0-9]/g,'')}
+if ($('#inc')) {
+  $('#inc').onclick=()=>{qty.value = clamp(+qty.value+1)}
+}
+if ($('#dec')) {
+  $('#dec').onclick=()=>{qty.value = clamp(+qty.value-1)}
+}
+if (qty) {
+  qty.oninput=()=>{qty.value = qty.value.replace(/[^0-9]/g,'')}
+}
 
 /* ======= Pincode check (mock) ======= */
-$('#checkPin').onclick=()=>{
-  const p = $('#pincode').value.trim();
-  if(!/^\d{6}$/.test(p)) { $('#pinMsg').textContent='Enter a valid 6-digit pincode'; return; }
-  const eta = ['2-3 days','3-5 days','5-7 days'][Math.floor((+p)%3)];
-  $('#pinMsg').textContent = `Delivery to ${p}: ETA ${eta}`;
+if ($('#checkPin')) {
+  $('#checkPin').onclick=()=>{
+    const p = $('#pincode').value.trim();
+    if(!/^\d{6}$/.test(p)) { $('#pinMsg').textContent='Enter a valid 6-digit pincode'; return; }
+    const eta = ['2-3 days','3-5 days','5-7 days'][Math.floor((+p)%3)];
+    $('#pinMsg').textContent = `Delivery to ${p}: ETA ${eta}`;
+  }
 }
 
 /* ======= Tabs ======= */
@@ -409,17 +423,194 @@ $$('.tab-btn').forEach(btn=>{
 
 /* ======= Wishlist/Cart buttons ======= */
 const addToCart = src => toast(src?`Added ${qty.value} item(s) from ${src}`:'Added to cart');
-$('#addCart').onclick=()=>addToCart('detail');
-$('#stickyAdd').onclick=()=>addToCart('sticky');
-$('#buyNow').onclick=()=>toast('Proceeding to checkout…');
-$('#stickyBuy').onclick=()=>toast('Proceeding to checkout…');
-$('#wishBtn').onclick=()=>toast('Saved to wishlist');
-$('#stickyWish').onclick=()=>toast('Saved to wishlist');
+if ($('#addCart')) {
+  $('#addCart').onclick=()=>addToCart('detail');
+}
+
+if ($('#stickyAdd')) {
+  $('#stickyAdd').onclick=()=>addToCart('sticky');
+}
+
+if ($('#buyNow')) {
+  $('#buyNow').onclick=()=>toast('Proceeding to checkout…');
+}
+
+if ($('#stickyBuy')) {
+  $('#stickyBuy').onclick=()=>toast('Proceeding to checkout…');
+}
+
+if ($('#wishBtn')) {
+  $('#wishBtn').onclick=()=>toast('Saved to wishlist');
+}
+
+if ($('#stickyWish')) {
+  $('#stickyWish').onclick=()=>toast('Saved to wishlist');
+}
 
 /* ======= Copy link ======= */
-$('#copyLink').onclick=async ()=>{
-  try{ await navigator.clipboard.writeText(location.href); toast('Link copied'); }
-  catch{ toast('Copy failed'); }
-};
+if ($('#copyLink')) {
+  $('#copyLink').onclick=async ()=>{
+    try{ await navigator.clipboard.writeText(location.href); toast('Link copied'); }
+    catch{ toast('Copy failed'); }
+  };
+}
 
 // Product Detail End
+
+
+
+// Customer Login Page Start
+
+(function(){
+  const KEY = 'cart:count';
+  const badge = document.getElementById('menuCartCount');
+  if(!badge) return;
+
+  function setCount(n){
+    const c = Math.max(0, Number(n||0));
+    badge.textContent = c > 99 ? '99+' : String(c);
+    badge.style.display = c > 0 ? 'inline-block' : 'none';
+    try{ localStorage.setItem(KEY, String(c)); }catch(e){}
+  }
+
+  // init from storage
+  let initial = 0;
+  try{ initial = Number(localStorage.getItem(KEY) || 0); }catch(e){}
+  setCount(initial);
+
+  // expose helper so you can update from anywhere
+  window.updateHeaderCartCount = function(n){ setCount(n); };
+
+  // if other scripts dispatch this event, we’ll react
+  window.addEventListener('cart:changed', (e)=>{
+    const count = e.detail && typeof e.detail.count !== 'undefined' ? e.detail.count : initial;
+    setCount(count);
+  });
+})();
+
+
+
+/* ====== Minimal, demo-only logic (scoped to #bzAuth) ====== */
+(function(){
+  const root = document.getElementById('bzAuth');
+  if(!root) return;
+
+  const emailStep = root.querySelector('.step-email');
+  const otpStep   = root.querySelector('.step-otp');
+  const emailInp  = root.querySelector('#authEmail');
+  const btnGetOtp = root.querySelector('#btnGetOtp');
+  const btnBack   = root.querySelector('#btnBack');
+  const btnResend = root.querySelector('#btnResend');
+  const timerSpan = root.querySelector('#resendTimer');
+  const otpEcho   = root.querySelector('#otpEmailEcho');
+  const otpCells  = [...root.querySelectorAll('.otp-cell')];
+  const otpForm   = root.querySelector('#otpForm');
+  const msgOk     = root.querySelector('#otpDemoMsg');
+  const msgErr    = root.querySelector('#otpErr');
+  const btnGoogle = root.querySelector('#btnGoogle');
+  const btnFacebook = root.querySelector('#btnFacebook');
+
+  let demoOTP = "";      // generated 6-digit (demo)
+  let timer = 0, tId;
+
+  function startResend(seconds=60){
+    btnResend.disabled = true;
+    timer = seconds;
+    timerSpan.textContent = timer;
+    clearInterval(tId);
+    tId = setInterval(()=>{
+      timer--; timerSpan.textContent = timer;
+      if(timer<=0){
+        clearInterval(tId);
+        btnResend.disabled = false;
+        btnResend.textContent = 'Resend code';
+      } else {
+        btnResend.disabled = true;
+        btnResend.innerHTML = `Resend code in <span id="resendTimer">${timer}</span>s`;
+      }
+    },1000);
+  }
+
+
+  // function generateDemoOtp(){
+  //   demoOTP = String(Math.floor(100000 + Math.random() * 900000));
+  //   msgOk.hidden = false;
+  //   msgOk.textContent = `Demo OTP (for testing): ${demoOTP}`;
+  // }
+
+  function switchToOtp(){
+    otpEcho.textContent = emailInp.value.trim();
+    emailStep.hidden = true;
+    otpStep.hidden = false;
+    // generateDemoOtp();
+    startResend(60);
+    otpCells[0].focus();
+  }
+
+  function switchToEmail(){
+    emailStep.hidden = false;
+    otpStep.hidden = true;
+    // msgOk.hidden = true;
+    // msgErr.hidden = true;
+    otpCells.forEach(c=>c.value="");
+    clearInterval(tId);
+  }
+
+  // Email → Get OTP
+  btnGetOtp.addEventListener('click', ()=>{
+    if(!emailInp.checkValidity()){
+      emailInp.reportValidity();
+      return;
+    }
+    switchToOtp();
+  });
+
+  // Back to edit email
+  btnBack.addEventListener('click', switchToEmail);
+
+  // Resend
+  btnResend.addEventListener('click', ()=>{
+    if(btnResend.disabled) return;
+    // generateDemoOtp();
+    startResend(60);
+    otpCells.forEach(c=>c.value="");
+    otpCells[0].focus();
+  });
+
+  // OTP input behavior
+  otpCells.forEach((cell, idx)=>{
+    cell.addEventListener('input', ()=>{
+      cell.value = cell.value.replace(/\D/g,'').slice(0,1);
+      // msgErr.hidden = true;
+      if(cell.value && idx < otpCells.length-1) otpCells[idx+1].focus();
+    });
+    cell.addEventListener('keydown', (e)=>{
+      if(e.key === 'Backspace' && !cell.value && idx>0){ otpCells[idx-1].focus(); }
+    });
+  });
+
+  // Verify (demo)
+  // otpForm.addEventListener('submit', (e)=>{
+  //   e.preventDefault();
+  //   const userCode = otpCells.map(c=>c.value).join('');
+  //   if(userCode.length === 6 && userCode === demoOTP){
+  //     msgErr.hidden = true;
+  //     msgOk.hidden = false;
+  //     msgOk.textContent = 'Success! You are signed in (demo).';
+  //     // TODO: Replace this with your real POST /verify-otp handler
+  //   }else{
+  //     msgErr.hidden = false;
+  //   }
+  // });
+
+  // Social stubs (wire to your OAuth endpoints)
+  btnGoogle.addEventListener('click', ()=> {
+    // location.href = '/auth/google';  // Example
+    alert('Google Sign-In: wire this button to your OAuth endpoint.');
+  });
+  btnFacebook.addEventListener('click', ()=> {
+    // location.href = '/auth/facebook'; // Example
+    alert('Facebook Sign-In: wire this button to your OAuth endpoint.');
+  });
+})();
+// Customer Login Page End
