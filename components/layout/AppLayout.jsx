@@ -10,6 +10,7 @@ import { useState } from 'react';
 import Footer from '../Footer';
 import LocationContext from '../context/LocationContext';
 import NearestLocationContext from '../context/NearesLocationContext';
+import { AuthProvider } from '../context/AuthContext';
 
 export default function AppLayout({ children }) {    
 
@@ -45,21 +46,23 @@ export default function AppLayout({ children }) {
   };
 
   return (
-    <TitleContext.Provider value={{ title, setTitle, resetTitle }}>
-      <PhoneNumberContext.Provider value={{ phoneNumber, setPhoneNumber, resetPhoneNumber }}>
-        <LogoContext.Provider value={{ logo, setLogo, resetLogo }}>
-          <BlogContext.Provider value={{ blogs, setBlogs, resetBlogs }}>
-            <LocationContext.Provider value={{ placeLocation, setLocation, resetLocation }} >
-              <NearestLocationContext.Provider value={{ nearestLocation, setNearestLocation, resetNearestLocation }}>
-                <Header />
-                <Message />
-                <main>{children}</main>
-                <Footer/>
-              </NearestLocationContext.Provider>
-            </LocationContext.Provider>
-          </BlogContext.Provider>
-        </LogoContext.Provider>
-      </PhoneNumberContext.Provider>
-    </TitleContext.Provider>
+    <AuthProvider>
+      <TitleContext.Provider value={{ title, setTitle, resetTitle }}>
+        <PhoneNumberContext.Provider value={{ phoneNumber, setPhoneNumber, resetPhoneNumber }}>
+          <LogoContext.Provider value={{ logo, setLogo, resetLogo }}>
+            <BlogContext.Provider value={{ blogs, setBlogs, resetBlogs }}>
+              <LocationContext.Provider value={{ placeLocation, setLocation, resetLocation }} >
+                <NearestLocationContext.Provider value={{ nearestLocation, setNearestLocation, resetNearestLocation }}>
+                  <Header />
+                  <Message />
+                  <main>{children}</main>
+                  <Footer/>
+                </NearestLocationContext.Provider>
+              </LocationContext.Provider>
+            </BlogContext.Provider>
+          </LogoContext.Provider>
+        </PhoneNumberContext.Provider>
+      </TitleContext.Provider>
+    </AuthProvider>
   );
 }
