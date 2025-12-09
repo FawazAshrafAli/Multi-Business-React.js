@@ -134,7 +134,7 @@ const Home = ({
   <div className="banner-sech-bar">
     <div className="banner-serch-bar-cntnt">
       <h2>SEARCH YOUR NEEDS</h2>
-      <p style={{width:"80%", margin:"0 auto", padding:"0px 0px 20px 0px"}}>Find the best companies in India for your service or product needs. Explore our curated business directory, focusing on one trusted company that delivers top-notch serviceMultiPages and productMultiPages nationwide.</p>
+      <p style={{width:"80%", margin:"0 auto", padding:"0px 0px 20px 0px"}}>Find the best companies in India for your service or product needs. Explore our curated business directory, focusing on one trusted company that delivers top-notch services and products nationwide.</p>
       <form className="search_bx mt-5" role="search">
         <input className="form-control " type="search" name="s" placeholder="Search" value={formData.s || ""} onChange={(e) => handleChange(e)} aria-label="Search"/>
         <button className="srch-btn" type="submit"><i className="fas fa-search" onClick={(e) => handleSubmit(e)}></i></button>
