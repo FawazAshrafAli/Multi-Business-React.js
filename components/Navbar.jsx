@@ -3,7 +3,7 @@ import company from '../lib/api/company';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import LogoContext from './context/LogoContext';
-import { useAuth } from "../hooks/useAuth";
+import AuthContext from './context/AuthContext';
 import location from '../lib/api/location';
 import NearestLocationContext from './context/NearesLocationContext';
 
@@ -49,8 +49,8 @@ const Navbar = () => {
   const [companyTypeError, setCompanyTypeError] = useState(null);
   const [companyTypeLoading, setCompanyTypeLoading] = useState(true)
   
-  const { user, loading, refresh, logout } = useAuth();  
-
+  const { user, loading, refreshUser, logout } = useContext(AuthContext); 
+  
   useEffect(() => {
     if (!slug) return;
 
@@ -114,8 +114,8 @@ const Navbar = () => {
     const logoutUser = async (e) => {
       e.preventDefault();
       await logout();
-      refresh();
-      router(0);
+      await refreshUser();
+      router.push('/login');
     }    
 
     if (companyTypeError) {
@@ -285,13 +285,24 @@ const Navbar = () => {
                  <li>
                  <Link href={`${(currentCompany && passingSlug) ?`/${passingSlug}`:''}/contact-us`} >Contact Us</Link>
                </li>
-                {user? (
-                    <a href="#"  className="customer_log" onClick={(e) => logoutUser(e)}><i className="fa fa-user-circle-o" aria-hidden="true"></i> Logout</a>
-                ):
+               <li className="cart-icon">
+                <Link href="/cart" className="cart-link">
+                  <i className="fa fa-shopping-cart"></i>
+                  {user &&
+                  <span className="cart-count">{user.cart_count}</span> 
+                  }
+                </Link>
+              </li>
                <li style={{border:'none'}}>
-                 <Link href="#"  className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> Sign In</Link>
-               </li>              
+                {user? (
+                    // <a href="#"  className="customer_log" onClick={(e) => logoutUser(e)}><i className="fa fa-user-circle-o" aria-hidden="true"></i> Logout</a>
+                    <>
+                    <a href="#" target="_blank" className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> My Account</a>
+                    </>
+                ):
+                 <Link href="/login"  className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> Sign In</Link>
                 }
+               </li>              
 
              </ul>
            </div>
