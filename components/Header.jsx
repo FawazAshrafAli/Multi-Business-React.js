@@ -1,51 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useContext } from 'react';
 
 import Navbar from './Navbar'
 import TitleContext from './context/TitleContext';
-import PhoneNumberContext from './context/PhoneNumberContext';
-
-import location from '../lib/api/location';
-import { useRouter } from 'next/router';
 
 const Header = () => {
-  const router = useRouter();
-
-  const {slug} = router.query;
-
   const {title} = useContext(TitleContext);
-  const {phoneNumber} = useContext(PhoneNumberContext);
-
-  const [states, setStates] = useState();
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const [quoteFormVisibility, setQuoteFormVisibility] = useState(false);
-
-  // States
-  useEffect(() => {
-    const fetchStates = async () => {
-      try {
-        const response = await location.getStates();
-        setStates(response.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStates();
-      
-  }, []);
-
-  
-  const handleQuoteFormVisibility = (e) => {
-    e.preventDefault();
-
-    setQuoteFormVisibility(!quoteFormVisibility)
-
-  }  
 
   return (
     <>
