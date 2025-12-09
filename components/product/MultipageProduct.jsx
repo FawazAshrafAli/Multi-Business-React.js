@@ -9,7 +9,7 @@ import NeonPhoneLink from '../common/NeonPhoneLink';
 import EnquiryForm from './common/EnquiryForm';
 import Faq from '../common/Faq';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth-old';
 import LoginForm from '../LoginForm';
 
 import Slider from "react-slick";

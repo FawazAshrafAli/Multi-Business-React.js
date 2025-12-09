@@ -1,107 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import product from '../../lib/api/product';
 
 import createDOMPurify from 'dompurify';
 
 import $ from 'jquery';
 import  "/public/easy-responsive-tabs.js";
-
-import NeonPhoneLink from '../common/NeonPhoneLink';
-import slugify from 'slugify';
-import Faq from '../common/Faq';
-import EnquiryForm from './common/EnquiryForm';
-import ReviewSlider from './common/ReviewSlider';
 import Cookies from 'js-cookie';
-import { useAuth } from '../../hooks/useAuth';
-import LoginForm from '../LoginForm';
 import Link from 'next/link';
-import TagCloud from '../home/TagCloud';
 
 const DetailProduct = ({
   detailPage, currentCompany,
   setMessage, setMessageClass
   }) => {
   const [formData, setFormData] = useState({});
-  const [reviewedRating, setReviewedRating] = useState(0);
-
-  const { user, loading, refresh } = useAuth();
-  const [showLogin, setShowLogin] = useState(false);
 
   const [sanitizedDescription, setSanitizedDescription] = useState();
   const [qty, setQty] = useState(1);
+  const [itemColor, setItemColor] = useState(detailPage?.colors?.[0]?.slug || "");
 
   let oldPrice;
 
   if (detailPage?.price) {
     oldPrice = (1.28 * detailPage?.price);
-  }
-
-  useEffect(() => {
-    if (user) setShowLogin(false);
-  }, [user]);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData, 
-      [e.target.name]: e.target.value,
-    })
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const csrfToken = Cookies.get('csrftoken');
-
-    try {
-      const response = product.postReview(
-        formData, 
-        {
-          headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true
-        },
-        currentCompany?.slug || ""
-      )
-
-      const { success, message } = response?.data || {};
-
-
-      setMessageClass(success ? "bg-success" : "bg-danger");
-      setMessage(message);
-
-      if (success) {
-          setFormData({});
-      }
-
-    } catch (err) {
-      console.error("Submission failed:", err);
-
-      const responseData = err.response?.data;
-      setMessageClass("bg-danger");
-
-      if (responseData?.errors) {
-          console.error("Validation details:", responseData.errors);
-      }
-
-      setMessage(responseData?.message || "Something went wrong.");
-    } finally {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  const handleStar = (rating) => {
-    setReviewedRating(rating);
-    setFormData({
-      ...formData,
-      "rating": rating
-    })
   }  
-
-  const handleQtyChange = (e) => {
-    setQty(e.target.value);
-  }
 
   useEffect(() => {
     if (typeof window === 'undefined' || !detailPage?.description) return;
@@ -154,6 +75,53 @@ const DetailProduct = ({
   
         return () => clearTimeout(timeout);
       }, []);
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+
+    const csrfToken = Cookies.get('csrfToken');
+
+    try {
+      const response = await product.addToCart(
+        {
+          "product": detailPage?.product_slug || "",
+          "quantity": qty || 1, 
+          "color": itemColor || "",   
+        },
+        {
+          headers:{
+          'X-CSRFToken': csrfToken,
+          "Content-Type": "application/json"
+        }, 
+        withCredential: true
+      },      
+      )
+
+      const { success, message } = response?.data || {};
+
+
+      setMessageClass(success ? "bg-success" : "bg-danger");
+      setMessage(message);
+
+      if (success) {
+          setQty(1);
+      }
+
+    } catch (err) {
+      console.error("Submission failed:", err);
+
+      const responseData = err.response?.data;
+      setMessageClass("bg-danger");
+
+      if (responseData?.errors) {
+          console.error("Validation details:", responseData.errors);
+      }
+
+      setMessage(responseData?.message || "Something went wrong.");
+    } finally {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   return (
     <>    
@@ -217,7 +185,7 @@ const DetailProduct = ({
         <div className="opt">
           <div className="lbl">Color</div>
           <div className="swatches" id="colors">
-            {detailPage?.colors?.map((color, index) => <label className={`swatch color ${index === 0? "active" : ""}`} data-value={color.hexa} title={color.name}><input type="radio" name="color" checked /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:`${color.hexa}`}}></span></label>)}
+            {detailPage?.colors?.map((color, index) => <label key={color.slug || index + 1} className={`swatch color ${index === 0? "active" : ""}`} data-value={color.hexa} title={color.name}><input type="radio" name="color" value={color.slug} onClick={(e) => setItemColor(color.slug)} /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:`${color.hexa}`}}></span></label>)}
             {/* <label className="swatch color active" data-value="yellow" title="Yellow"><input type="radio" name="color" checked /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#f59e0b"}}></span></label>
             <label className="swatch color" data-value="gold" title="Golden"><input type="radio" name="color" /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#fbbf24"}}></span></label>
             <label className="swatch color" data-value="raw" title="Raw"><input type="radio" name="color" /><span style={{width:"100%",height:"100%",borderRadius:"8px",background:"#ca8a04"}}></span></label> */}
@@ -239,11 +207,11 @@ const DetailProduct = ({
         <div className="opt">
           <div className="row">
             <div className="stepper">
-              <button id="dec">−</button>
-              <input id="qty" value="1" onChange={() => handleQtyChange()} inputMode="numeric" />
-              <button id="inc">+</button>
+              <button id="dec" onClick={() => setQty(prev => prev != 1 ? prev - 1 : prev)}>−</button>
+              <input id="qty" value={qty || "1"} inputMode="numeric" />
+              <button id="inc" onClick={() => setQty(prev => prev + 1)}>+</button>
             </div>
-            <button className="btn primary" id="addCart">Add to Cart</button>
+            <button className="btn primary" id="addCart" onClick={(e) => handleAddToCart(e)}>Add to Cart</button>
             <button className="btn ghost" id="buyNow">Buy Now</button>
             <button className="btn wish" id="wishBtn">♡ Wishlist</button>
           </div>

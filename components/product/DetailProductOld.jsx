@@ -12,7 +12,7 @@ import Faq from '../common/Faq';
 import EnquiryForm from './common/EnquiryForm';
 import ReviewSlider from './common/ReviewSlider';
 import Cookies from 'js-cookie';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth-old';
 import LoginForm from '../LoginForm';
 import Link from 'next/link';
 import TagCloud from '../home/TagCloud';
