@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: process.env.NEXT_PUBLIC_MEDIA_PROTOCOL || "http",
+        hostname: process.env.NEXT_PUBLIC_MEDIA_HOST || "localhost",
+        port: process.env.NEXT_PUBLIC_MEDIA_PORT || "5005",
+        pathname: "/media/**",
+      },
+    ],
+  },
   async rewrites() {
     return [
       {
@@ -10,23 +20,7 @@ const nextConfig = {
       {
         source: `/state-list-in-india/feed`,
         destination: '/api/listLocationFeed',
-      },
-      {
-        source: `/courses/feed`,
-        destination: '/api/coursesFeed',
-      },
-      {
-        source: `/registrations/feed`,
-        destination: '/api/registrationsFeed',
-      },
-      {
-        source: `/services/feed`,
-        destination: '/api/servicesFeed',
-      },
-      {
-        source: `/products/feed`,
-        destination: '/api/productsFeed',
-      },
+      },      
       {
         source: `/learn/feed`,
         destination: '/api/blogsFeed',
@@ -60,8 +54,48 @@ const nextConfig = {
         destination: '/api/companyHomeFeed',
       },
       {
+        source: `/:slug/more-courses/feed`,
+        destination: '/api/coursesFeed',
+      },
+      {
+        source: `/:slug/more-courses/:specializationSlug/feed`,
+        destination: '/api/locationBasedCourseDetailsFeed',
+      },
+      {
+        source: `/:slug/startup-services/feed`,
+        destination: '/api/registrationsFeed',
+      },
+      {
+        source: `/:slug/startup-services/:subTypeSlug/feed`,
+        destination: '/api/locationBasedRegistrationDetailsFeed',
+      },
+      {
+        source: `/:slug/more-services/feed`,
+        destination: '/api/servicesFeed',
+      },
+      {
+        source: `/:slug/more-services/:subCategorySlug/feed`,
+        destination: '/api/locationBasedServiceDetailsFeed',
+      },
+      {
+        source: `/:slug/more-products/feed`,
+        destination: '/api/productsFeed',
+      },
+      {
+        source: `/:slug/more-products/:subCategorySlug/feed`,
+        destination: '/api/locationBasedProductDetailsFeed',
+      },
+      {
         source: `/:slug/faqs/feed`,
         destination: '/api/faqFeed',
+      },
+      {
+        source: `/:slug/csc/feed`,
+        destination: '/api/cscFeed',
+      },
+      {
+        source: `/:slug/csc/:cscSlug/feed`,
+        destination: '/api/cscDetailFeed',
       },
       {
         source: `/:slug/faqs/:faqSlug/feed`,
@@ -72,11 +106,11 @@ const nextConfig = {
         destination: '/api/contactUsFeed',
       },
       {
-        source: `/:slug/courses/feed`,
+        source: `/:slug/view-courses/feed`,
         destination: '/api/courseDetailsFeed',
       },
       {
-        source: `/:slug/more-services/feed`,
+        source: `/:slug/view-services/feed`,
         destination: '/api/serviceDetailsFeed',
       },
       {
@@ -84,7 +118,7 @@ const nextConfig = {
         destination: '/api/registrationDetailsFeed',
       },
       {
-        source: `/:slug/products/feed`,
+        source: `/:slug/view-products/feed`,
         destination: '/api/productDetailsFeed',
       },
       {
