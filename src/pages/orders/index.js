@@ -1,23 +1,23 @@
-import SeoHead from "../../components/SeoHead";
-import Cart from "../../components/user/Cart";
+import Orders from "../../../components/user/Orders";
+import SeoHead from "../../../components/SeoHead";
 import axios from "axios";
 
-export default function cartPage({
+export default function ordersPage({
   homeContent = {},
   blogs = [],
-  user
+  user,
 }) {
   return (
     <>
       <SeoHead
         meta_description={homeContent?.meta_description}
-        meta_title="Cart"
+        meta_title="Orders"
         metaTags={[]}
         blogs={blogs}
-        url="https://bzindia.in/cart"
+        url="https://bzindia.in/orders"
       />      
 
-      <Cart user={user} />
+        <Orders user={user}/>
     </>
   );
 }
@@ -57,7 +57,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (err) {
-    console.log("No User");
+    console.error("No User");
 
     return {
       redirect: {

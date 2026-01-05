@@ -1,14 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import product from '../lib/api/product';
-import AuthContext from './context/AuthContext';
+import product from '../../lib/api/product';
 import Cookies from 'js-cookie';
-import Message from './common/Message';
-import Loading from './Loading';
-import { useDebounce } from '../hooks/useDebounce';
+import Message from '../common/Message';
+import Loading from '../Loading';
+import { useDebounce } from '../../hooks/useDebounce';
+import AuthContext from '../context/AuthContext';
 
-const Cart = () => {
-    const {user} = useContext(AuthContext);
-
+const Cart = ({user}) => {
     const [message, setMessage] = useState();
     const [messageClass, setMessageClass] = useState();
 
@@ -16,6 +14,8 @@ const Cart = () => {
     const [cartItemsLoading, setCartItemsLoading] = useState(true);
 
     const [totalAmount, setTotalAmount] = useState(0);
+
+    const {setUserCartCount} = useContext(AuthContext);
 
     useEffect(() => {
         if (message) {
@@ -160,11 +160,15 @@ const Cart = () => {
         try {
             const response = await product.removeFromCart(itemSlug)
 
-            const { success, message } = response?.data || {};            
+            const { success, message, cart_count } = response?.data || {};            
             
             setCartItems(prev => prev.filter(item => item.slug !== itemSlug));
-            setMessageClass(success ? "bg-success" : "bg-danger");
-            setMessage(message);
+
+            if (success) {
+                setUserCartCount(cart_count)
+                // setMessageClass(success ? "bg-success" : "bg-danger");
+                // setMessage(message);
+            }
         } catch (err) {
             console.error("Submission failed:", err);
 
@@ -229,7 +233,7 @@ const Cart = () => {
                         ₹ <span className="lineTotal">{item.quantity * item.price}</span>
                         </div>
                     </article>
-                    ))             
+                    ))
                 }
                 
                 
@@ -273,7 +277,9 @@ const Cart = () => {
                     <span className="summary-value">₹ <span id="sumGrand">{totalAmount}</span></span>
                     </div>
 
+                    {cartItems?.length > 0 &&
                     <a className="btn-primary text-center" href="/delivery-address" type="button">PROCEED TO CHECKOUT</a>
+                    }
                     <a className="btn-whatsapp" href="https://api.whatsapp.com/send?phone=919845272560" aria-label="Chat on WhatsApp">
                         {/* simple WA icon */}
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a11.4 11.4 0 0 0-9.7 17.4L1.5 24l6.3-1.6A11.4 11.4 0 1 0 12 .5Zm6.6 17.2c-.3.8-1.7 1.5-2.3 1.6-.6.1-1.3.2-2.1 0-1.8-.4-3.6-1.5-5-3.1-1.3-1.5-2.2-3.3-2.5-5.1-.1-.8 0-1.5.3-2.1.3-.5.8-1.1 1.5-1.2.4 0 .9 0 1 .1.2.1.5 1.3.6 1.6.1.3.2.5.1.7-.1.2-.2.4-.4.6l-.2.3c-.1.1-.2.3-.1.5.2.4.7 1.3 1.6 2.2 1 1.1 2.3 1.8 2.7 1.9.2.1.4 0 .6-.2l.5-.7c.2-.3.4-.4.6-.3.2.1 1.4.7 1.6.8.3.1.6.3.7.5.1.2.1 1 .0 1.1Z"/></svg>

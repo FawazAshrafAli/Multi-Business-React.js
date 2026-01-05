@@ -1,8 +1,8 @@
 import Head from "next/head";
 import SeoHead from "../../components/SeoHead";
-import Cart from "../../components/Cart";
+import Cart from "../../components/user/Cart";
 import axios from "axios";
-import DeliveryAddress from "../../components/DeliveryAddress";
+import DeliveryAddress from "../../components/user/DeliveryAddress";
 
 export default function deliveryAddressPage({
   structuredData = [],
@@ -28,7 +28,7 @@ export default function deliveryAddressPage({
         ))}
       </Head>
 
-      <DeliveryAddress />
+      <DeliveryAddress user={user} />
     </>
   );
 }
@@ -36,6 +36,8 @@ export default function deliveryAddressPage({
 export async function getServerSideProps(context) {
     const { req } = context;
     const cookie = req.headers.cookie || "";
+
+    let userChecked = false;
 
     try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth_api/user/`, {
@@ -45,8 +47,10 @@ export async function getServerSideProps(context) {
 
         const user = res.data || null;
 
+        userChecked = true;
+
         // 🔥 If no user → redirect BEFORE rendering
-        if (!user) {
+        if (userChecked && !user) {
             return {
                 redirect: {
                 destination: "/login",
@@ -61,6 +65,7 @@ export async function getServerSideProps(context) {
                 structuredData: [],
                 homeContent: {},
                 blogs: [],
+                user: user || null
             },
         };
 

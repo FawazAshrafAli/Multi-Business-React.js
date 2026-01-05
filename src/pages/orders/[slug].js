@@ -1,23 +1,24 @@
-import SeoHead from "../../components/SeoHead";
-import Cart from "../../components/user/Cart";
+import OrderDetail from "../../../components/user/OrderDetail";
+import SeoHead from "../../../components/SeoHead";
 import axios from "axios";
 
-export default function cartPage({
+export default function ordersPage({
   homeContent = {},
   blogs = [],
-  user
+  user,
+  order,
 }) {
   return (
     <>
       <SeoHead
         meta_description={homeContent?.meta_description}
-        meta_title="Cart"
+        meta_title="Order"
         metaTags={[]}
         blogs={blogs}
-        url="https://bzindia.in/cart"
+        url={`https://bzindia.in/orders/${order?.slug}`}
       />      
 
-      <Cart user={user} />
+        <OrderDetail user={user} order={order}/>
     </>
   );
 }
@@ -25,6 +26,8 @@ export default function cartPage({
 export async function getServerSideProps(context) {
   const { req } = context;
   const cookie = req.headers.cookie || "";
+
+  const {slug} = context.params;
 
   let userChecked = false;
 
@@ -48,16 +51,24 @@ export async function getServerSideProps(context) {
       };
     }
 
+    const orderRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/product_api/order/${slug}`, {
+      headers: { cookie },
+      withCredentials: true,
+    });
+
+    const order = orderRes.data || {};
+
     return {
       props: {
         user,
         homeContent: {},
         blogs: [],
+        order: order || {},
         user: user || null,
       },
     };
   } catch (err) {
-    console.log("No User");
+    console.error("No User");
 
     return {
       redirect: {

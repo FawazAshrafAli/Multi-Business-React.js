@@ -52,6 +52,10 @@ export const AuthProvider = ({ children, cookieHeader = '' }) => {
     }
   }, []);
 
+  const setUserCartCount = (cart_count) => {
+    setUser({...user, cart_count})
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -61,6 +65,7 @@ export const AuthProvider = ({ children, cookieHeader = '' }) => {
         verifyOtp,
         logout,
         refreshUser,
+        setUserCartCount
       }}
     >
       {children}

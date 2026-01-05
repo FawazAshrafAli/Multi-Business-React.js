@@ -458,6 +458,7 @@ export async function getServerSideProps(context) {
           ending_date: c.course.ending_date?? null,
           starting_date: c.course.starting_date?? null,
           duration: c.course.duration?? null,
+          duration_type: c.course.duration_type?? null,
           program_name: c.course.program_name?? null,
           rating: c.course.rating?? null,
           rating_count: c.course.rating_count?? null,
@@ -470,7 +471,8 @@ export async function getServerSideProps(context) {
           name: s.name?? null,
           price: s.price?? null,
           image_url: s.image_url?? null,
-          duration_count: s.duration_count?? null,
+          duration: s.duration?? null,
+          duration_type: s.duration_type?? null,
           url: s.url?? null,
 
           sub_category_name: s.sub_category_name?? null,
@@ -556,7 +558,7 @@ export async function getServerSideProps(context) {
       sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
       const priceValidUntil = sixMonthsLater.toISOString().split("T")[0];
   
-      const articleBody = `<section class="bg-half main_slide_bx" style="padding:20px 0px;background:linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%), url() no-repeat fixed center top / cover" data-aos="fade-in">
+      const articleBody = `<section class="bg-half main_slide_bx" style="padding:20px 0px;background:linear-gradient(61deg, rgba(247,101,31,1) 0%, rgba(255,255,255,1) 50%, rgba(4,103,54,1) 100%), url() no-repeat fixed center top / cover">
         <div class="container">
           <div class="row">
             <div class="col-2 col-md-1 college-logo"><img src="/images/csc_logo.jpg" alt=""/></div>
@@ -588,7 +590,7 @@ export async function getServerSideProps(context) {
         </div>
       </section>
 
-      <div id="stick_navbar" style="padding:0;background:#005c9f" data-aos="fade-in">
+      <div id="stick_navbar" style="padding:0;background:#005c9f">
         <div class="communicate_language"><p>Common Service Centers (CSC) in ${locationData?.name || "India"}</p></div>
         <div class="csc_near_dv">
           <a href="#" id="nearbyCSC" style="padding:3px 15px;font-size:14px"><i class="fa fa-crosshairs" aria-hidden="true"></i> CSC Near Me</a>
@@ -612,7 +614,7 @@ export async function getServerSideProps(context) {
 
       <section style="background:#f1f1f1;margin-bottom:20px;padding:0 0 50px 0">
         <div class="container">
-          <div class="row" style="padding:40px 0 0 0;text-align:center" data-aos="fade-down">
+          <div class="row" style="padding:40px 0 0 0;text-align:center">
             <div class="offerd-service-section" style="margin:0">
               <h2 id="slug-info">${center?.title} – e-Governance Services, Digital Seva, Common Service Center</h2>
               <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>

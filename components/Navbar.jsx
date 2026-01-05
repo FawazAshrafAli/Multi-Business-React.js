@@ -49,7 +49,7 @@ const Navbar = () => {
   const [companyTypeError, setCompanyTypeError] = useState(null);
   const [companyTypeLoading, setCompanyTypeLoading] = useState(true)
   
-  const { user, loading, refreshUser, logout } = useContext(AuthContext); 
+  const { user, refreshUser, logout } = useContext(AuthContext); 
   
   useEffect(() => {
     if (!slug) return;
@@ -297,7 +297,7 @@ const Navbar = () => {
                 {user? (
                     // <a href="#"  className="customer_log" onClick={(e) => logoutUser(e)}><i className="fa fa-user-circle-o" aria-hidden="true"></i> Logout</a>
                     <>
-                    <a href="#" target="_blank" className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> My Account</a>
+                    <a href="/orders" target="_blank" className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> My Account</a>
                     </>
                 ):
                  <Link href="/login"  className="customer_log"><i className="fa fa-user-circle-o" aria-hidden="true"></i> Sign In</Link>

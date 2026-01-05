@@ -13,7 +13,6 @@ export function useSearchableDropdown(options = [], onSelect, labelKey = 'name')
     const keyword = search?.toString().toUpperCase().trim();
     const original = originalSearch.toString().toUpperCase().trim();
 
-    // If input equals the selected item and user hasn't changed it, show full list
     const hasUserModified = keyword !== original;
     if (!hasUserModified) return options;
 
@@ -41,7 +40,7 @@ export function useSearchableDropdown(options = [], onSelect, labelKey = 'name')
       if (selected) {
         const label = selected?.[labelKey] || '';
         setSearch(label);
-        setOriginalSearch(label); // store the selected label
+        setOriginalSearch(label);
         setShowList(false);
         onSelect?.(selected);
       }

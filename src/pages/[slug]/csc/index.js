@@ -13,8 +13,8 @@ export default function ListFaqPage({
     <>
       <>
         <SeoHead
-        meta_description=""
-        meta_title={`CSCs`}
+        meta_description={`Common Service Centers near ${locationData?.name}`}
+        meta_title={`Common Service Centers`}
 
 
         url = {`https://bzindia.in/${slug}/csc/`}

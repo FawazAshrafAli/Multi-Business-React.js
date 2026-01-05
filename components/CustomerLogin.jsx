@@ -6,11 +6,10 @@ import Message from './common/Message.jsx';
 import { useRouter } from 'next/router.js';
 import AuthContext from './context/AuthContext.js';
 
-const CustomerLogin = () => {
+const CustomerLogin = ({user}) => {
     const csrfToken = Cookies.get("csrftoken");
     const router = useRouter();
-
-    const { user, refreshUser} = useContext(AuthContext);
+    const { refreshUser } = useContext(AuthContext); 
 
     const [isOtpValidated, setIsOtpValidated] = useState(false);
     const [otpErrorMsg, setOtpErrorMsg] = useState(null);
@@ -112,12 +111,12 @@ const CustomerLogin = () => {
 
 
     useEffect(() => {
-            const timeout = setTimeout(() => {
-              import("../public/js/newScript.js");
-            }, 300); 
-      
-            return () => clearTimeout(timeout);
-          }, []);
+      const timeout = setTimeout(() => {
+        import("../public/js/newScript.js");
+      }, 300); 
+
+      return () => clearTimeout(timeout);
+    }, []);
   return (
     <>
         {message&&

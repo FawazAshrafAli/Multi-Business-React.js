@@ -24,6 +24,7 @@ import CategoryPage from '../../components/service/CategoryPage';
 import SubCategoryPage from '../../components/service/SubCategoryPage';
 import ProductCategoryPage from '../../components/product/ProductCategoryPage';
 import ProductSubCategoryPage from '../../components/product/ProductSubCategoryPage';
+import axios from 'axios';
 
 const DynamicMultiPage = ({
   currentCompany, multipageImage, detailPageImage,
@@ -37,7 +38,7 @@ const DynamicMultiPage = ({
   serviceCategory, categorySlug, isServiceSubCategoryPage,
   serviceSubCategory, subCategorySlug, isProductCategoryPage,
   isProductSubCategoryPage, productCategory, productSubCategory,  
-  structuredData
+  structuredData, user
 
 }) => {
   const router = useRouter();
@@ -177,6 +178,7 @@ const DynamicMultiPage = ({
         slug={slug}        
         currentCompany={currentCompany}
         detailPage={detailPage}
+        user={user}
         />
     : isRegistrationTypePage ?
         <TypePage 
@@ -253,6 +255,8 @@ const DynamicMultiPage = ({
 export async function getServerSideProps(context) {
 
   const multipageParams = context.params?.multipageParams || [];
+
+  let user;
 
   try {
     if (multipageParams[0] === '.well-known') {
@@ -493,21 +497,24 @@ export async function getServerSideProps(context) {
           const detailPageSlug = multipageParams[3];            
             
             try {
-              const response = await course.getDetail(slug, detailPageSlug);
-              const courseDetailRes = response.data;
+              const courseDetailRes = await course.getDetail(slug, detailPageSlug);
+              const courseDetail = courseDetailRes.data;
 
-              if (courseDetailRes.testimonials?.length < 1) {
+              if (courseDetail.testimonials?.length < 1) {
                 const fallbackCourseTestimonialsRes = await course.getTestimonials(slug);
-                courseDetailRes["fallback_testimonials"] = fallbackCourseTestimonialsRes.data;
+                courseDetail = {
+                  ...courseDetail,
+                  "fallback_testimonials": fallbackCourseTestimonialsRes.data
+                }
               }
               
               isDetailpage = true;
 
               if (
-                courseDetailRes.program_slug === courseProgramSlug &&
-                courseDetailRes.specialization_slug === courseSpecializationSlug
+                courseDetail.program_slug === courseProgramSlug &&
+                courseDetail.specialization_slug === courseSpecializationSlug
               ) {
-                detailPage = response.data;
+                detailPage = courseDetail;
                 detailPageImage = detailPage?.image_url;
                 detailPageUrl = detailPage?.url;
               }              
@@ -575,16 +582,16 @@ export async function getServerSideProps(context) {
           const detailPageSlug = multipageParams[3];
             
             try {
-              const response = await service.getDetail(slug, detailPageSlug);              
-              const serviceDetailRes = response.data;
+              const serviceDetailRes = await service.getDetail(slug, detailPageSlug);              
+              const serviceDetail = serviceDetailRes.data;
 
               isDetailpage = true;
 
               if (
-                serviceDetailRes.category_slug === serviceCategorySlug &&
-                serviceDetailRes.sub_category_slug === serviceSubCategorySlug
+                serviceDetail.category_slug === serviceCategorySlug &&
+                serviceDetail.sub_category_slug === serviceSubCategorySlug
               ) {
-                detailPage = response.data;
+                detailPage = serviceDetail;
                 detailPageImage = detailPage?.image_url;
                 detailPageUrl = `${detailPage?.url}`
 
@@ -652,16 +659,32 @@ export async function getServerSideProps(context) {
           const detailPageSlug = multipageParams[3];
           
           try {
-            const response = await product.getDetail(slug, detailPageSlug);
-            const productDetailRes = response.data;
+            const productDetailRes = await product.getDetail(slug, detailPageSlug);
+            const productDetail = productDetailRes.data;
 
             isDetailpage = true;
 
+            const { req } = context;
+            const cookie = req.headers.cookie || "";
+          
+          
+            try {
+              const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth_api/user/`, {
+                headers: { cookie },
+                withCredentials: true,
+              });
+          
+              user = res.data || null;
+          
+            } catch (err) {
+
+            }
+
             if (
-              productDetailRes.category_slug === productCategorySlug &&
-              productDetailRes.sub_category_slug === productSubCategorySlug
+              productDetail.category_slug === productCategorySlug &&
+              productDetail.sub_category_slug === productSubCategorySlug
             ) {
-              detailPage = response.data;
+              detailPage = productDetail;
               detailPageImage = detailPage?.image_url;
               detailPage = {...detailPage, "faqs": detailPage?.faqs?? null}
               detailPageUrl = `${detailPage?.url}`
@@ -732,16 +755,16 @@ export async function getServerSideProps(context) {
           const detailPageSlug = multipageParams[3];          
             
             try {
-              const response = await registration.getDetail(slug, detailPageSlug);
-              const registrationDetailRes = response.data;
+              const registrationDetailRes = await registration.getDetail(slug, detailPageSlug);
+              const registrationDetail = registrationDetailRes.data;
 
               isDetailpage = true;
               
               if (
-                registrationDetailRes.type_slug === registrationTypeSlug &&
-                registrationDetailRes.sub_type_slug === registrationSubTypeSlug
+                registrationDetail.type_slug === registrationTypeSlug &&
+                registrationDetail.sub_type_slug === registrationSubTypeSlug
               ) {
-                detailPage = response.data;
+                detailPage = registrationDetail;
                 detailPageImage = detailPage?.image_url;
                 detailPageUrl = `/${detailPage?.url}`
               }
@@ -802,7 +825,7 @@ export async function getServerSideProps(context) {
       articleBody = `<section>
                   <div class="container">
                     <div class="row">
-                      <div class="tg-authorbox" data-aos="fade-up">
+                      <div class="tg-authorbox">
                         ${detailPage?.detailPageImage ? `
                           <figure class="tg-authorpic">
                             <a href="#"><img src="${detailPage?.detailPageImage}" alt=${detailPage?.name} /></a>
@@ -829,7 +852,7 @@ export async function getServerSideProps(context) {
                     ${!detailPage?.hide_vertical_tab && detailPage?.vertical_tabs?.length ? `
                     <h3 id="${slugify(detailPage.vertical_title || '', { lower: true })}-section">${detailPage.vertical_title}</h3>
                     <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>
-                    <div class="row" data-aos="fade-in">
+                    <div class="row">
                       <div class="col-md-12 col-sm-12 col-xs-12">
                         <div id="verticalTab">
                           <ul class="resp-tabs-list">
@@ -852,7 +875,7 @@ export async function getServerSideProps(context) {
                     <h3 id="${slugify(detailPage.horizontal_title || '', { lower: true })}-section">${detailPage.horizontal_title}</h3>
                     <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>
                     <div class="row">
-                      <div class="col-md-12 col-sm-12 col-xs-12" data-aos="fade-in">
+                      <div class="col-md-12 col-sm-12 col-xs-12">
                         <div id="horizontalTab">
                           <ul class="resp-tabs-list">
                             ${detailPage.horizontal_tabs.map(tab => `<li>${tab.heading}</li>`).join('')}
@@ -872,7 +895,7 @@ export async function getServerSideProps(context) {
                     ${!detailPage?.hide_table && detailPage?.tables?.length && detailPage?.get_data?.length ? `
                     <h3 id="${slugify(detailPage.table_title || '', { lower: true })}-section">${detailPage.table_title}</h3>
                     <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>
-                    <div class="row" data-aos="fade-up">
+                    <div class="row">
                       <div class="col-md-12 col-sm-12 col-xs-12">
                         <table>
                           <thead>
@@ -892,13 +915,13 @@ export async function getServerSideProps(context) {
                     ${!detailPage?.hide_bullets && detailPage?.bullet_points?.length ? `
                     <h3 id="${slugify(detailPage.bullet_title || '', { lower: true })}-section">${detailPage.bullet_title}</h3>
                     <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>
-                    <ul class="row list-default" data-aos="fade-up">
+                    <ul class="row list-default">
                       ${detailPage.bullet_points.map(bullet => `<li class="col col-md-6 col-12">${bullet.bullet_point}</li>`).join('')}
                     </ul>` : ''}
                     ${!detailPage?.hide_tags && detailPage?.tags?.length ? `
                     <h3 id="${slugify(detailPage.tag_title || '', { lower: true })}-section">${detailPage.tag_title}</h3>
                     <p class="flip"><span class="deg1"></span><span class="deg2"></span><span class="deg3"></span></p>
-                    <div class="row" data-aos="fade-up">
+                    <div class="row">
                       <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="tags_cloud">
                           ${detailPage.tags.map(tag => `<a href="#" title="${tag.tag}">${tag.tag}</a>`).join('')}
@@ -1457,7 +1480,7 @@ export async function getServerSideProps(context) {
                     "category": {
                         "@type": "Thing",
                         "name": product.category_name || "",
-                        "url": `https://bzindia/${currentCompany?.slug}/products/`
+                        "url": `https://bzindia/${currentCompany?.slug}/view-products/`
                     },
                     "brand": {
                         "@type": "Brand",
@@ -2252,11 +2275,13 @@ export async function getServerSideProps(context) {
 
         multipageImage: multipageImage || "",
         detailPageImage: detailPageImage || "",
+
+        user: user?? null
       },
     };
 
   } catch (err) {
-    console.error(err);
+    console.error(err);    
 
     return {
       props: {

@@ -1,26 +1,24 @@
 import Head from 'next/head';
 import SeoHead from '../../../components/SeoHead';
 import company from '../../../lib/api/company';
-import service from '../../../lib/api/service';
-import ListService from '../../../components/service/ListService';
+import course from '../../../lib/api/course';
+import ListEducation from '../../../components/education/ListEducation';
 
-export default function ListServicePage({
+export default function ListCoursePage({
   detailPages, currentCompany,
   testimonials, structuredData
 }) {
   return (
     <>
-      {currentCompany &&
-      <>
+        {currentCompany &&
+        <>
         <SeoHead
-        meta_description={`List of services offered by ${currentCompany?.sub_type}`}
-        meta_title={`Services - ${currentCompany?.meta_title}`}
+        meta_description={`List of courses offered by ${currentCompany?.sub_type}`}
+        meta_title={`Courses - ${currentCompany?.meta_title ||""}`}
         metaTags={currentCompany?.meta_tags || []}      
         blogs={currentCompany?.blogs || []}
 
-        currentCompany={currentCompany}
-
-        url = {`https://bzindia.in/${currentCompany?.slug}/services`}
+        url = {`https://bzindia.in/${currentCompany?.slug}/view-courses`}
         />
 
         <Head>
@@ -30,10 +28,10 @@ export default function ListServicePage({
             </script>
           ))}        
         </Head>
-      </>
-      }
+    </>
+    }
 
-      <ListService
+      <ListEducation
        
       blogs={currentCompany?.blogs}
       currentCompany={currentCompany}
@@ -49,16 +47,34 @@ export async function getServerSideProps(context) {
     const {slug} = context.query;
 
     const companyRes = await company.getInnerPageCompany(slug);
-    const currentCompany = companyRes.data; 
+    const currentCompany = companyRes.data;    
+        
+    const detailPagesRes = await course.getDetailList(slug);
+    const detailPages = detailPagesRes.data?.results;  
     
-    const detailPagesRes = await service.getDetailList(slug);
-    const detailPages = detailPagesRes.data?.results;       
+    const partnersRes = await course.getPartners(slug);
+    const partners = partnersRes.data?.map(partner => ({
+        "id": partner.id?? "",
+        "name": partner.name?? "",
+        "image_url": partner.image_url?? "",
+        "url": partner.url?? "",
+        "slug": partner.slug?? ""
+    }));
     
-    const testimonialsRes = await company.getTestimonials(slug);
-    const testimonials = testimonialsRes.data;
+    const testimonialsRes = await course.getTestimonials(slug);
+    const testimonials = testimonialsRes.data?.map(test => ({
+        "id": test.id?? "",
+        "name": test.name?? "",
+        "image_url": test.image_url?? "",
+        "course_name": test.course_name?? "",
+        "place_name": test.place_name?? "",
+        "text": test.text?? "",
+        "rating": test.rating?? "",
+        "slug": test.slug?? "",
+        "course_meta_description": test.course_meta_description?? ""
+    }));
 
     const structuredData = [
-        
         JSON.stringify(
             {
                 "@context": "https://schema.org",
@@ -67,61 +83,75 @@ export async function getServerSideProps(context) {
                 "description": currentCompany?.meta_description || "",
                 "logo": currentCompany?.logo_url || "",
                 "url": `https://bzindia.in/${currentCompany?.slug}`,
-                "memberOf": currentCompany?.clients?.map((client) => (
+                "memberOf": partners?.map((partner) => (
                     {
                         "@type": "Organization",
-                        "name": client?.name
+                        "name": partner?.name
                     }
                 )) || [],
                 "hasOfferCatalog": {
                     "@type": "OfferCatalog",
                     "name": "Clients",
-                    "itemListElement": currentCompany?.clients?.map((client, index) => (
+                    "itemListElement": partners?.map((partner, index) => (
                         {
                             "@type": "ListItem",
                             "position": index+1,
                             "item": {
                                 "@type": "Organization",
-                                "name": client?.name || "",
+                                "name": partner?.name || "",
                                 "url": "",
-                                "logo": client?.image_url || ""
+                                "logo": partner?.image_url || ""
                             }
                         }
                     )) || [],
                 },
             },
-        ),            
+            
+        ),
+    
 
     
-    JSON.stringify(
-        {
-        "@context": "http://schema.org",
-        "@type": "ItemList",
-        "itemListElement": detailPages?.map(detail => ({
-            "@type": "Service",
-                "name": detail.service?.name || "",
-                "serviceType": detail.service?.sub_category_name || "",
-                "provider": {
-                "@type": "Organization",
-                "name": currentCompany?.sub_type,
-                "url": `https://bzindia.in/${currentCompany?.slug}`
-                },
-                "offers": {
-                "@type": "Offer",
-                "price": detail.service?.price || "",
-                "priceCurrency": "INR",
-                "url": `https://bzindia.in/${detail?.url}`,
-                "category": detail.service?.category_name || "",
-                },
-                "description": detail.meta_description || "",
-                "image": detail.service?.image_url   || "",
-                "areaServed": {
-                "@type": "Place",
-                "name": "India"
-                }
-        })) || []
-        },
-    ),          
+        JSON.stringify(
+            {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": "Training Courses",
+                "description": "A list of available training courses",
+                "itemListElement":
+                    detailPages?.map((detail) => ({
+                        "@type": "Course",
+                        "name": detail?.meta_title || "",
+                        "description": detail?.meta_description || "",
+                        "provider": {
+                            "@type": "Organization",
+                            "name": detail?.course?.company_name || ""
+                        },
+                        "image": detail?.course?.image_url || "",
+                        "hasCourseInstance": {
+                            "@type": "CourseInstance",
+                            "courseMode": [detail?.course?.mode || "Online"],
+                            "endDate": detail?.course?.ending_date ? detail?.course?.ending_date.split('T')[0] : "",
+                            "startDate": detail?.course?.starting_date ? detail?.course?.starting_date.split('T')[0] : "",
+                            "courseWorkload": detail?.course?.duration?"P"+detail?.course?.duration+"D": ""
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "price": detail?.course?.price || "",
+                            "priceCurrency": "INR",
+                            "availability": "http://schema.org/InStock",
+                            "category": detail?.course?.program_name || ""
+                        },
+                        "aggregateRating": detail?.course?.rating_count > 0 ? {
+                        "@type": "AggregateRating",
+                        "ratingValue": Number(detail?.course?.rating),
+                        "bestRating": 5,
+                        "ratingCount": Number(detail?.course?.rating_count)
+                        } : undefined,                      
+                    })) || []
+                
+            },                    
+        ),
+        
     
     
         JSON.stringify([
@@ -136,7 +166,7 @@ export async function getServerSideProps(context) {
                 "@type": "Review",
                 "itemReviewed": {
                     "@type": "Organization",
-                    "name": testimonial?.client_company || "",
+                    "name": testimonial?.partner_company || "",
                     "location": {
                     "@type": "Place",
                     "name": testimonial?.place_name || ""
@@ -161,8 +191,8 @@ export async function getServerSideProps(context) {
             "@type": "AggregateRating",
             "ratingValue": currentCompany?.rating || 0
             }
-        ],
-    ),            
+        ], ),
+    
 
     
         JSON.stringify({
@@ -173,11 +203,11 @@ export async function getServerSideProps(context) {
             "logo": currentCompany?.logo_url || "",
             "telephone": currentCompany?.phone1 ? "+91" + currentCompany.phone1 : "",
             "sameAs": [
-                    "https://www.facebook.com/BZindia/",
-                    "https://x.com/Bzindia_in",
-                    "https://www.linkedin.com/company/bzindia",
-                    "https://www.youtube.com/channel/UCObPeK-T-jvgyfed9ysaSdQ?sub_confirmation=1"
-                  ],
+            "https://www.facebook.com/BZindia/",
+            "https://x.com/Bzindia_in",
+            "https://www.linkedin.com/company/bzindia",
+            "https://www.youtube.com/channel/UCObPeK-T-jvgyfed9ysaSdQ?sub_confirmation=1"
+        ],
             "contactPoint": [
             currentCompany?.phone1 ? {
                 "@type": "ContactPoint",
@@ -201,8 +231,8 @@ export async function getServerSideProps(context) {
                 "areaServed": "IN"
             } : null,
             ].filter(Boolean)
-        },
-    ),            
+        }, ),
+    
 
     
         JSON.stringify(
@@ -225,32 +255,35 @@ export async function getServerSideProps(context) {
                 {
                 "@type": "ListItem",
                 "position": 3,
-                "name": "Services",
-                "item": `https://bzindia.in/${currentCompany?.slug}/services`
+                "name": "Courses",
+                "item": `https://bzindia.in/${currentCompany?.slug}/view-courses`
                 },            
             ]
             },
-        )     
+            
+        )
     ]
 
     return {
-      props: {          
-        detailPages: detailPages?.slice(0,12) || {},
-        currentCompany,
-        testimonials,
-        structuredData
+      props: {
+        detailPages: detailPages?.slice(0,12) || [],
+        currentCompany: currentCompany || {},
+        partners: partners || [],
+        testimonials: testimonials || [],
+        structuredData: structuredData || [],
       },
     };
 
   } catch (err) {
-    console.error(err);
+    console.error(err);    
 
     return {
-      props: {        
+      props: {
         detailPages: [],
         currentCompany: [],
+        partners: [],
         testimonials: [],
-        structuredData: []
+        structuredData: [],
       }
     }
   }

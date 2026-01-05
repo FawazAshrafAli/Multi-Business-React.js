@@ -1,15 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
-import AuthContext from './context/AuthContext'
-import product from '../lib/api/product';
+import React, { useEffect, useState } from 'react'
+import product from '../../lib/api/product';
 import Cookies from 'js-cookie';
-import Message from './common/Message';
-import Loading from './Loading';
-import { useDebounce } from '../hooks/useDebounce';
+import Message from '../common/Message';
+import Loading from '../Loading';
+import { useDebounce } from '../../hooks/useDebounce';
 import Link from 'next/link';
 
-const DeliveryAddress = () => {
-    const {user} = useContext(AuthContext);
-    
+const DeliveryAddress = ({user}) => {
     const [message, setMessage] = useState();
     const [messageClass, setMessageClass] = useState();
 

@@ -14,7 +14,7 @@ import AutoPopUp from './common/AutoPopUp';
 import Message from './common/Message';
 
 const CompanyDetail = (
-  {slug, currentCompany, detailPage}
+  {slug, currentCompany, detailPage, user}
 ) => {
     const { setLogo, resetLogo } = useContext(LogoContext)
     const { setTitle, resetTitle } = useContext(TitleContext)
@@ -67,7 +67,7 @@ const CompanyDetail = (
         : (currentCompany?.company_type == "Registration")? 
         <DetailRegistration slug={slug} detailPage={detailPage} currentCompany={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
         : (currentCompany?.company_type == "Product")? 
-        <DetailProduct slug={slug} detailPage={detailPage} currentCompany={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
+        <DetailProduct slug={slug} detailPage={detailPage} currentCompany={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass} user={user}/>
         : (currentCompany?.company_type == "Service")? 
         <DetailService slug={slug} detailPage={detailPage} currentCompany={currentCompany} setMessage={setMessage} setMessageClass={setMessageClass}/>
         :[]

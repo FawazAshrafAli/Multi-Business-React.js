@@ -16,8 +16,11 @@ import { useEffect } from 'react';
 import * as gtag from '../../lib/gtag';
 import { useRouter } from 'next/router';
 
+import { setupInterceptors } from "../../lib/api/axiosInterceptor";
+  
 export default function App({ Component, pageProps }) {
   const router = useRouter();
+  setupInterceptors();
 
   useEffect(() => {
     const handleRouteChange = (url) => gtag.pageview(url);

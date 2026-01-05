@@ -1,4 +1,3 @@
-// components/layout/AppLayout.jsx
 import Header from '../Header';
 import Message from '../common/Message';
 import LogoContext from '../context/LogoContext';

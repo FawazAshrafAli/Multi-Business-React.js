@@ -21,7 +21,7 @@ export default function ListSpecializationPage({
         metaKeywords={metaKeywords}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -141,9 +141,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/more-courses#page`,
             "name": `Specification Courses in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/more-courses`,
             "description": `Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
@@ -162,19 +162,19 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs (eligible rich result) */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/courses#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}/more-courses#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://${locationData?.district_slug || locationData?.state_slug}/courses` },
-              { "@type": "ListItem", "position": 4, "name": `${specialization?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}` },
+              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses` },
+              { "@type": "ListItem", "position": 4, "name": `${specialization?.full_title} ${locationData?.name}`, "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-courses/${specialization?.locationSlug || specialization?.slug}-${locationData?.slug}` },
             ]
           },
 
           /* C) FAQ (eligible rich result) */
           {
             "@type": "FAQPage",
-            "@id": "https://bzindia.in/kerala/courses/CompanySubType/specification-courses-in-malappuram#faq",
+            "@id": "https://bzindia.in/kerala/more-courses/CompanySubType/specification-courses-in-malappuram#faq",
             "mainEntity": specialization?.faqs?.map(faq => ({
                 "@type": "Question",
                 "name": faq.question || "",
@@ -217,10 +217,10 @@ export async function getServerSideProps(context) {
 
           details?.map(detail => ({
             "@type": "Course",
-            "@id": `https://${detail.url}#course`,
+            "@id": `https://bzindia.in/${detail.url}#course`,
             "name": detail?.course?.name || "",
             "description": detail?.description || ` ${detail?.course?.name}`,
-            "url": `https://${detail.url}`,
+            "url": `https://bzindia.in/${detail.url}`,
             "image": detail?.course?.image_url || "",
             "provider": { "@id": `https://bzindia.in/${specialization?.company_slug}/#org` },
             "aggregateRating": (detail?.course?.testimonials?.length > 0) ? {
@@ -266,7 +266,7 @@ export async function getServerSideProps(context) {
                   "priceCurrency": "INR",
                   "price": detail?.course?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${detail.url}#apply`
+                  "url": `https://bzindia.in/${detail.url}#apply`
                 }
               },
               {
@@ -280,7 +280,7 @@ export async function getServerSideProps(context) {
                   "priceCurrency": "INR",
                   "price": detail?.course?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${detail.url}#apply`
+                  "url": `https://bzindia.in/${detail.url}#apply`
                 }
               }
             ]

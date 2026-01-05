@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useContext, useEffect, useState } from 'react'
 import createDOMPurify from 'dompurify';
 import slugify from 'slugify';
 
@@ -9,9 +9,6 @@ import NeonPhoneLink from '../common/NeonPhoneLink';
 import EnquiryForm from './common/EnquiryForm';
 import Faq from '../common/Faq';
 
-import { useAuth } from '../../hooks/useAuth-old';
-import LoginForm from '../LoginForm';
-
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -19,6 +16,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { productsSlider } from '../../public/w3/js/slider';
 import Link from 'next/link';
 import TagCloud from '../home/TagCloud';
+import AuthContext from '../context/AuthContext';
 
 const MultipageProduct = ({
   slug, currentCompany, replacedMultipage,
@@ -27,14 +25,9 @@ const MultipageProduct = ({
 }) => {        
     const [sanitizedDescription, setSanitizedDescription] = useState();    
 
-    const { user, loading, refresh } = useAuth();
-    const [showLogin, setShowLogin] = useState(false);
+    const { user } = useContext(AuthContext); 
 
-    const [formData, setFormData] = useState({});
-
-    useEffect(() => {
-      if (user) setShowLogin(false);
-    }, [user]);
+    const [formData, setFormData] = useState({});    
 
     const sanitizedTextEditor = (content) => {
       if (!content || typeof window === 'undefined') return;
@@ -305,7 +298,7 @@ const MultipageProduct = ({
                                 {[1, 2, 3, 4, 5].map((i) => (
                                 <span
                                     key={i}
-                                    className={`fa fa-star${reviewedRating >= i ? " checked" : ""}`}
+                                    className={`fa fa-star${replacedMultipage?.product?.rating >= i ? " checked" : ""}`}
                                     aria-hidden="true"
                                     onClick={() => handleStar(i)}
                                 ></span>
@@ -348,11 +341,8 @@ const MultipageProduct = ({
                   </>
                   :                  
                   <>
-                    {showLogin ? (
-                      <LoginForm onLoginSuccess={refresh} />
-                    ) : (
-                      <button onClick={() => setShowLogin(true)}>Login</button>
-                    )}
+                    
+                    <a href="/login" className="btn btn-dark">Login</a>
                   </>
                   }
               </li>

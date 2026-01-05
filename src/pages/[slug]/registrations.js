@@ -25,12 +25,10 @@ export default function ListRegistrationPage({
 
         <Head>
           {structuredData.map((schema, i) => (
-            <script
-              key={i}
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: schema }}
-            />
-          ))}    
+            <script key={i} type="application/ld+json">
+              {schema}
+            </script>
+          ))}        
         </Head>
       </>
       }

@@ -1,26 +1,28 @@
 import Head from 'next/head';
 import SeoHead from '../../../../components/SeoHead';
 import registration from '../../../../lib/api/registration';
-import ListRegistrationSubTypes from '../../../../components/registration/ListRegistrationSubTypes';
 import location from '../../../../lib/api/location';
+import ListRegistrationDetails from '../../../../components/registration/ListRegistrationDetails';
 import blog from '../../../../lib/api/blog';
 
 export default function ListSubTypePage({
-  isSubTypeListingPage, blogs,
-  structuredData, address,
-  locationData
-}) {
+  details, isListRegistrationDetailsPage,
+  structuredData, subType, blogs,
+  locationData, address, metaKeywords
+}) {  
+
   return (
     <>
-      {isSubTypeListingPage &&
+      {isListRegistrationDetailsPage &&
         <>
         <SeoHead
-        meta_description={`Get online registrations in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Filing ${locationData?.name}`}
+        meta_description={subType?.meta_description?.replace("place_name", locationData?.name) || ""}
+        meta_title={`${subType?.full_title} ${locationData?.name || ""}`}
         blogs={blogs || []}
+        metaKeywords={metaKeywords}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/filings`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -32,13 +34,14 @@ export default function ListSubTypePage({
             />
           ))}    
         </Head>
-
-      <ListRegistrationSubTypes
-       
-       blogs={blogs}
-       locationData={locationData}
-       />
-       </>
+        
+        <ListRegistrationDetails
+         
+        details={details}
+        locationData={locationData}
+        subType={subType}
+        />
+      </>
       }
 
     </>
@@ -47,44 +50,46 @@ export default function ListSubTypePage({
 
 export async function getServerSideProps(context) {
   try {
-    const {slug} = context.params;
-    let isSubTypeListingPage = false;
-    let locationData = {};
+    const {slug, subTypeSlug} = context.params;
+    let isListRegistrationDetailsPage = false;
+    
+    let urlLocationRes;
+    
+    urlLocationRes = await location.getUrlLocation("state", subTypeSlug);
 
-               
-    try {
+    if (!urlLocationRes?.data?.data) {
+      urlLocationRes = await location.getUrlLocation("district", subTypeSlug);
+    }
 
-      const districtRes = await location.getMinimalDistrict(slug);
-      const district = districtRes.data;
+    if (!urlLocationRes?.data?.data) {
+      urlLocationRes = await location.getUrlLocation("place", subTypeSlug);
+    }
 
-      isSubTypeListingPage = true;
+    const urlLocation = urlLocationRes.data;
 
-      const districtCenterRes = await location.getDistrictCenter(slug);
-      const districtCenter = districtCenterRes.data;
+    const locationData = urlLocation?.data;
 
-      locationData = {
-          ...district, 
-          "latitude": districtCenter?.latitude, "longitude": districtCenter?.longitude
-      }
-    } catch (err) {
-      const stateRes = await location.getMinimalState(slug);
-      const state = stateRes.data;          
-      
-      isSubTypeListingPage = true;
-      
-      const stateCenterRes = await location.getStateCenter(slug);
-      const stateCenter = stateCenterRes.data;
+    const passingSubTypeSlug = subTypeSlug?.replace(`-${locationData?.slug}`, "");
 
-      locationData = {
-          ...state, 
-          "latitude": stateCenter?.latitude, "longitude": stateCenter?.longitude
-      }
-    }            
+    let subType, subTypeRes;
 
-    if (!isSubTypeListingPage) throw new Error("Not a registration sub type listing page");
+    subTypeRes = await registration.getSubTypes("all", undefined, `location_slug=${passingSubTypeSlug}`);
+    subType = subTypeRes.data?.results?.[0];
+  
+    if (!subType) {
+      subTypeRes = await registration.getSubType("all", passingSubTypeSlug);
+      subType = subTypeRes.data;
 
-    const subTypeRes = await registration.getSubTypes("all");
-    const subTypes = subTypeRes.data?.results;
+    }
+
+    if (subType && (locationData?.district_slug == slug || locationData?.state_slug == slug || locationData?.slug == slug)) {
+      isListRegistrationDetailsPage = true;
+    }
+
+    if (!isListRegistrationDetailsPage) throw new Error("Not a registration sub type listing page");
+
+    const detailRes = await registration.getSubTypes("all");
+    const details = detailRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
     const blogs = (blogsRes.data.results || [])
@@ -102,7 +107,6 @@ export async function getServerSideProps(context) {
         meta_tags: b.meta_tags,
         })); 
 
-      
     const address_list = [];
 
     if (locationData?.name) address_list.push(locationData?.name);
@@ -110,6 +114,11 @@ export async function getServerSideProps(context) {
     if (locationData?.state_name) address_list.push(locationData?.state_name);
 
     const address = address_list.join(", ");
+
+    const detailKeywords =  details?.slice(0, 10)?.map(detail => detail.name);
+    const metaKeywords = [
+      `${subType?.full_title} ${locationData?.name}`.trim(), ...detailKeywords
+    ].filter(Boolean);
 
     const structuredData = [
       JSON.stringify({
@@ -119,9 +128,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings#page`,
-            "name": `Registration Sub Types in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/filings`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}#page`,
+            "name": `Registrations in ${address}`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}`,
             "description": `Get online registrations in ${address} with expert consultants and quick approvals.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": {
@@ -143,18 +152,18 @@ export async function getServerSideProps(context) {
             },
             "mainEntity": {
               "@type": "ItemList",
-              "name": `Registrations in ${locationData?.name || ""}`,
+              "name": `Registration Sub Types in ${locationData?.name || ""}`,
               "itemListOrder": "http://schema.org/ItemListOrderAscending",
-              "itemListElement": subTypes?.map((subType, index) => ({
+              "itemListElement": details?.map((detail, index) => ({
                   "@type": "ListItem",
                   "position": index + 1,
                   "item": {
                     "@type": "Service",
-                    "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}#government-service`,
-                    "name": subType?.full_title || "",
-                    "description": subType?.description || "",
-                    "image": subType?.image_url || "",
-                    "url": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}`
+                    "@id": `${detail.url}#government-service`,
+                    "name": detail?.meta_title || detail?.name || "",
+                    "description": detail?.meta_description || "",
+                    "image": detail?.image_url || "",
+                    "url": `${detail.url}`
                   }
               }))
             }
@@ -163,47 +172,39 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Filings", "item": `https://${locationData?.district_slug || locationData?.state_slug}/filings` },
+              { "@type": "ListItem", "position": 3, "name": "Startup Services", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services` },
+              { "@type": "ListItem", "position": 4, "name": `${subType?.full_title} ${locationData?.name}`, "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}` },
             ]
           },
 
           /* C) FAQ */
-          // {
-          //   "@type": "FAQPage",
-          //   "@id": "https://bzindia.in/kerala/services/CompanySubType/subcatogry-services-in-malappuram#faq",
-          //   "mainEntity": [
-          //     {
-          //       "@type": "Question",
-          //       "name": `How long does GST registration take in ${locationData?.name}?`,
-          //       "acceptedAnswer": {
-          //         "@type": "Answer",
-          //         "text": "With complete documents, GST registration approval typically takes 3–7 working days."
-          //       }
-          //     },
-          //     {
-          //       "@type": "Question",
-          //       "name": "Which FSSAI license should I choose: Basic, State, or Central?",
-          //       "acceptedAnswer": {
-          //         "@type": "Answer",
-          //         "text": "Choose based on your annual turnover and business scale: up to ₹12 lakh (Basic), ₹12 lakh–₹20 crore (State), and above ₹20 crore or multi-state operations (Central)."
-          //       }
-          //     }
-          //   ]
-          // },
+          {
+            "@type": "FAQPage",
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/startup-services/${subType?.locationSlug || subType?.slug}-${locationData?.slug}#faq`,
+            "mainEntity": subType?.faqs?.map(faq => ({
+                "@type": "Question",
+                "name": faq.question || "",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer || ""
+                }
+              }))
+                        
+          },
 
           /* D) Provider with ratings */
-          subTypes?.map((subType, index) => ({
+          details?.map((detail, index) => ({
             "@type": "ProfessionalService",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}#government-service`,
-            "name": `${subType.company_name || index + 1} - ${subType.name}`, 
-            "image": subType.company_logo_url || "",
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/filings/${subType.location_slug || subType.slug}-${locationData?.slug}`,
-            "telephone": subType?.company_contact? `+91-${subType?.company_contact}`: "",
-            "priceRange": subType?.price? `₹${subType?.price}` : "",
+            "@id": `${detail.url}#government-service`,
+            "name": `${detail.company_name || index + 1} - ${detail.name}`, 
+            "image": detail.company_logo_url || "",
+            "url": `${detail.url}`,
+            "telephone": detail?.company_contact? `+91-${detail?.company_contact}`: "",
+            "priceRange": detail?.price? `₹${detail?.price}` : "",
             "address": {
               "@type": "PostalAddress",
               "addressLocality": locationData?.name || "",
@@ -243,11 +244,13 @@ export async function getServerSideProps(context) {
     return {
       props: {
         structuredData,
-        subTypes: subTypes || [],
-        isSubTypeListingPage: isSubTypeListingPage || false,
+        details: details || [],
+        isListRegistrationDetailsPage: isListRegistrationDetailsPage || false,
         locationData: locationData || {},
+        subType: subType || null,
         blogs: blogs || [],
-        address: address || null
+        address: address || [],
+        metaKeywords: metaKeywords || [],
       },
     };
 
@@ -256,13 +259,15 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        subTypes: [],
+        details: [],
         structuredData: [],
-        isSubTypeListingPage: false,
+        isListRegistrationDetailsPage: false,
         locationData: {},
+        subType: null,
         blogs: [],
-        address: null
-      }
+        address: null,
+        metaKeywords: []
+      }      
     }
   }
 

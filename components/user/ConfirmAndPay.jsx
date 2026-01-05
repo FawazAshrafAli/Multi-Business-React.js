@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
-import AuthContext from './context/AuthContext';
-import product from '../lib/api/product';
+import product from '../../lib/api/product';
 import Link from 'next/link';
-import Loading from './Loading';
+import Loading from '../Loading';
 import Cookies from 'js-cookie';
-import Message from './common/Message';
+import Message from '../common/Message';
 import { useRouter } from 'next/router';
+import AuthContext from '../context/AuthContext';
 
-const ConfirmAndPay = () => {
-    const {user} = useContext(AuthContext);
+const ConfirmAndPay = ({user}) => {
 
     const router = useRouter();
 
@@ -17,6 +16,8 @@ const ConfirmAndPay = () => {
 
     const [message, setMessage] = useState();
     const [messageClass, setMessageClass] = useState();
+
+    const {setUserCartCount} = useContext(AuthContext);
 
     const [paymentMethod, setPaymentMethod] = useState("UPI / QR"); 
     
@@ -73,10 +74,12 @@ const ConfirmAndPay = () => {
                 }
             );
             
-            const {success, message, order_slug} = response.data || {};
+            const {success, message, cart_count} = response.data || {};
 
             
             if (success) {
+                setUserCartCount(cart_count);
+                
                 setMessageClass(success ? "bg-success" : "bg-danger");
                 setMessage(message);
 
@@ -117,7 +120,7 @@ const ConfirmAndPay = () => {
             
             <div className="container"  style={{padding:"30px 0"}}>
             <div className="grid cols-2">
-                {/* Left: Payment methods */}
+                {/* Left: Payment methods */}                
                 <form className="card" onSubmit={(e) => handleSubmit(e)}>
                 <div className="hd"><h2>Payment Method</h2></div>
                 <div className="bd">
@@ -155,14 +158,16 @@ const ConfirmAndPay = () => {
                     </label>
                     </div>
 
-                    <div style={{marginTop:"16px"}} className="coupon">
+                    {/* <div style={{marginTop:"16px"}} className="coupon">
                     <input className="input" placeholder="Have a coupon? Enter code" />
                     <button className="btn ghost">Apply</button>
-                    </div>
+                    </div> */}
                 </div>
+                {cartSummary?.item_count > 0 &&
                 <div className="ft">
                     <button className="btn success" type="submit">Place Order & Pay</button>
                 </div>
+                }
                 </form>
 
                 {/* Right: Order Summary */}
@@ -172,11 +177,11 @@ const ConfirmAndPay = () => {
                     {cartSummaryLoading? <Loading/> 
                     :
                     <ul className="summary" style={{listStyle:"none", margin:"0", padding:"0"}}>
-                        <li><span>Items ({cartSummary?.item_count})</span><strong>₹{cartSummary?.total || 0}</strong></li>
+                        <li><span>Items ({cartSummary?.item_count})</span><strong>₹{cartSummary?.total || "0.00"}</strong></li>
                         <li><span>GST</span><strong>₹0.00</strong></li>
                         <li><span>Delivery</span><strong>₹0.00</strong></li>
                         <li><span>Round Off</span><strong>₹0.00</strong></li>
-                        <li className="total"><span>Total Amount</span><span>₹{cartSummary?.total || 0}</span></li>
+                        <li className="total"><span>Total Amount</span><span>₹{cartSummary?.total || "0.00"}</span></li>
                     </ul>
                     }
                     <p className="help" style={{marginTop:"8px"}}>* Freight charges are extra if applicable and will be informed by the seller.</p>

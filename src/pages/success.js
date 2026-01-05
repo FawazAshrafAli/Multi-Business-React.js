@@ -1,12 +1,12 @@
 import SeoHead from "../../components/SeoHead";
-import Cart from "../../components/Cart";
 import axios from "axios";
-import OrderSuccess from "../../components/OrderSuccess";
+import OrderSuccess from "../../components/user/OrderSuccess";
 
 export default function successPage({
   homeContent = {},
   blogs = [],
-  user
+  user,
+  recentOrder
 }) {
   return (
     <>
@@ -18,7 +18,7 @@ export default function successPage({
         url="https://bzindia.in/success"
       />      
 
-      <OrderSuccess user={user} />
+      <OrderSuccess user={user} recentOrder={recentOrder}/>
     </>
   );
 }
@@ -26,6 +26,8 @@ export default function successPage({
 export async function getServerSideProps(context) {
   const { req } = context;
   const cookie = req.headers.cookie || "";
+
+  let userChecked = false;
 
   try {
     const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth_api/user/`, {
@@ -35,8 +37,10 @@ export async function getServerSideProps(context) {
 
     const user = res.data || null;
 
+    userChecked = true;
+
     // 🔥 If no user → redirect BEFORE rendering
-    if (!user) {
+    if (userChecked && !user) {
       return {
         redirect: {
           destination: "/login",
@@ -45,15 +49,43 @@ export async function getServerSideProps(context) {
       };
     }
 
+    let recentOrder;
+
+    if (userChecked && user) {
+      try {
+        const recentOrderRes = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/product_api/order/recent`, {
+          headers: { cookie },
+          withCredentials: true,
+        });
+        recentOrder = recentOrderRes?.data;
+      
+      } catch (err) {
+        console.error(err)
+
+        const responseData = err.response?.data;        
+
+        if (responseData?.expired === true) {
+          return {
+            redirect: {
+              destination: "/orders",
+              permanent: false,
+            },
+          };
+        }
+      }
+    }
+
     return {
       props: {
         user,
         homeContent: {},
         blogs: [],
+        recentOrder: recentOrder?? null,
+        user: user || null,
       },
     };
   } catch (err) {
-    console.log("No User");
+    console.error("No User");
 
     return {
       redirect: {

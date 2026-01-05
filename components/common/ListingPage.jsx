@@ -1062,8 +1062,9 @@ useEffect(() => {
       <strong className="bz_cat_heading">Products</strong>
       <div className="bznew_list_list">
         {productCompaniesLoading ? <Loading/> :
-        productCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)}
-         <Link href="#" className="more-link"><span className="more_list_dets">View More...</span></Link>
+          productSubCategories?.map((subCategory, index) => <Link href={`/${subCategory?.url}`} key={subCategory?.slug || index + 1}><span className="bznew_list_dot"></span>{subCategory.name}</Link>)}
+          {/* productCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)} */}
+         <Link href={`/${computedLocation?.ending_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/`} className="more-link"><span className="more_list_dets">View More...</span></Link>
       </div>
     </div>
 
@@ -1072,8 +1073,9 @@ useEffect(() => {
       <strong className="bz_cat_heading">Courses</strong>
       <div className="bznew_list_list">
         {courseCompaniesLoading ? <Loading/> :
-        courseCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)}
-        <Link href="#" className="more-link"><span className="more_list_dets">View More...</span></Link>
+        courseSpecializations?.map((specialization, index) => <Link href={`/${specialization?.url}`} key={specialization?.slug || index + 1}><span className="bznew_list_dot"></span>{specialization.name}</Link>)}
+        {/* courseCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)} */}
+        <Link href={`/${computedLocation?.ending_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/`} className="more-link"><span className="more_list_dets">View More...</span></Link>
       </div>
     </div>
 
@@ -1082,8 +1084,9 @@ useEffect(() => {
       <strong className="bz_cat_heading">Services</strong>
       <div className="bznew_list_list">
         {serviceCompaniesLoading ? <Loading/> :
-        serviceCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)}
-        <Link href="#" className="more-link"><span className="more_list_dets">View More...</span></Link>
+        serviceSubCategories?.map((subCategory, index) => <Link href={`/${subCategory?.url}`} key={subCategory?.slug || index + 1}><span className="bznew_list_dot"></span>{subCategory.name}</Link>)}
+        {/* serviceCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)} */}
+        <Link href={`/${computedLocation?.ending_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/`} className="more-link"><span className="more_list_dets">View More...</span></Link>
       </div>
     </div>
 
@@ -1092,8 +1095,9 @@ useEffect(() => {
       <strong className="bz_cat_heading">Startup Services</strong>
       <div className="bznew_list_list">
         {registrationCompaniesLoading ? <Loading/> :
-        registrationCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)}
-        <Link href="#" className="more-link"><span className="more_list_dets">View More...</span></Link>
+        registrationSubTypes?.map((subType, index) => <Link href={`/${subType?.url}`} key={subType?.slug || index + 1}><span className="bznew_list_dot"></span>{subType.name}</Link>)}
+        {/* registrationCompanies?.map((company, index) => <Link href={`/${company?.slug}`} key={company?.slug || index + 1}><span className="bznew_list_dot"></span>{company.name}</Link>)} */}
+        <Link href={`/${computedLocation?.ending_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/startup-services/`} className="more-link"><span className="more_list_dets">View More...</span></Link>
       </div>
     </div>
 
@@ -1629,7 +1633,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
+                  <a href={`/${computedLocation?.staring_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Buy Now</a>
                   <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
@@ -1872,7 +1876,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`/${computedLocation?.starting_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization?.location_slug || specialization?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
                   <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>
@@ -2113,7 +2117,7 @@ useEffect(() => {
               </div>
               </div>
               <div className="bznew_list_cta">
-                  <a href={`/${computedLocation?.district_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
+                  <a href={`/${computedLocation?.starting_slug || locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.location_slug || subCategory?.slug}-${computedLocation?.ending_slug || locationData?.slug}`} className="bznew_list_btn primary">Read More</a>
                   <a href={`tel:+91${contactNumber}`} className="bznew_list_btn ghost"><i className="bi bi-telephone"></i><i className="fa fa-phone" aria-hidden="true"></i> Call Us</a>
                 </div>
               </div>

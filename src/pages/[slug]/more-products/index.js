@@ -15,12 +15,12 @@ export default function ListSubCategoriePage({
       {isSubCategoryListingPage &&
         <>
         <SeoHead
-        meta_description={`Find Sub Categories wholesale suppliers in ${address}.`}
-        meta_title={`Sub Categories Wholesale Supplier in ${address}`}
+        meta_description={`Find product wholesale suppliers in ${address}.`}
+        meta_title={`Products in ${locationData?.name}`}
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products`}
         />
 
         <Head>
@@ -122,9 +122,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products#page`,
             "name": `Sub Categories Wholesale Supplier in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products`,
             "description": `Find Sub Categories wholesale suppliers in ${address}.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" }
@@ -133,18 +133,18 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products` },
+              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products` },
             ]
           },
 
           /* C) FAQ (eligible rich result) */
           // {
           //   "@type": "FAQPage",
-          //   "@id": "https://bzindia.in/kerala/products/CompanySubType/Sub-Categories-wholesale-supplier-in-malappuram#faq",
+          //   "@id": "https://bzindia.in/kerala/more-products/CompanySubType/Sub-Categories-wholesale-supplier-in-malappuram#faq",
           //   "mainEntity": [
           //     {
           //       "@type": "Question",
@@ -190,11 +190,11 @@ export async function getServerSideProps(context) {
 
           subCategories?.map(subCategory => ({
             "@type": "Product",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#product`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#product`,
             "name": `${subCategory.company_name || index + 1} - ${subCategory.name}`,
             "description": subCategory?.description || "",
             "image":[subCategory?.image_url || "https://bzindia.in/images/logo.svg"],
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
             "sku": subCategory.sku || "",
             "brand": { "@type": "Brand", "name": subCategory.brand || "" },
             "aggregateRating": (subCategory?.testimonials?.length > 0) ? {
@@ -221,7 +221,7 @@ export async function getServerSideProps(context) {
               "price": subCategory?.price || "",
               "priceValidUntil": priceValidUntil,
               "availability": "https://schema.org/InStock",
-              "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
+              "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-products/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
               "seller": { "@id": "https://bzindia.in/#org" },
               "shippingDetails": [{
                 "@type": "OfferShippingDetails",

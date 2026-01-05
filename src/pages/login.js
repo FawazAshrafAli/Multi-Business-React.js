@@ -5,7 +5,8 @@ import axios from "axios";
 
 
 export default function LoginPage({
-    homeContent={}, blogs=[], structuredData=[]
+    homeContent={}, blogs=[], structuredData=[],
+    user
 }) {
     return (
         <>
@@ -26,7 +27,7 @@ export default function LoginPage({
           ))}        
       </Head>
 
-        <CustomerLogin/>
+        <CustomerLogin user={user}/>
         </>
     )
 }
@@ -61,6 +62,7 @@ export async function getServerSideProps(context) {
         structuredData: [],
         homeContent: {},
         blogs: [],
+        user: user || null,
       },
     };
   } catch (err) {

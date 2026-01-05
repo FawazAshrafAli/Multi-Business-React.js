@@ -15,12 +15,12 @@ export default function ListSpecializationPage({
       {isSpecializationListingPage &&
         <>
         <SeoHead
-        meta_description={`Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`}
-        meta_title={`Specification Courses in ${address}`}
+        meta_description={`Explore industry-oriented professional and skill development courses in ${address} with certification and placement support.`}
+        meta_title={`Courses in ${locationData?.name}`}
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses`}
         />
 
         <Head>
@@ -118,9 +118,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses#page`,
             "name": `Specification Courses in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses`,
             "description": `Explore industry-oriented professional and skill development Specification Courses in ${address} with certification and placement support.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
@@ -139,18 +139,18 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs (eligible rich result) */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses` },
+              { "@type": "ListItem", "position": 3, "name": "Courses", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses` },
             ]
           },
 
           /* C) FAQ (eligible rich result) */
           // {
           //   "@type": "FAQPage",
-          //   "@id": "https://bzindia.in/kerala/courses/CompanySubType/specification-courses-in-malappuram#faq",
+          //   "@id": "https://bzindia.in/kerala/more-courses/CompanySubType/specification-more-courses-in-malappuram#faq",
           //   "mainEntity": [
           //     {
           //       "@type": "Question",
@@ -205,10 +205,10 @@ export async function getServerSideProps(context) {
 
           specializations?.map(specialization => ({
             "@type": "Course",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#course`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#course`,
             "name": specialization?.name || "",
-            "description": specialization?.description || `Specification courses of ${specialization?.name}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}`,
+            "description": specialization?.description || `Specification more-courses of ${specialization?.name}`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}`,
             "image": specialization?.image_url || "",
             "provider": { "@id": `https://bzindia.in/${specialization?.company_slug}/#org` },
             "aggregateRating": (specialization?.testimonials?.length > 0) ? {
@@ -254,7 +254,7 @@ export async function getServerSideProps(context) {
                   "priceCurrency": "INR",
                   "price": specialization?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
+                  "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
                 }
               },
               {
@@ -268,7 +268,7 @@ export async function getServerSideProps(context) {
                   "priceCurrency": "INR",
                   "price": specialization?.price || "",
                   "availability": "https://schema.org/InStock",
-                  "url": `https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
+                  "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-courses/${specialization.location_slug || specialization.slug}-${locationData?.slug}#apply`
                 }
               }
             ]

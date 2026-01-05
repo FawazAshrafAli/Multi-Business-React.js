@@ -11,6 +11,7 @@ import service from '../../lib/api/service';
 import registration from '../../lib/api/registration';
 import product from '../../lib/api/product';
 import search from '../../lib/api/search';
+import pMap from 'p-map';
 
 export default function IndexPage({
   homeContent, metaTags, blogs, companies,
@@ -30,14 +31,11 @@ export default function IndexPage({
       />
 
       <Head>
-        {structuredData.map((schema, i) => (
-          <script
-            key={i}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: schema }}
-          />
-        ))}
-
+          {structuredData.map((schema, i) => (
+            <script key={i} type="application/ld+json">
+              {schema}
+            </script>
+          ))}        
       </Head>
 
       <Home 
@@ -58,27 +56,40 @@ export default function IndexPage({
 export async function getServerSideProps(context) {
   try {
 
-    const {s} = context.query?? null;
+    const {s} = context.query;
     let matchingItems;
-    let companyTypes, companies = [];
-    let courseDetailPages, serviceDetailPages, registrationDetailPages, productDetailPages = [];    
+    let companyTypes = [];
+    let companies = [];
+    let courseDetailPages = [];
+    let serviceDetailPages = [];
+    let registrationDetailPages = [];
+    let productDetailPages = [];  
 
-    const [homeRes, metaTagRes, blogsRes] = await Promise.all([
-      home.getHomeContent(),
-      metaTag.getMetaTags(),
-      blog.getBlogs(`/blog_api/blogs`)
-    ]);
+    async function safe(fn, fallback) {
+      try {
+        return await fn();
+      } catch (e) {
+        console.error("SSR API error:", e?.message);
+        return fallback;
+      }
+    }
+
+    const [homeRes, metaTagRes, blogsRes] = await pMap([
+      () => safe(() => home.getHomeContent(), { data: [] }),
+      () => safe(() => metaTag.getMetaTags(), { data: { results: [] } }),
+      () => safe(() => blog.getBlogs(`/blog_api/blogs`), { data: { results: [] } }),
+    ], fn => fn(), { concurrency: 3 });
 
     const homeContent = {
-        "title": homeRes.data?.[0]?.title,
-        "meta_title": homeRes.data?.[0]?.meta_title,
-        "meta_description": homeRes.data?.[0]?.meta_description,
-        "description": homeRes.data?.[0]?.description,
+        "title": homeRes.data?.[0]?.title?? null,
+        "meta_title": homeRes.data?.[0]?.meta_title?? null,
+        "meta_description": homeRes.data?.[0]?.meta_description?? null,
+        "description": homeRes.data?.[0]?.description?? null,
     };
 
     const metaTags = (metaTagRes.data.results || [])
     .slice(0, 12)
-    .map(tag => ({"slug": tag.slug, "name": tag.name}));
+    ?.map(tag => ({"slug": tag.slug, "name": tag.name}));
 
     const blogs = (blogsRes.data.results || [])
       .slice(0, 12)
@@ -94,6 +105,130 @@ export async function getServerSideProps(context) {
       content: b.content,
       meta_tags: b.meta_tags,
       }));
+
+    if (!s) {
+      console.time("Second Fetch")                
+
+      // Detail pages
+      const companySlug = "all";
+
+      const [
+        companyTypesRes, companiesRes,
+        courseRes, serviceRes,
+        registrationRes, productRes
+      ] = await pMap([
+        () => safe(() => company.getBriefCompanyTypes(), { data: [] }),
+        () => safe(() => company.getBriefCompanies(), { data: [] }),
+        () => safe(() => course.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => service.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => registration.getSliderDetails(companySlug), { data: { results: [] } }),
+        () => safe(() => product.getSliderProductDetails(companySlug), { data: { results: [] } }),
+      ], fn => fn(), { concurrency: 3 });
+
+      companyTypes = (companyTypesRes.data || [])
+          .slice(0, 12)
+          .map(c => ({
+            id: c.id, 
+            name: c.name,
+          }));
+
+      companies = (companiesRes.data || [])
+          .slice(0, 12)
+          .map(c => ({
+          id: c.id,
+          name: c.name,
+          logo_url: c.logo_url,
+          get_absolute_url: c.get_absolute_url,
+          meta_description: c.meta_description,
+          summary: c.summary,
+          slug: c.slug,
+          sub_categories: c.sub_categories,
+          }));
+
+      courseDetailPages = (courseRes.data?.results || [])
+          .slice(0, 12)
+          .map(c => ({
+          id: c.id,
+          name: c.course?.name,
+          image_url: c.course?.image_url,
+          price: c.course?.price,
+          url: c.url,
+          meta_description: c.meta_description,
+          company_name: c.course?.company_name,
+          mode: c.course?.mode,
+          ending_date: c.course?.ending_date,
+          starting_date: c.course?.starting_date,
+          duration: c.course?.duration,
+          duration_type: c.course?.duration_type?? null,
+          program_name: c.course?.program_name,
+          rating: c.course?.rating,
+          rating_count: c.course?.rating_count,
+          }));
+          
+
+      serviceDetailPages = (serviceRes.data?.results || [])
+          .slice(0, 12)
+          .map(s => ({
+          id: s.id?? null,
+          name: s.name?? null,
+          price: s.price?? null,
+          image_url: s.image_url?? null,
+          duration: s.duration?? null,
+          duration_type: s.duration_type?? null,
+          url: s.url?? null,
+
+          sub_category_name: s.sub_category_name?? null,
+          company_sub_type: s.company_sub_type?? null,
+          company_slug: s.company_slug?? null,
+          category_name: s.category_name?? null,
+          meta_description: s.meta_description?? null,
+          }));
+
+      registrationDetailPages = (registrationRes.data?.results || [])
+          .slice(0, 12)
+          .map(r => ({
+          id: r.id,
+          title: r.registration?.title,
+          price: r.registration?.price,
+          image_url: r.registration?.image_url,
+          url: r.url,
+          company_slug: r.company_slug,
+          company_sub_type: r.company_sub_type,
+          meta_description: r.meta_description,
+          image_url: r.registration.image_url,
+          sub_type: r.registration.sub_type,
+          type_name: r.registration.type_name,
+          }));
+
+      productDetailPages = (productRes.data?.results || [])
+          .slice(0, 12)
+          .map(p => ({
+          id: p.id,
+          name: p.product?.name,
+          price: p.product?.price,
+          image_url: p.product?.image_url,
+          url: p.url,
+
+          category: p.product.category_name,
+          company_sub_type: p.company_sub_type,
+          company_slug: p.company_slug,
+          meta_description: p.meta_description,
+          sku: p.product.sku,
+          rating: p.product.rating,
+          rating_count: p.product.rating_count,
+          product_reviews: (p.reviews || [])
+          .slice(0, 5)
+          .map(review => ({
+              "review_by": review.review_by,
+              "name": review.name ?? null,
+              "created": review.created,
+              "text": review.text,
+              "rating": review.rating,
+          })),
+        }));
+
+      console.timeEnd("Second Fetch")
+    }
 
     const sixMonthsLater = new Date();
     sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
@@ -112,9 +247,13 @@ export async function getServerSideProps(context) {
       }),
     ]
 
+
     if (s) {
-      const matchingItemsRes = await search.getResults(s, 'limit=9&offset=0')
-      matchingItems = matchingItemsRes?.data?.results;
+      const searchRes = await safe(
+        () => search.getResults(s, "limit=9&offset=0"),
+        { data: { results: [] } }
+      );
+      const matchingItems = searchRes?.data?.results ?? [];
 
       structuredData.push(
         JSON.stringify(
@@ -182,125 +321,7 @@ export async function getServerSideProps(context) {
           }, null, 2)
       )
 
-    } else {
-      const [companyTypesRes, companiesRes] = await Promise.all([        
-        company.getBriefCompanyTypes(),
-        company.getBriefCompanies()
-      ]);    
-
-      companyTypes = (companyTypesRes.data || [])
-          .slice(0, 12)
-          .map(c => ({
-            id: c.id, 
-            name: c.name,
-          }));
-
-      companies = (companiesRes.data || [])
-          .slice(0, 12)
-          .map(c => ({
-          id: c.id,
-          name: c.name,
-          logo_url: c.logo_url,
-          get_absolute_url: c.get_absolute_url,
-          meta_description: c.meta_description,
-          summary: c.summary,
-          slug: c.slug,
-          sub_categories: c.sub_categories,
-          }));    
-
-      // Detail pages
-      const companySlug = "all";
-
-      const [
-          courseRes,
-          serviceRes,
-          registrationRes,
-          productRes
-      ] = await Promise.all([
-          course.getSliderDetails(companySlug),
-          service.getSliderDetails(companySlug),
-          registration.getSliderDetails(companySlug),
-          product.getSliderProductDetails(companySlug)
-      ]);
-
-      courseDetailPages = (courseRes.data?.results || [])
-          .slice(0, 12)
-          .map(c => ({
-          id: c.id,
-          name: c.course?.name,
-          image_url: c.course?.image_url,
-          price: c.course?.price,
-          url: c.url,
-          meta_description: c.meta_description,
-          company_name: c.course.company_name,
-          mode: c.course.mode,
-          ending_date: c.course.ending_date,
-          starting_date: c.course.starting_date,
-          duration: c.course.duration,
-          program_name: c.course.program_name,
-          rating: c.course.rating,
-          rating_count: c.course.rating_count,
-          }));
-
-      serviceDetailPages = (serviceRes.data?.results || [])
-          .slice(0, 12)
-          .map(s => ({
-          id: s.id?? null,
-          name: s.name?? null,
-          price: s.price?? null,
-          image_url: s.image_url?? null,
-          duration_count: s.duration_count?? null,
-          url: s.url?? null,
-
-          sub_category_name: s.sub_category_name?? null,
-          company_sub_type: s.company_sub_type?? null,
-          company_slug: s.company_slug?? null,
-          category_name: s.category_name?? null,
-          meta_description: s.meta_description?? null,
-          }));
-
-      registrationDetailPages = (registrationRes.data?.results || [])
-          .slice(0, 12)
-          .map(r => ({
-          id: r.id,
-          title: r.registration?.title,
-          price: r.registration?.price,
-          image_url: r.registration?.image_url,
-          url: r.url,
-          company_slug: r.company_slug,
-          company_sub_type: r.company_sub_type,
-          meta_description: r.meta_description,
-          image_url: r.registration.image_url,
-          sub_type: r.registration.sub_type,
-          type_name: r.registration.type_name,
-          }));
-
-      productDetailPages = (productRes.data?.results || [])
-          .slice(0, 12)
-          .map(p => ({
-          id: p.id,
-          name: p.product?.name,
-          price: p.product?.price,
-          image_url: p.product?.image_url,
-          url: p.url,
-
-          category: p.product.category_name,
-          company_sub_type: p.company_sub_type,
-          company_slug: p.company_slug,
-          meta_description: p.meta_description,
-          sku: p.product.sku,
-          rating: p.product.rating,
-          rating_count: p.product.rating_count,
-          product_reviews: (p.reviews || [])
-          .slice(0, 5)
-          .map(review => ({
-              "review_by": review.review_by,
-              "name": review.name ?? null,
-              "created": review.created,
-              "text": review.text,
-              "rating": review.rating,
-          })),
-        }));
+    } else {      
 
         structuredData.push(
           JSON.stringify({
@@ -554,7 +575,7 @@ export async function getServerSideProps(context) {
         registrationDetailPages: [],
         productDetailPages: [],
         structuredData: [],
-        query: [],
+        query: null,
       }
     };
   }

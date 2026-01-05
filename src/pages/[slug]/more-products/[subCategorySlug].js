@@ -8,7 +8,7 @@ import product from '../../../../lib/api/product';
 export default function ListSubCategoryPage({
   isListProductDetailsPage,
   structuredData, subCategory, blogs,
-  locationData, address, metaKeywords
+  locationData, metaKeywords
 }) {  
   return (
     <>
@@ -21,7 +21,7 @@ export default function ListSubCategoryPage({
         metaKeywords={metaKeywords}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -87,7 +87,7 @@ export async function getServerSideProps(context) {
 
     if (!isListProductDetailsPage) throw new Error("Not a product sub type listing page");
 
-    const detailRes = await product.getSubCategories("all");
+    const detailRes = await product.getProductDetailList("all");
     const details = detailRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
@@ -131,9 +131,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page container */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#page`,
             "name": `Sub Categories Wholesale Supplier in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`,
             "description": `${subCategory.name}, bulk pricing, reliable shipping across ${locationData?.name}."`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" }
@@ -142,19 +142,19 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://${locationData?.district_slug || locationData?.state_slug}/products` },
-              { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
+              { "@type": "ListItem", "position": 3, "name": "Products", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products` },
+              { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
             ]
           },
 
           /* C) FAQ (eligible rich result) */
           {
             "@type": "FAQPage",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#faq`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#faq`,
             "mainEntity": subCategory?.faqs?.map(faq => ({
               "@type": "Question",
               "name": faq.question || "",
@@ -183,7 +183,7 @@ export async function getServerSideProps(context) {
           details?.map(detail => ({
             "@type": "Product",
             "@id": `${detail.url}#product`,
-            "name": `${detail.company_name || index + 1} - ${detail.name}`,
+            "name": `${detail.company_name} - ${detail.name}`,
             "description": detail?.description || "",
             "image":[detail?.image_url || "https://bzindia.in/images/logo.svg"],
             "url": `${detail.url}`,
@@ -196,7 +196,7 @@ export async function getServerSideProps(context) {
               "bestRating": "5",
               "worstRating": "1"
             } : undefined,
-            "review": detail?.testimonials.length > 0 ? detail?.testimonials?.map(testimonial => ({
+            "review": detail?.testimonials?.length > 0 ? detail?.testimonials?.map(testimonial => ({
                 "@type": "Review",
                 "author": { "@type": "Person", "name": testimonial.name || testimonial.review_by || "" },
                 "datePublished": testimonial.created || "",
@@ -213,7 +213,7 @@ export async function getServerSideProps(context) {
               "price": detail?.price || "",
               "priceValidUntil": priceValidUntil,
               "availability": "https://schema.org/InStock",
-              "url": `https://${locationData?.district_slug || locationData?.state_slug}/products/${detail.location_slug || detail.slug}-${locationData?.slug}`,
+              "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-products/${detail.location_slug || detail.slug}-${locationData?.slug}`,
               "seller": { "@id": "https://bzindia.in/#org" },
               "shippingDetails": [{
                 "@type": "OfferShippingDetails",

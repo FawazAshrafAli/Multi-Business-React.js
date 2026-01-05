@@ -8,7 +8,7 @@ import service from '../../../../lib/api/service';
 export default function ListSubCategoryPage({
   isListServiceDetailsPage,
   structuredData, subCategory, blogs,
-  locationData, address, metaKeywords
+  locationData, metaKeywords
 }) {  
   return (
     <>
@@ -16,12 +16,12 @@ export default function ListSubCategoryPage({
         <>
         <SeoHead
         meta_description={subCategory?.meta_description?.replace("place_name", locationData?.name) || ""}
-        meta_title={`${subCategory?.full_title} ${locationData?.name || ""}`}
+        meta_title={`${subCategory?.full_title?.replace("place_name", locationData?.name)} ${locationData?.name || ""}`}
         blogs={blogs || []}
         metaKeywords={metaKeywords}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}`}
         />
 
         <Head>
@@ -63,7 +63,6 @@ export async function getServerSideProps(context) {
       urlLocationRes = await location.getUrlLocation("place", subCategorySlug);
     }
 
-
     const urlLocation = urlLocationRes?.data;
 
     const locationData = urlLocation?.data;
@@ -104,7 +103,7 @@ export async function getServerSideProps(context) {
     const details = detailRes.data?.results;
 
     const blogsRes = await blog.getBlogs(`/blog_api/blogs`);
-    const blogs = (blogsRes.data.results || [])
+    const blogs = (blogsRes.data?.results || [])
         .slice(0, 12)
         .map(b => ({
         id: b.id,
@@ -140,9 +139,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#page`,
             "name": `Sub category Services in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}/`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}/`,
             "description": `Get online services in ${address} with expert consultants and quick approvals.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
@@ -167,11 +166,11 @@ export async function getServerSideProps(context) {
                   "position": index + 1,
                   "item": {
                     "@type": "Service",
-                    "@id": `https://${detail?.url}#service`,
+                    "@id": `https://bzindia.in/${detail?.url}#service`,
                     "name": detail?.service?.name || "",
                     "description": detail?.description || detail?.service?.description || "",
                     "image": detail?.service?.image_url || "",
-                    "url": `https://${detail?.url}`
+                    "url": `https://bzindia.in/${detail?.url}`
                   }
               }))
             }
@@ -180,19 +179,19 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Services", "item": `https://${locationData?.district_slug || locationData?.state_slug}/more-services` },
-              { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
+              { "@type": "ListItem", "position": 3, "name": "Services", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services` },
+              { "@type": "ListItem", "position": 4, "name": `${subCategory?.full_title} ${locationData?.name}`, "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}` },
             ]
           },
 
           /* C) FAQ */
           {
             "@type": "FAQPage",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#faq`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services/${subCategory?.locationSlug || subCategory?.slug}-${locationData?.slug}#faq`,
             "mainEntity": subCategory?.faqs?.map(faq => ({
                 "@type": "Question",
                 "name": faq?.question || "",
@@ -206,10 +205,10 @@ export async function getServerSideProps(context) {
           /* D) Provider with ratings */
           details?.map((detail, index) => ({
             "@type": "ProfessionalService",
-            "@id": `https://${detail.url}#service`,
+            "@id": `https://bzindia.in/${detail.url}#service`,
             "name": `${detail.company_name || index + 1} - ${detail.service?.name}`, 
             "image": detail.company_logo_url || "",
-            "url": `https://${detail.url}`,
+            "url": `https://bzindia.in/${detail.url}`,
             "telephone": detail?.company_contact? `+91-${detail?.company_contact}`: "",
             "priceRange": detail?.service?.price? `₹${detail?.service?.price}` : "",
             "address": {

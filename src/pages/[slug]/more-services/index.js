@@ -16,11 +16,11 @@ export default function ListSubCategoriePage({
         <>
         <SeoHead
         meta_description={`Get online services in ${address} with expert consultants and quick approvals.`}
-        meta_title={`Sub category Services in ${address}`}
+        meta_title={`Services in ${locationData?.name}`}
         blogs={blogs || []}
 
 
-        url = {`https://${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services`}
+        url = {`https://bzindia.in/${locationData?.district_slug || locationData?.state_slug || locationData?.slug}/more-services`}
         />
 
         <Head>
@@ -67,7 +67,7 @@ export async function getServerSideProps(context) {
       }
     } catch (err) {
       const stateRes = await location.getMinimalState(slug);
-      const state = stateRes.data;          
+      const state = stateRes.data;
       
       isSubCategoryListingPage = true;
       
@@ -118,9 +118,9 @@ export async function getServerSideProps(context) {
           /* A) Listing page */
           {
             "@type": ["WebPage","CollectionPage"],
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services#page`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services#page`,
             "name": `Sub category Services in ${address}`,
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services/`,
             "description": `Get online services in ${address} with expert consultants and quick approvals.`,
             "image": "https://bzindia.in/images/logo.svg",
             "isPartOf": { "@type": "WebSite", "url": "https://bzindia.in", "name": "BZIndia" },
@@ -145,11 +145,11 @@ export async function getServerSideProps(context) {
                   "position": index + 1,
                   "item": {
                     "@type": "Service",
-                    "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#service`,
+                    "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#service`,
                     "name": subCategory?.full_title || "",
                     "description": subCategory?.meta_description || "",
                     "image": subCategory?.image_url || "",
-                    "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`
+                    "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`
                   }
               }))
             }
@@ -158,18 +158,18 @@ export async function getServerSideProps(context) {
           /* B) Breadcrumbs */
           {
             "@type": "BreadcrumbList",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services#breadcrumbs`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services#breadcrumbs`,
             "itemListElement": [
               { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://bzindia.in/" },
               { "@type": "ListItem", "position": 2, "name": locationData?.district_name || locationData?.state_name || locationData?.name, "item": `https://bzindia.in/${locationData?.state_slug || locationData?.district_slug || locationData?.slug}` },
-              { "@type": "ListItem", "position": 3, "name": "Services", "item": `https://${locationData?.district_slug || locationData?.state_slug}/more-services` },
+              { "@type": "ListItem", "position": 3, "name": "Services", "item": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services` },
             ]
           },
 
           /* C) FAQ */
           // {
           //   "@type": "FAQPage",
-          //   "@id": "https://bzindia.in/kerala/services/CompanySubType/subcatogry-services-in-malappuram#faq",
+          //   "@id": "https://bzindia.in/kerala/more-services/CompanySubType/subcatogry-services-in-malappuram#faq",
           //   "mainEntity": [
           //     {
           //       "@type": "Question",
@@ -193,10 +193,10 @@ export async function getServerSideProps(context) {
           /* D) Provider with ratings */
           subCategories?.map((subCategory, index) => ({
             "@type": "ProfessionalService",
-            "@id": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#service`,
+            "@id": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}#service`,
             "name": `${subCategory.company_name || index + 1} - ${subCategory.name}`, 
             "image": subCategory.company_logo_url || "",
-            "url": `https://${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
+            "url": `https://bzindia.in/${locationData?.district_slug || locationData?.state_slug}/more-services/${subCategory.location_slug || subCategory.slug}-${locationData?.slug}`,
             "telephone": subCategory?.company_contact? `+91-${subCategory?.company_contact}`: "",
             "priceRange": subCategory?.price? `₹${subCategory?.price}` : "",
             "address": {

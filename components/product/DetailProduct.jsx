@@ -7,12 +7,18 @@ import $ from 'jquery';
 import  "/public/easy-responsive-tabs.js";
 import Cookies from 'js-cookie';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import AuthContext from '../context/AuthContext';
 
 const DetailProduct = ({
   detailPage, currentCompany,
-  setMessage, setMessageClass
+  setMessage, setMessageClass,
+  user
   }) => {
   const [formData, setFormData] = useState({});
+  const router = useRouter();
+
+  const {setUserCartCount} = useContext(AuthContext);
 
   const [sanitizedDescription, setSanitizedDescription] = useState();
   const [qty, setQty] = useState(1);
@@ -76,8 +82,13 @@ const DetailProduct = ({
         return () => clearTimeout(timeout);
       }, []);
 
-  const handleAddToCart = async (e) => {
+  const handleAddToCart = async (e, buyNow = false) => {
     e.preventDefault();
+
+    if (!user) {
+      router.push('/login');
+      return;
+    }
 
     const csrfToken = Cookies.get('csrfToken');
 
@@ -97,15 +108,24 @@ const DetailProduct = ({
       },      
       )
 
-      const { success, message } = response?.data || {};
+      const { success, message, cart_count } = response?.data || {};
 
 
-      setMessageClass(success ? "bg-success" : "bg-danger");
-      setMessage(message);
-
+      
       if (success) {
-          setQty(1);
+        if (buyNow) {
+          router.push("/cart")
+          return;
+        }
+
+        setMessageClass(success ? "bg-success" : "bg-danger");
+        setMessage(message);
+        setQty(1);
       }
+
+      if (cart_count) {
+        setUserCartCount(cart_count);
+      }      
 
     } catch (err) {
       console.error("Submission failed:", err);
@@ -192,17 +212,15 @@ const DetailProduct = ({
           </div>
         </div>
 
-        {detailPage?.size &&    
+        {/* {detailPage?.size &&    
             <div className="opt">
                 <div className="lbl">Size</div>
                 <div className="swatches" id="sizes">
-                    <label className="swatch active" data-size={detailPage?.size}>{detailPage?.size}</label>
-                    {/* <label className="swatch" data-size="500">500g</label>
-                    <label className="swatch" data-size="1000">1kg</label> */}
+                    <label className="swatch active" data-size={detailPage?.size}>{detailPage?.size}</label>                    
                 </div>
                 <div className="help">Price updates with size.</div>
             </div>
-        }
+        } */}
 
         <div className="opt">
           <div className="row">
@@ -212,17 +230,17 @@ const DetailProduct = ({
               <button id="inc" onClick={() => setQty(prev => prev + 1)}>+</button>
             </div>
             <button className="btn primary" id="addCart" onClick={(e) => handleAddToCart(e)}>Add to Cart</button>
-            <button className="btn ghost" id="buyNow">Buy Now</button>
-            <button className="btn wish" id="wishBtn">♡ Wishlist</button>
+            <button className="btn ghost" id="buyNow" onClick={(e) => handleAddToCart(e, true)}>Buy Now</button>
+            {/* <button className="btn wish" id="wishBtn">♡ Wishlist</button> */}
           </div>
         </div>
 
         <div className="opt">
-          <div className="ship">
+          {/* <div className="ship">
             <input className="input" id="pincode" placeholder="Enter pincode for delivery ETA" />
             <button className="btn ghost" id="checkPin">Check</button>
    
-          </div>
+          </div> */}
           
           <div className="share">
       

@@ -14,7 +14,7 @@ import location from '../../../lib/api/location';
 import metaTag from '../../../lib/api/metaTag';
 import blog from '../../../lib/api/blog';
 import home from '../../../lib/api/home';
-import State from '../../../components/common/State';
+import State from '../../../components/State';
 import District from '../../../components/District';
 
 const CompanyHome = dynamic(() => import('../../../components/CompanyHome'), { ssr: false });
@@ -49,8 +49,8 @@ const CompanyHomePage = ({
 
         : isStatePage ?
           <SeoHead
-          meta_description={`Discover ${state?.name}, one of the most beautiful states in India, along with a complete list of districts, towns, and key locations.` }
-          meta_title={`${state?.name}- Overview | Explore State-Wise, District-Wise & City Locations - ${homeContent?.[0]?.meta_title || ""}`}
+          meta_description={`List of services available in ${state?.name}` }
+          meta_title={state?.name}
           metaTags={metaTags}
           
           blogs={blogs}
@@ -160,14 +160,15 @@ export async function getServerSideProps(context) {
           price: c.course?.price?? null,
           url: c.url?? null,
           meta_description: c.meta_description?? null,
-          company_name: c.course.company_name?? null,
-          mode: c.course.mode?? null,
-          ending_date: c.course.ending_date?? null,
-          starting_date: c.course.starting_date?? null,
-          duration: c.course.duration?? null,
-          program_name: c.course.program_name?? null,
-          rating: c.course.rating?? null,
-          rating_count: c.course.rating_count?? null,
+          company_name: c.course?.company_name?? null,
+          mode: c.course?.mode?? null,
+          ending_date: c.course?.ending_date?? null,
+          starting_date: c.course?.starting_date?? null,
+          duration: c.course?.duration?? null,
+          duration_type: c.course?.duration_type?? null,
+          program_name: c.course?.program_name?? null,
+          rating: c.course?.rating?? null,
+          rating_count: c.course?.rating_count?? null,
           }));
 
         const testimonialsRes = await course.getTestimonials(slug);
@@ -183,7 +184,8 @@ export async function getServerSideProps(context) {
           name: s.name?? null,
           price: s.price?? null,
           image_url: s.image_url?? null,
-          duration_count: s.duration_count?? null,
+          duration: s.duration?? null,
+          duration_type: s.duration_type?? null,
           url: s.url?? null,
 
           sub_category_name: s.sub_category_name?? null,
@@ -875,14 +877,14 @@ export async function getServerSideProps(context) {
                   subCategory => subCategory?.company_slug === company.slug
                 ).map(subCat => ({
                     "@type": "Offer",
-                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/services/${subCat?.location_slug || subCat?.slug}/#offer`,
+                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/view-services/${subCat?.location_slug || subCat?.slug}/#offer`,
                     "price": subCat?.price,
                     "priceCurrency": "INR",
-                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/services/${subCat?.location_slug || subCat?.slug}/`,
+                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/view-services/${subCat?.location_slug || subCat?.slug}/`,
                     "availability": "https://schema.org/InStock",
                     "itemOffered": {
                       "@type": "Service",
-                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/services/${subCat?.location_slug || subCat?.slug}/#service`,
+                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/view-services/${subCat?.location_slug || subCat?.slug}/#service`,
                       "name": subCat?.name,
                       "description": subCat?.meta_description || ""
                     }
@@ -906,14 +908,14 @@ export async function getServerSideProps(context) {
                 "aggregateRating": company?.rating_count > 0 ? { "@type": "AggregateRating", "ratingValue": Number(company?.rating), "reviewCount": Number(company?.rating_count) } : undefined,
                 "makesOffer": registrationSubTypes?.map(subType => ({
                     "@type": "Offer",
-                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/filings/${subType?.location_slug || subType?.slug}/#offer`,
+                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/startup-services/${subType?.location_slug || subType?.slug}/#offer`,
                     "price": subType?.price || "",
                     "priceCurrency": "INR",
-                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/filings/${subType?.location_slug || subType?.slug}/`,
+                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/startup-services/${subType?.location_slug || subType?.slug}/`,
                     "availability": "https://schema.org/InStock",
                     "itemOffered": {
                       "@type": "GovernmentService",
-                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/filings/${subType?.location_slug || subType?.slug}/#service`,
+                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/startup-services/${subType?.location_slug || subType?.slug}/#service`,
                       "name": subType?.name,
                       "description": subType?.meta_description || "",
                       "serviceOperator": {
@@ -937,10 +939,10 @@ export async function getServerSideProps(context) {
                 "parentOrganization": { "@id": "https://www.bzindia.in/#org" },
                 "makesOffer": productSubCategories?.map(subCat => ({
                     "@type": "Offer",
-                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/products/${subCat?.location_slug || subCat?.slug}/#offer`,
+                    "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/more-products/${subCat?.location_slug || subCat?.slug}/#offer`,
                     "price": subCat?.price,
                     "priceCurrency": "INR",
-                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/products/${subCat?.location_slug || subCat?.slug}`,
+                    "url": `https://www.bzindia.in/${state?.slug || district?.slug}/more-products/${subCat?.location_slug || subCat?.slug}`,
                     "availability": "https://schema.org/InStock",
                     "seller": { "@id": `https://www.bzindia.in/${company?.slug}/#org` }
                   }))
@@ -950,20 +952,20 @@ export async function getServerSideProps(context) {
               /* Product nodes (ratings ON Product; offers linked by @id) */
               productSubCategories?.map(subCat => ({
                 "@type": "Product",
-                "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/products/${subCat?.location_slug || subCat?.slug}/#product`,
+                "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/more-products/${subCat?.location_slug || subCat?.slug}/#product`,
                 "name": subCat?.name,
                 "description": subCat?.meta_description?.replace("place_name", state?.name),
                 "image": subCat?.image_url,
                 "brand": { "@type": "Brand", "name": subCat?.brand_name },
                 "manufacturer": { "@id": `https://www.bzindia.in/${subCat?.company_slug}/#org` },
                 "aggregateRating": subCat?.rating_count > 0 ? { "@type": "AggregateRating", "ratingValue": Number(subCat?.rating), "reviewCount": Number(subCat?.rating_count) } : undefined,
-                "offers": { "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/products/${subCat?.location_slug || subCat?.slug}/#offer`}
+                "offers": { "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/more-products/${subCat?.location_slug || subCat?.slug}/#offer`}
               })),              
 
               /* ONE carousel on page: Courses (ratings ON Course) */
               {
                 "@type": "ItemList",
-                "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/courses/#list`,
+                "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/more-courses/#list`,
                 "name": "Popular Courses",
                 "itemListOrder": "ItemListOrderAscending",
                 "itemListElement": courseSpecializations?.map((spec, index) => ({
@@ -971,7 +973,7 @@ export async function getServerSideProps(context) {
                     "position": index + 1,
                     "item": {
                       "@type": "Course",
-                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/courses/${spec?.location_slug || spec?.slug}/#course`,
+                      "@id": `https://www.bzindia.in/${state?.slug || district?.slug}/more-courses/${spec?.location_slug || spec?.slug}/#course`,
                       "name": spec?.name,
                       "description": spec?.meta_description?.replace("place_name", state?.name) || spec?.description || spec?.name || "",
                       "provider": { "@id": `https://www.bzindia.in/${spec?.company_slug}/#org` },
@@ -1008,7 +1010,7 @@ export async function getServerSideProps(context) {
     };
 
   } catch (err) {
-    console.error(err);
+    console.error(err);    
 
     return {
       props: {
